@@ -1,0 +1,17 @@
+{
+  "reagents": [
+    {
+      "formula": "BaCl2",
+      "moles": 0.02,
+      "phase": "aq"
+    },
+    {
+      "formula": "Na2SO4",
+      "moles": 0.02,
+      "phase": "aq"
+    }
+  ],
+  "options": {
+    "accuracy": "fast"
+  }
+}

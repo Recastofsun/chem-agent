@@ -1,0 +1,36 @@
+{
+  "reagents": [
+    {
+      "formula": "BaCl2",
+      "moles": 0.02,
+      "phase": "aq"
+    },
+    {
+      "formula": "Na2SO4",
+      "moles": 0.02,
+      "phase": "aq"
+    }
+  ],
+  "known_energies": {
+    "BaSO4": {
+      "delta_Gf_kJ_mol": -1340.0,
+      "delta_Hf_kJ_mol": -1460.0,
+      "source": "гипотетическое значение для проверки",
+      "uncertainty": 3.0,
+      "phase": "s"
+    }
+  },
+  "conditions": {
+    "temperature_K": 298.15
+  },
+  "options": {
+    "accuracy": "balanced",
+    "output_formats": [
+      "json",
+      "html",
+      "markdown"
+    ],
+    "language": "ru",
+    "theme": "light"
+  }
+}

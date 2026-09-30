@@ -1,0 +1,7 @@
+services:
+  chem-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.offline
+    network_mode: "none"
+    ports: []

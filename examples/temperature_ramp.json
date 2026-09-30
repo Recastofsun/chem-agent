@@ -1,0 +1,33 @@
+{
+  "reagents": [
+    {
+      "formula": "NH4Cl",
+      "moles": 0.05,
+      "phase": "aq"
+    },
+    {
+      "formula": "NaOH",
+      "moles": 0.05,
+      "phase": "aq"
+    }
+  ],
+  "conditions": {
+    "temperature_K": 298.15,
+    "temperature_profile": {
+      "type": "ramp",
+      "start_K": 293.15,
+      "end_K": 363.15,
+      "rate_K_per_min": 5
+    }
+  },
+  "options": {
+    "accuracy": "balanced",
+    "output_formats": [
+      "json",
+      "html",
+      "markdown"
+    ],
+    "language": "ru",
+    "theme": "light"
+  }
+}

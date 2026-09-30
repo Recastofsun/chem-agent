@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chem-agent"
+version = "1.0.0"
+description = "Локальный офлайн-предсказатель продуктов неорганических реакций (минимизация энергии Гиббса)"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = {text = "MIT"}
+dependencies = [
+  "numpy==2.4.4", "scipy==1.17.1", "Jinja2==3.1.6", "PyYAML==6.0.3",
+  "fastapi==0.118.0", "uvicorn==0.46.0", "pydantic==2.13.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1", "httpx==0.28.1"]
+
+[project.scripts]
+chem-agent = "chem_agent.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["chem_agent*"]
+
+[tool.setuptools.package-data]
+chem_agent = ["data/*.db", "data/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

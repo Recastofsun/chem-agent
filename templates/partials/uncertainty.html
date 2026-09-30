@@ -1,0 +1,17 @@
+<section id="uncertainty" class="card">
+  <details open><summary><h2>7. Неопределенность</h2></summary>
+  {% set u = d.uncertainty %}
+  {% if u %}
+  <p>Метод: {{ u.method }}, членов ансамбля: {{ u.members }}{% if u.failed %} (не сошлось: {{ u.failed }}){% endif %}.
+     Уверенность <b>{{ u.confidence|pct }}</b> - {{ u.confidence_definition }}.</p>
+  {% if u.delta_G and u.delta_G.n %}<p>ΔG основной реакции по ансамблю: {{ u.delta_G.mean|pm(u.delta_G.std) }} кДж/моль (5-95 %: {{ u.delta_G.p05|num }} … {{ u.delta_G.p95|num }}).</p>{% endif %}
+  {% if u.products %}
+  <div class="table-wrap"><table class="sortable">
+    <thead><tr><th>Продукт</th><th class="n">Среднее, моль</th><th class="n">σ, моль</th><th class="n">5 %</th><th class="n">95 %</th></tr></thead>
+    <tbody>{% for p in u.products %}<tr><td>{{ p.formula|chem }}</td><td class="n">{{ p.mean|num }}</td><td class="n">{{ p.std|num }}</td><td class="n">{{ p.p05|num }}</td><td class="n">{{ p.p95|num }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+  {% if charts.contrib %}<figure><figcaption>Вклад частиц в дисперсию ΔG реакции</figcaption>{{ charts.contrib | safe }}</figure>{% endif %}
+  {% else %}<p class="muted">Не рассчитывалась.</p>{% endif %}
+  </details>
+</section>

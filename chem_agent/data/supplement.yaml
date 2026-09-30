@@ -1,0 +1,63 @@
+# Дополнение к таблицам CRC: частицы, которых нет в CRC-таблицах пакета chemicals.
+# Единицы: dGf, dHf - кДж/моль; S - Дж/(моль*К). sigma - оценка погрешности dGf, кДж/моль.
+# Тип "direct" - значения из NBS Tables of Chemical Thermodynamic Properties (Wagman et al., 1982).
+# Тип "ksp"    - dGf твердого вещества выведен из произведения растворимости (CRC Handbook,
+#                "Solubility Product Constants") и dGf ионов из этой же базы.
+# Тип "e0"     - dGf иона выведен из стандартного электродного потенциала (CRC Handbook): dGf = +zFE0.
+# Значения внесены вручную и прошли независимую сверку (см. CHANGELOG). Погрешность выше, чем у CRC.
+
+direct:
+  - {formula: "CO2", phase: aq, dGf: -385.98, dHf: -413.80, S: 117.6, sigma: 1.5}
+  - {formula: "NH3", phase: aq, dGf: -26.50, dHf: -80.29, S: 111.3, sigma: 1.5}
+  - {formula: "H2S", phase: aq, dGf: -27.83, dHf: -39.7, S: 121.0, sigma: 1.5}
+  - {formula: "SO2", phase: aq, dGf: -300.676, dHf: -322.980, S: 161.9, sigma: 1.5}
+  - {formula: "O2", phase: aq, dGf: 16.4, dHf: -11.7, S: 110.9, sigma: 1.5}
+  - {formula: "H2", phase: aq, dGf: 17.6, dHf: -4.2, S: 57.7, sigma: 1.5}
+  - {formula: "N2", phase: aq, dGf: 18.7, dHf: -10.54, S: 95.8, sigma: 1.5}
+  - {formula: "Cl2", phase: aq, dGf: 6.94, dHf: -23.4, S: 121.0, sigma: 1.5}
+  - {formula: "Br2", phase: aq, dGf: 3.93, dHf: -2.59, S: 130.5, sigma: 1.5}
+  - {formula: "I2", phase: aq, dGf: 16.40, dHf: 22.6, S: 137.2, sigma: 1.5}
+  - {formula: "HClO", phase: aq, dGf: -79.9, dHf: -120.9, S: 142.0, sigma: 2.0}
+  - {formula: "HNO2", phase: aq, dGf: -50.6, dHf: -119.2, S: 135.6, sigma: 2.0}
+  - {formula: "HF", phase: aq, dGf: -296.82, dHf: -320.08, S: 88.7, sigma: 1.5}
+  - {formula: "HCN", phase: aq, dGf: 119.7, dHf: 107.1, S: 124.7, sigma: 1.5}
+  - {formula: "H3PO4", phase: aq, dGf: -1142.54, dHf: -1288.34, S: 158.2, sigma: 1.5}
+  - {formula: "H3BO3", phase: aq, dGf: -968.75, dHf: -1072.32, S: 162.3, sigma: 1.5}
+  - {formula: "CH3COOH", phase: aq, dGf: -396.46, dHf: -485.76, S: 178.7, sigma: 1.5}
+  - {formula: "HCOOH", phase: aq, dGf: -372.3, dHf: -425.43, S: 163.0, sigma: 1.5}
+  - {formula: "H2O2", phase: aq, dGf: -134.03, dHf: -191.17, S: 143.9, sigma: 1.5}
+  - {formula: "C2H5OH", phase: aq, dGf: -181.64, dHf: -288.3, S: 148.5, sigma: 1.5}
+  - {formula: "Cu(NH3)4+2", phase: aq, dGf: -111.07, dHf: -348.5, S: 273.6, sigma: 2.0}
+  - {formula: "Ag(NH3)2+", phase: aq, dGf: -17.12, dHf: -111.29, S: 245.2, sigma: 2.0}
+  - {formula: "Zn(NH3)4+2", phase: aq, dGf: -301.9, dHf: -533.5, S: 301.0, sigma: 2.5}
+  - {formula: "Zn(OH)4-2", phase: aq, dGf: -858.52, sigma: 2.5}
+  - {formula: "I3-", phase: aq, dGf: -51.4, dHf: -51.5, S: 239.3, sigma: 1.5}
+  - {formula: "Ag2S", phase: s, dGf: -40.67, dHf: -32.59, S: 144.01, sigma: 1.5}
+  - {formula: "Fe3O4", phase: s, dGf: -1015.4, dHf: -1118.4, S: 146.4, sigma: 2.0}
+  - {formula: "FeO", phase: s, dGf: -251.4, dHf: -272.0, S: 60.75, sigma: 3.0}
+  - {formula: "NaNO2", phase: s, dGf: -284.6, dHf: -358.7, S: 103.8, sigma: 1.5}
+
+ksp:
+  # Fe(OH)3 и Al(OH)3 - аморфные свежеосажденные фазы: log Ksp = log_k(phreeqc.dat) - 3*14,0
+  # (Fe(OH)3(a): log_k 4,891; Al(OH)3(a): log_k 10,8). Кристаллические фазы (гетит, гиббсит) в
+  # лаборатории образуются медленно.
+  - {formula: "Fe(OH)3", ions: {"Fe+3": 1, "OH-": 3}, ksp: 7.8e-38, sigma: 4.0, note: "аморфный, phreeqc.dat", dS_ref: {dHf: -823.0, dGf: -696.5}}
+  - {formula: "Fe(OH)2", ions: {"Fe+2": 1, "OH-": 2}, ksp: 4.87e-17, sigma: 3.0}
+  - {formula: "Al(OH)3", ions: {"Al+3": 1, "OH-": 3}, ksp: 6.3e-32, sigma: 4.0, note: "аморфный, phreeqc.dat"}
+  - {formula: "Mn(OH)2", ions: {"Mn+2": 1, "OH-": 2}, ksp: 2.06e-13, sigma: 3.0}
+  - {formula: "Cr(OH)3", ions: {"Cr+3": 1, "OH-": 3}, ksp: 6.3e-31, sigma: 5.0}
+  - {formula: "Cu(OH)2", ions: {"Cu+2": 1, "OH-": 2}, ksp: 2.2e-20, sigma: 3.0}
+  - {formula: "Pb(OH)2", ions: {"Pb+2": 1, "OH-": 2}, ksp: 1.43e-20, sigma: 3.0}
+  - {formula: "Ag3PO4", ions: {"Ag+": 3, "PO4-3": 1}, ksp: 8.89e-17, sigma: 3.0}
+  - {formula: "FePO4·2H2O", ions: {"Fe+3": 1, "PO4-3": 1, "H2O": 2}, ksp: 9.91e-16, sigma: 8.0}
+  - {formula: "BaCrO4", ions: {"Ba+2": 1, "CrO4-2": 1}, ksp: 1.17e-10, sigma: 2.0}
+  - {formula: "PbCrO4", ions: {"Pb+2": 1, "CrO4-2": 1}, ksp: 2.8e-13, sigma: 3.0}
+  - {formula: "CaC2O4·H2O", ions: {"Ca+2": 1, "C2O4-2": 1, "H2O": 1}, ksp: 2.32e-9, sigma: 2.0}
+  - {formula: "CaSO3·0.5H2O", ions: {"Ca+2": 1, "SO3-2": 1, "H2O": 0.5}, ksp: 3.1e-7, sigma: 3.0}
+  - {formula: "Mg3(PO4)2", ions: {"Mg+2": 3, "PO4-3": 2}, ksp: 1.04e-24, sigma: 4.0}
+  - {formula: "Pb3(PO4)2", ions: {"Pb+2": 3, "PO4-3": 2}, ksp: 8.0e-43, sigma: 5.0}
+  - {formula: "Ba3(PO4)2", ions: {"Ba+2": 3, "PO4-3": 2}, ksp: 3.4e-23, sigma: 4.0}
+
+e0:
+  # M(z+) + z e- -> M(s): dG = -zFE0, отсюда dGf(ion) = +z*F*E0 (относительно стандартного водородного электрода)
+  - {formula: "Cr+3", element_phase: s, z: 3, E0: -0.744, sigma: 3.0}

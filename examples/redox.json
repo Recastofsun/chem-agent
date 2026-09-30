@@ -1,0 +1,33 @@
+{
+  "reagents": [
+    {
+      "formula": "KMnO4",
+      "moles": 0.004,
+      "phase": "aq"
+    },
+    {
+      "formula": "FeSO4",
+      "moles": 0.02,
+      "phase": "aq"
+    },
+    {
+      "formula": "H2SO4",
+      "moles": 0.02,
+      "phase": "aq"
+    }
+  ],
+  "conditions": {
+    "temperature_K": 298.15,
+    "volume_L": 1.0
+  },
+  "options": {
+    "accuracy": "balanced",
+    "output_formats": [
+      "json",
+      "html",
+      "markdown"
+    ],
+    "language": "ru",
+    "theme": "light"
+  }
+}

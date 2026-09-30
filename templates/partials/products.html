@@ -1,0 +1,22 @@
+<section id="products" class="card">
+  <details open><summary><h2>4. Продукты</h2></summary>
+  {% if d.products %}
+  <div class="table-wrap"><table class="sortable">
+    <thead><tr><th>Формула</th><th>Вид</th><th class="n">Моль</th><th class="n">Масса, г</th><th class="n">ΔGf(T), кДж/моль</th><th>Источник</th><th class="n">Активность</th><th class="n">SI</th></tr></thead>
+    <tbody>{% for p in d.products %}
+      <tr><td><b>{{ p.formula|chem }}</b>{% if p.name_ru %}<div class="small muted">{{ p.name_ru }}</div>{% endif %}</td><td>{{ p.kind_ru }}</td>
+      <td class="n" data-v="{{ p.moles }}">{{ p.moles|num }}</td><td class="n" data-v="{{ p.mass_g }}">{{ p.mass_g|num }}</td>
+      <td class="n" data-v="{{ p.delta_Gf_kJ_mol }}">{{ p.delta_Gf_kJ_mol|pm(p.uncertainty) }}</td><td class="small">{{ p.source }}</td>
+      <td class="n">{{ p.activity|num if p.activity is not none else "-" }}</td><td class="n">{{ p.saturation_index|num(3) if p.saturation_index is not none else "-" }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}<p>Новых веществ нет.</p>{% endif %}
+  <details><summary>Полный равновесный состав</summary>
+  <div class="table-wrap"><table class="sortable">
+    <thead><tr><th>Частица</th><th>Фаза</th><th class="n">Было, моль</th><th class="n">Стало, моль</th><th class="n">Изменение</th><th class="n">Активность</th><th>Источник</th></tr></thead>
+    <tbody>{% for r in d.final_composition or [] %}
+      <tr><td>{{ r.formula|chem }}</td><td>{{ r.phase }}</td><td class="n" data-v="{{ r.initial_mol }}">{{ r.initial_mol|num }}</td><td class="n" data-v="{{ r.final_mol }}">{{ r.final_mol|num }}</td>
+      <td class="n" data-v="{{ r.change_mol }}">{{ r.change_mol|num }}</td><td class="n">{{ r.activity|num if r.activity is not none else "-" }}</td><td class="small">{{ r.source }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  </details>
+  </details>
+</section>

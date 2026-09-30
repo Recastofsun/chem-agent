@@ -1,0 +1,28 @@
+<section id="input" class="card">
+  <details open><summary><h2>2. Входные данные</h2></summary>
+  {% set c = d.input.conditions %}
+  <div class="table-wrap"><table class="sortable">
+    <thead><tr><th>Реагент</th><th>Фаза</th><th class="n">Моль</th><th class="n">Концентрация, М</th><th>Энергия</th></tr></thead>
+    <tbody>{% for r in d.input.reagents %}
+      <tr><td>{{ r.formula|chem }}</td><td>{{ r.phase }}{% if r.phase_guessed %} <span class="muted">(принята)</span>{% endif %}</td>
+      <td class="n">{{ r.moles|num }}</td><td class="n">{{ r.concentration_M|num if r.concentration_M else "-" }}</td>
+      <td>{{ "задана пользователем" if r.known_energy else "из базы" }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  <dl class="grid2">
+    <dt>Температура</dt><dd>{{ c.temperature_K|num }} K ({{ (c.temperature_K - 273.15)|num(3) }} °C)</dd>
+    <dt>Давление</dt><dd>{{ c.pressure_atm|num }} атм</dd>
+    <dt>Объем</dt><dd>{{ c.volume_L|num }} л</dd>
+    <dt>Растворитель</dt><dd>{{ c.solvent.name }}{% if c.solvent.dielectric_constant %}, ε = {{ c.solvent.dielectric_constant|num }}{% endif %}{% if c.solvent.ionic_strength_M is not none and c.solvent.ionic_strength_M %}, фиксированная ионная сила {{ c.solvent.ionic_strength_M|num }} М{% endif %}</dd>
+    <dt>Модель активности</dt><dd>{{ d.options.activity_model }}</dd>
+    {% if c.temperature_profile %}<dt>Профиль T</dt><dd>{{ c.temperature_profile.type }}: {{ c.temperature_profile.start_K|num }} → {{ c.temperature_profile.end_K|num }} K, {{ c.temperature_profile.rate_K_per_min|num }} K/мин</dd>{% endif %}
+    {% if c.pH and c.pH.initial is not none %}<dt>pH</dt><dd>{{ c.pH.initial|num }}{% if c.pH.buffered %} (буфер){% endif %}</dd>{% endif %}
+    {% if c.atmosphere %}<dt>Атмосфера</dt><dd>{% for k, v in (c.atmosphere.composition or {}).items() %}{{ k }} {{ v|num }}{% if not loop.last %}, {% endif %}{% endfor %}</dd>{% endif %}
+    {% if c.catalyst and c.catalyst.formula %}<dt>Катализатор</dt><dd>{{ c.catalyst.formula }}</dd>{% endif %}
+  </dl>
+  <h3>Источники энергий (приоритет)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Источник</th><th>Доступен</th><th>Использован</th><th>Комментарий</th></tr></thead>
+    <tbody>{% for e in d.energy_chain %}<tr><td>{{ e.level }}</td><td>{{ e.source }}</td><td>{{ "да" if e.available else "нет" }}</td><td>{{ "да" if e.used else "нет" }}</td><td class="small">{{ e.note }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  </details>
+</section>

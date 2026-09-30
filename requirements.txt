@@ -1,0 +1,19 @@
+# Точные версии; колеса для Windows x64 / CPython 3.11 лежат в offline_cache\wheels
+numpy==2.4.4
+scipy==1.17.1
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+PyYAML==6.0.3
+fastapi==0.118.0
+starlette==0.48.0
+pydantic==2.13.3
+pydantic_core==2.46.3
+annotated-types==0.8.0
+typing_extensions==4.16.0
+typing-inspection==0.4.4
+anyio==4.15.1
+idna==3.20
+uvicorn==0.46.0
+click==8.5.0
+h11==0.16.0
+colorama==0.4.6

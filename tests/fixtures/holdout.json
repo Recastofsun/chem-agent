@@ -1,0 +1,1595 @@
+[
+ {
+  "id": "hold-001",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "AgCl",
+  "expected_any": [
+   "AgCl",
+   "NaNO3"
+  ],
+  "equation": "AgNO3 + NaCl -> AgCl + NaNO3",
+  "in_scope": true,
+  "note": "silver chloride"
+ },
+ {
+  "id": "hold-002",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "BaCl2",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "BaSO4",
+  "expected_any": [
+   "BaSO4",
+   "NaCl"
+  ],
+  "equation": "BaCl2 + Na2SO4 -> BaSO4 + 2NaCl",
+  "in_scope": true,
+  "note": "barium sulfate"
+ },
+ {
+  "id": "hold-003",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "PbI2",
+  "expected_any": [
+   "PbI2",
+   "KNO3"
+  ],
+  "equation": "Pb(NO3)2 + 2KI -> PbI2 + 2KNO3",
+  "in_scope": true,
+  "note": "lead iodide"
+ },
+ {
+  "id": "hold-004",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "CuSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Cu(OH)2",
+  "expected_any": [
+   "Cu(OH)2",
+   "Na2SO4"
+  ],
+  "equation": "CuSO4 + 2NaOH -> Cu(OH)2 + Na2SO4",
+  "in_scope": true,
+  "note": "copper hydroxide"
+ },
+ {
+  "id": "hold-005",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "FeCl3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.15,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Fe(OH)3",
+  "expected_any": [
+   "Fe(OH)3",
+   "NaCl"
+  ],
+  "equation": "FeCl3 + 3NaOH -> Fe(OH)3 + 3NaCl",
+  "in_scope": true,
+  "note": "iron(III) hydroxide"
+ },
+ {
+  "id": "hold-006",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "CaCl2",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2CO3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CaCO3",
+  "expected_any": [
+   "CaCO3",
+   "NaCl"
+  ],
+  "equation": "CaCl2 + Na2CO3 -> CaCO3 + 2NaCl",
+  "in_scope": true,
+  "note": "calcium carbonate"
+ },
+ {
+  "id": "hold-007",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "ZnSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Zn(OH)2",
+  "expected_any": [
+   "Zn(OH)2",
+   "Na2SO4"
+  ],
+  "equation": "ZnSO4 + 2NaOH -> Zn(OH)2 + Na2SO4",
+  "in_scope": true,
+  "note": "stoichiometric NaOH to avoid zincate"
+ },
+ {
+  "id": "hold-008",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "MgCl2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Mg(OH)2",
+  "expected_any": [
+   "Mg(OH)2",
+   "NaCl"
+  ],
+  "equation": "MgCl2 + 2NaOH -> Mg(OH)2 + 2NaCl",
+  "in_scope": true,
+  "note": "magnesium hydroxide"
+ },
+ {
+  "id": "hold-009",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KBr",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "AgBr",
+  "expected_any": [
+   "AgBr",
+   "KNO3"
+  ],
+  "equation": "AgNO3 + KBr -> AgBr + KNO3",
+  "in_scope": true,
+  "note": "silver bromide"
+ },
+ {
+  "id": "hold-010",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "PbSO4",
+  "expected_any": [
+   "PbSO4",
+   "NaNO3"
+  ],
+  "equation": "Pb(NO3)2 + Na2SO4 -> PbSO4 + 2NaNO3",
+  "in_scope": true,
+  "note": "lead sulfate"
+ },
+ {
+  "id": "hold-011",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "CaCl2",
+    "moles": 0.06,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na3PO4",
+    "moles": 0.04,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Ca3(PO4)2",
+  "expected_any": [
+   "Ca3(PO4)2",
+   "NaCl"
+  ],
+  "equation": "3CaCl2 + 2Na3PO4 -> Ca3(PO4)2 + 6NaCl",
+  "in_scope": true,
+  "note": "calcium phosphate"
+ },
+ {
+  "id": "hold-012",
+  "category": "precipitation",
+  "reagents": [
+   {
+    "formula": "NiSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Ni(OH)2",
+  "expected_any": [
+   "Ni(OH)2",
+   "Na2SO4"
+  ],
+  "equation": "NiSO4 + 2NaOH -> Ni(OH)2 + Na2SO4",
+  "in_scope": true,
+  "note": "nickel hydroxide"
+ },
+ {
+  "id": "hold-013",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "NaCl",
+  "expected_any": [
+   "NaCl",
+   "H2O"
+  ],
+  "equation": "HCl + NaOH -> NaCl + H2O",
+  "in_scope": true,
+  "note": "strong acid strong base"
+ },
+ {
+  "id": "hold-014",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "H2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "KOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "K2SO4",
+  "expected_any": [
+   "K2SO4",
+   "H2O"
+  ],
+  "equation": "H2SO4 + 2KOH -> K2SO4 + 2H2O",
+  "in_scope": true,
+  "note": "diprotic acid full neutralization"
+ },
+ {
+  "id": "hold-015",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "HNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "KNO3",
+  "expected_any": [
+   "KNO3",
+   "H2O"
+  ],
+  "equation": "HNO3 + KOH -> KNO3 + H2O",
+  "in_scope": true,
+  "note": "strong acid strong base"
+ },
+ {
+  "id": "hold-016",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "CH3COOH",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CH3COONa",
+  "expected_any": [
+   "CH3COONa",
+   "H2O"
+  ],
+  "equation": "CH3COOH + NaOH -> CH3COONa + H2O",
+  "in_scope": true,
+  "note": "weak acid strong base"
+ },
+ {
+  "id": "hold-017",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "NH4Cl",
+  "expected_any": [
+   "NH4Cl"
+  ],
+  "equation": "HCl + NH3 -> NH4Cl",
+  "in_scope": true,
+  "note": "strong acid weak base"
+ },
+ {
+  "id": "hold-018",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "Ca(OH)2",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CaCl2",
+  "expected_any": [
+   "CaCl2",
+   "H2O"
+  ],
+  "equation": "2HCl + Ca(OH)2 -> CaCl2 + 2H2O",
+  "in_scope": true,
+  "note": "strong acid with alkaline earth hydroxide"
+ },
+ {
+  "id": "hold-019",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "H3PO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.15,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Na3PO4",
+  "expected_any": [
+   "Na3PO4",
+   "H2O"
+  ],
+  "equation": "H3PO4 + 3NaOH -> Na3PO4 + 3H2O",
+  "in_scope": true,
+  "note": "triprotic acid full neutralization"
+ },
+ {
+  "id": "hold-020",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "HF",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "KF",
+  "expected_any": [
+   "KF",
+   "H2O"
+  ],
+  "equation": "HF + KOH -> KF + H2O",
+  "in_scope": true,
+  "note": "weak acid strong base"
+ },
+ {
+  "id": "hold-021",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "H2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "(NH4)2SO4",
+  "expected_any": [
+   "(NH4)2SO4"
+  ],
+  "equation": "H2SO4 + 2NH3 -> (NH4)2SO4",
+  "in_scope": true,
+  "note": "ammonium sulfate"
+ },
+ {
+  "id": "hold-022",
+  "category": "neutralization",
+  "reagents": [
+   {
+    "formula": "HBr",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "NaBr",
+  "expected_any": [
+   "NaBr",
+   "H2O"
+  ],
+  "equation": "HBr + NaOH -> NaBr + H2O",
+  "in_scope": true,
+  "note": "strong acid strong base"
+ },
+ {
+  "id": "hold-023",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "CaCO3",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CO2",
+  "expected_any": [
+   "CO2",
+   "CaCl2",
+   "H2O"
+  ],
+  "equation": "CaCO3 + 2HCl -> CaCl2 + H2O + CO2",
+  "in_scope": true,
+  "note": "carbonate plus acid"
+ },
+ {
+  "id": "hold-024",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "Na2CO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CO2",
+  "expected_any": [
+   "CO2",
+   "NaCl",
+   "H2O"
+  ],
+  "equation": "Na2CO3 + 2HCl -> 2NaCl + H2O + CO2",
+  "in_scope": true,
+  "note": "carbonate plus acid"
+ },
+ {
+  "id": "hold-025",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "NaHCO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CO2",
+  "expected_any": [
+   "CO2",
+   "NaCl",
+   "H2O"
+  ],
+  "equation": "NaHCO3 + HCl -> NaCl + H2O + CO2",
+  "in_scope": true,
+  "note": "bicarbonate plus acid"
+ },
+ {
+  "id": "hold-026",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "Na2S",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2S",
+  "expected_any": [
+   "H2S",
+   "NaCl"
+  ],
+  "equation": "Na2S + 2HCl -> 2NaCl + H2S",
+  "in_scope": true,
+  "note": "sulfide plus acid"
+ },
+ {
+  "id": "hold-027",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "FeS",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2S",
+  "expected_any": [
+   "H2S",
+   "FeCl2"
+  ],
+  "equation": "FeS + 2HCl -> FeCl2 + H2S",
+  "in_scope": true,
+  "note": "metal sulfide plus acid"
+ },
+ {
+  "id": "hold-028",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "K2CO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CO2",
+  "expected_any": [
+   "CO2",
+   "K2SO4",
+   "H2O"
+  ],
+  "equation": "K2CO3 + H2SO4 -> K2SO4 + H2O + CO2",
+  "in_scope": true,
+  "note": "carbonate plus sulfuric acid"
+ },
+ {
+  "id": "hold-029",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "BaCO3",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HNO3",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "CO2",
+  "expected_any": [
+   "CO2",
+   "Ba(NO3)2",
+   "H2O"
+  ],
+  "equation": "BaCO3 + 2HNO3 -> Ba(NO3)2 + H2O + CO2",
+  "in_scope": true,
+  "note": "carbonate plus nitric acid"
+ },
+ {
+  "id": "hold-030",
+  "category": "gas_evolution",
+  "reagents": [
+   {
+    "formula": "NH4Cl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 353,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "NH3",
+  "expected_any": [
+   "NH3",
+   "NaCl",
+   "H2O"
+  ],
+  "equation": "NH4Cl + NaOH -> NaCl + NH3 + H2O",
+  "in_scope": true,
+  "note": "heated to drive off ammonia"
+ },
+ {
+  "id": "hold-031",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Zn",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2",
+  "expected_any": [
+   "H2",
+   "ZnCl2"
+  ],
+  "equation": "Zn + 2HCl -> ZnCl2 + H2",
+  "in_scope": true,
+  "note": "metal plus acid"
+ },
+ {
+  "id": "hold-032",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Mg",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2",
+  "expected_any": [
+   "H2",
+   "MgSO4"
+  ],
+  "equation": "Mg + H2SO4 -> MgSO4 + H2",
+  "in_scope": true,
+  "note": "metal plus dilute acid"
+ },
+ {
+  "id": "hold-033",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Fe",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2",
+  "expected_any": [
+   "H2",
+   "FeCl2"
+  ],
+  "equation": "Fe + 2HCl -> FeCl2 + H2",
+  "in_scope": true,
+  "note": "iron gives Fe(II)"
+ },
+ {
+  "id": "hold-034",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Al",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.3,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2",
+  "expected_any": [
+   "H2",
+   "AlCl3"
+  ],
+  "equation": "2Al + 6HCl -> 2AlCl3 + 3H2",
+  "in_scope": true,
+  "note": "aluminium plus acid"
+ },
+ {
+  "id": "hold-035",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Zn",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "CuSO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Cu",
+  "expected_any": [
+   "Cu",
+   "ZnSO4"
+  ],
+  "equation": "Zn + CuSO4 -> Cu + ZnSO4",
+  "in_scope": true,
+  "note": "displacement"
+ },
+ {
+  "id": "hold-036",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Fe",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "CuSO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Cu",
+  "expected_any": [
+   "Cu",
+   "FeSO4"
+  ],
+  "equation": "Fe + CuSO4 -> Cu + FeSO4",
+  "in_scope": true,
+  "note": "displacement"
+ },
+ {
+  "id": "hold-037",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Cu",
+    "moles": 0.05,
+    "phase": "s"
+   },
+   {
+    "formula": "AgNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Ag",
+  "expected_any": [
+   "Ag",
+   "Cu(NO3)2"
+  ],
+  "equation": "Cu + 2AgNO3 -> 2Ag + Cu(NO3)2",
+  "in_scope": true,
+  "note": "displacement of silver"
+ },
+ {
+  "id": "hold-038",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Zn",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Pb",
+  "expected_any": [
+   "Pb",
+   "Zn(NO3)2"
+  ],
+  "equation": "Zn + Pb(NO3)2 -> Pb + Zn(NO3)2",
+  "in_scope": true,
+  "note": "displacement of lead"
+ },
+ {
+  "id": "hold-039",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Cl2",
+    "moles": 0.05,
+    "phase": "g"
+   },
+   {
+    "formula": "KBr",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Br2",
+  "expected_any": [
+   "Br2",
+   "KCl"
+  ],
+  "equation": "Cl2 + 2KBr -> Br2 + 2KCl",
+  "in_scope": true,
+  "note": "halogen displacement"
+ },
+ {
+  "id": "hold-040",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Br2",
+    "moles": 0.05,
+    "phase": "l"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "I2",
+  "expected_any": [
+   "I2",
+   "KBr"
+  ],
+  "equation": "Br2 + 2KI -> I2 + 2KBr",
+  "in_scope": true,
+  "note": "halogen displacement"
+ },
+ {
+  "id": "hold-041",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "KMnO4",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "FeSO4",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.08,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "MnSO4",
+  "expected_any": [
+   "MnSO4",
+   "Fe2(SO4)3",
+   "K2SO4",
+   "H2O"
+  ],
+  "equation": "2KMnO4 + 10FeSO4 + 8H2SO4 -> 2MnSO4 + 5Fe2(SO4)3 + K2SO4 + 8H2O",
+  "in_scope": true,
+  "note": "permanganate oxidises Fe(II) in acid"
+ },
+ {
+  "id": "hold-042",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "K2Cr2O7",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "FeSO4",
+    "moles": 0.12,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.14,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "Cr2(SO4)3",
+  "expected_any": [
+   "Cr2(SO4)3",
+   "Fe2(SO4)3",
+   "K2SO4",
+   "H2O"
+  ],
+  "equation": "K2Cr2O7 + 6FeSO4 + 7H2SO4 -> Cr2(SO4)3 + 3Fe2(SO4)3 + K2SO4 + 7H2O",
+  "in_scope": true,
+  "note": "dichromate oxidises Fe(II) in acid"
+ },
+ {
+  "id": "hold-043",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "H2O2",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.2,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "I2",
+  "expected_any": [
+   "I2",
+   "K2SO4",
+   "H2O"
+  ],
+  "equation": "H2O2 + 2KI + H2SO4 -> I2 + K2SO4 + 2H2O",
+  "in_scope": true,
+  "note": "peroxide oxidises iodide"
+ },
+ {
+  "id": "hold-044",
+  "category": "redox",
+  "reagents": [
+   {
+    "formula": "Na",
+    "moles": 0.1,
+    "phase": "s"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": "H2",
+  "expected_any": [
+   "H2",
+   "NaOH"
+  ],
+  "equation": "2Na + 2H2O -> 2NaOH + H2",
+  "in_scope": true,
+  "note": "alkali metal with water"
+ },
+ {
+  "id": "hold-045",
+  "category": "dry_thermal",
+  "reagents": [
+   {
+    "formula": "CaCO3",
+    "moles": 1,
+    "phase": "s"
+   }
+  ],
+  "temperature_K": 1300,
+  "solvent": "none",
+  "volume_L": 1,
+  "expected_main": "CaO",
+  "expected_any": [
+   "CaO",
+   "CO2"
+  ],
+  "equation": "CaCO3 -> CaO + CO2",
+  "in_scope": true,
+  "note": "limestone calcination above 1100 K"
+ },
+ {
+  "id": "hold-046",
+  "category": "dry_thermal",
+  "reagents": [
+   {
+    "formula": "KClO3",
+    "moles": 1,
+    "phase": "s"
+   }
+  ],
+  "temperature_K": 800,
+  "solvent": "none",
+  "volume_L": 1,
+  "expected_main": "KCl",
+  "expected_any": [
+   "KCl",
+   "O2"
+  ],
+  "equation": "2KClO3 -> 2KCl + 3O2",
+  "in_scope": true,
+  "note": "chlorate decomposition"
+ },
+ {
+  "id": "hold-047",
+  "category": "dry_thermal",
+  "reagents": [
+   {
+    "formula": "NaHCO3",
+    "moles": 1,
+    "phase": "s"
+   }
+  ],
+  "temperature_K": 500,
+  "solvent": "none",
+  "volume_L": 1,
+  "expected_main": "Na2CO3",
+  "expected_any": [
+   "Na2CO3",
+   "CO2",
+   "H2O"
+  ],
+  "equation": "2NaHCO3 -> Na2CO3 + H2O + CO2",
+  "in_scope": true,
+  "note": "bicarbonate decomposition"
+ },
+ {
+  "id": "hold-048",
+  "category": "dry_thermal",
+  "reagents": [
+   {
+    "formula": "Mg",
+    "moles": 1,
+    "phase": "s"
+   },
+   {
+    "formula": "O2",
+    "moles": 0.5,
+    "phase": "g"
+   }
+  ],
+  "temperature_K": 800,
+  "solvent": "none",
+  "volume_L": 10,
+  "expected_main": "MgO",
+  "expected_any": [
+   "MgO"
+  ],
+  "equation": "2Mg + O2 -> 2MgO",
+  "in_scope": true,
+  "note": "metal oxidation"
+ },
+ {
+  "id": "hold-049",
+  "category": "dry_thermal",
+  "reagents": [
+   {
+    "formula": "Fe",
+    "moles": 1,
+    "phase": "s"
+   },
+   {
+    "formula": "S",
+    "moles": 1,
+    "phase": "s"
+   }
+  ],
+  "temperature_K": 800,
+  "solvent": "none",
+  "volume_L": 1,
+  "expected_main": "FeS",
+  "expected_any": [
+   "FeS"
+  ],
+  "equation": "Fe + S -> FeS",
+  "in_scope": true,
+  "note": "iron sulfide synthesis"
+ },
+ {
+  "id": "hold-050",
+  "category": "dry_thermal",
+  "reagents": [
+   {
+    "formula": "Al",
+    "moles": 2,
+    "phase": "s"
+   },
+   {
+    "formula": "Fe2O3",
+    "moles": 1,
+    "phase": "s"
+   }
+  ],
+  "temperature_K": 1200,
+  "solvent": "none",
+  "volume_L": 1,
+  "expected_main": "Al2O3",
+  "expected_any": [
+   "Al2O3",
+   "Fe"
+  ],
+  "equation": "2Al + Fe2O3 -> Al2O3 + 2Fe",
+  "in_scope": true,
+  "note": "thermite"
+ },
+ {
+  "id": "hold-051",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "NaCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "NaCl + KNO3 -> no reaction",
+  "in_scope": true,
+  "note": "all salts soluble"
+ },
+ {
+  "id": "hold-052",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "NaNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "NaNO3 + KCl -> no reaction",
+  "in_scope": true,
+  "note": "all salts soluble"
+ },
+ {
+  "id": "hold-053",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "Cu",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "Cu + HCl -> no reaction",
+  "in_scope": true,
+  "note": "copper below hydrogen in activity series"
+ },
+ {
+  "id": "hold-054",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "Ag",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "Ag + H2SO4(dil) -> no reaction",
+  "in_scope": true,
+  "note": "silver does not reduce H+"
+ },
+ {
+  "id": "hold-055",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "CaCl2",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "CaCl2 + NaNO3 -> no reaction",
+  "in_scope": true,
+  "note": "all salts soluble"
+ },
+ {
+  "id": "hold-056",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "NaCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KBr",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "NaCl + KBr -> no reaction",
+  "in_scope": true,
+  "note": "all salts soluble"
+ },
+ {
+  "id": "hold-057",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "Na2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "Na2SO4 + KCl -> no reaction",
+  "in_scope": true,
+  "note": "all salts soluble"
+ },
+ {
+  "id": "hold-058",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "Cu",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "ZnSO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "Cu + ZnSO4 -> no reaction",
+  "in_scope": true,
+  "note": "copper cannot displace zinc"
+ },
+ {
+  "id": "hold-059",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "Ag",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "CuSO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "Ag + CuSO4 -> no reaction",
+  "in_scope": true,
+  "note": "silver cannot displace copper"
+ },
+ {
+  "id": "hold-060",
+  "category": "no_reaction",
+  "reagents": [
+   {
+    "formula": "MgCl2",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "temperature_K": 298,
+  "solvent": "water",
+  "volume_L": 1,
+  "expected_main": null,
+  "expected_any": [],
+  "equation": "MgCl2 + KNO3 -> no reaction",
+  "in_scope": true,
+  "note": "all salts soluble"
+ }
+]

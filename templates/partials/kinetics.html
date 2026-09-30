@@ -1,0 +1,17 @@
+<section id="kinetics" class="card">
+  <details open><summary><h2>6. Кинетика</h2></summary>
+  {% set k = d.kinetics %}
+  {% if k %}
+  <dl class="grid2">
+    <dt>Модель</dt><dd>{{ k.model }}</dd>
+    <dt>Барьер</dt><dd>{{ k.barrier_kJ_mol|pm(k.uncertainty) }} кДж/моль</dd>
+    <dt>Константа скорости</dt><dd>{{ k.rate_constant|num }} {{ k.rate_constant_units }}</dd>
+    <dt>Период полупревращения</dt><dd>{{ k.half_life_s|num }} с</dd>
+    {% if k.extent_at_duration %}<dt>За {{ k.extent_at_duration.t_s|num }} с</dt><dd>{{ k.extent_at_duration.fraction_of_equilibrium|pct }} от равновесия</dd>{% endif %}
+  </dl>
+  {% if k.note %}<p class="small">{{ k.note }}</p>{% endif %}
+  {% if k.catalyst %}<p class="small">{{ k.catalyst }}</p>{% endif %}
+  {% if charts.kinetics %}<figure><figcaption>Приближение к равновесию</figcaption>{{ charts.kinetics | safe }}</figure>{% endif %}
+  {% else %}<p class="muted">Кинетика не рассчитывалась.</p>{% endif %}
+  </details>
+</section>

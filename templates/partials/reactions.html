@@ -1,0 +1,17 @@
+<section id="reactions" class="card">
+  <details open><summary><h2>3. Возможные реакции</h2></summary>
+  {% if d.balanced_equations %}
+  <div class="table-wrap"><table class="sortable">
+    <thead><tr><th>Уравнение</th><th class="n">ΔG, кДж/моль</th><th class="n">ΔH, кДж/моль</th><th class="n">lg K</th><th>Выполнима</th><th class="n">Уверенность</th></tr></thead>
+    <tbody>{% for e in d.balanced_equations %}
+      <tr><td class="eqcell">{{ e.equation|chem }}</td><td class="n" data-v="{{ e.delta_G_kJ_mol }}">{{ e.delta_G_kJ_mol|pm(e.delta_G_uncertainty) }}</td>
+      <td class="n">{{ e.delta_H_kJ_mol|num }}</td><td class="n" data-v="{{ e.log10_K }}">{{ e.log10_K|pm(e.log10_K_uncertainty) }}</td>
+      <td>{{ "да" if e.feasible else "нет" }}</td><td class="n">{{ e.confidence|pct }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% if d.ionic_equation %}<p>Сокращенное ионное уравнение: <span class="eq">{{ d.ionic_equation.equation|chem }}</span></p>{% endif %}
+  {% if d.balanced_equations[0].energy_sources %}
+  <p class="small muted">Источники энергий: {% for k, v in d.balanced_equations[0].energy_sources.items() %}{{ k|chem }} - {{ v }}{% if not loop.last %}; {% endif %}{% endfor %}</p>
+  {% endif %}
+  {% else %}<p>Реакций нет.</p>{% endif %}
+  </details>
+</section>

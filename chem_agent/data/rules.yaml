@@ -1,0 +1,168 @@
+# Кинетические правила-фильтры.
+# Термодинамика говорит, что возможно; эти правила отсекают то, что при данных условиях
+# кинетически заторможено (известные метастабильные системы). Каждое сработавшее правило
+# попадает в раздел «Объяснение» отчета.
+#
+# Условия (if): все должны выполняться.
+#   T_below / T_at_least: K
+#   reagent_absent / reagent_present: формула (сравнение по составу)
+#   no_strong_oxidant / strong_oxidant: true
+#   acid_conc_at_least / acid_conc_below: {acid: HNO3, M: 6}
+#   no_acid / acid: true           - есть ли кислота среди реагентов (кроме воды)
+#   aqueous: true|false            - водная система или «сухая»
+#   no_peroxide: true              - нет пероксидов среди реагентов
+#   no_water_reducer: true         - нет металлов, восстанавливающих воду (щелочные, Ca, Sr, Ba; Mg при T>=340 K;
+#                                    амфотерные Al, Zn, Be, Sn, Pb, Ga в присутствии щелочи)
+#   organic_reagent: true|false
+#   active_metal_reagent: true     - Mg, Zn, Al, Fe, Mn среди реагентов
+# Действия (then):
+#   decouple: {element: S, groups: [[6], [others]]} - степени окисления из разных групп
+#             не переходят друг в друга (редокс-развязка, как master species в PHREEQC)
+#   forbid_new: ["O2", "O3"]  - частица не образуется, если ее нет среди исходных веществ
+#   forbid_new_class: organic
+#   inert_reagent: {metals: [Fe, Al, Cr]} - реагент не участвует (пассивация)
+
+rules:
+  - id: n2_inert
+    title: "N2 кинетически инертен"
+    why: "Тройная связь N≡N: при обычных условиях азот не образуется из соединений азота и не реагирует."
+    if: {reagent_absent: N2}
+    then: {decouple: {element: N, groups: [[0], [others]]}}
+
+  - id: nitrogen_redox_lowT
+    title: "Азот: нитрат восстанавливается только до NO/NO2/HNO2"
+    why: "При T < 450 K нитрат и азотная кислота восстанавливаются до оксидов азота; NH4+, N2O, N2 из нитрата кинетически не образуются, аммоний и нитрат друг с другом не реагируют."
+    if: {T_below: 450}
+    then: {decouple: {element: N, groups: [[5, 4, 3, 2], [-3], [1], [0], [others]]}}
+
+  - id: nitrogen_redox_lowT_dilute_active
+    title: "Очень разбавленная HNO3 с активным металлом: до NH4+"
+    why: "С Mg, Zn, Al очень разбавленная азотная кислота (< 1 М) восстанавливается до иона аммония."
+    if: {T_below: 450, reagent_present: HNO3, acid_conc_below: {acid: HNO3, M: 1.0}, active_metal_reagent: true}
+    then: {decouple: {element: N, groups: [[5, 4, 3, 2, -3], [1], [0], [others]]}}
+
+  - id: nitrate_neutral_inert
+    title: "Нитрат в нейтральной среде не окисляет металлы"
+    why: "Без кислоты нитрат-ион кинетически инертен: металлы вытесняют катионы из растворов нитратов, а не восстанавливают NO3-."
+    if: {T_below: 450, no_acid: true}
+    then: {decouple: {element: N, groups: [[5], [4, 3, 2], [-3], [1], [0], [others]]}}
+
+  - id: conc_nitric_no2
+    title: "Концентрированная HNO3 дает NO2"
+    why: "В концентрированной азотной кислоте NO окисляется до NO2 (3NO2 + H2O ⇌ 2HNO3 + NO смещено влево); модели активности при > 6 М ненадежны, поэтому используется правило."
+    if: {acid_conc_at_least: {acid: HNO3, M: 6.0}}
+    then: {forbid_new: ["NO", "HNO2", "NO2-"]}
+
+  - id: dilute_nitric_no
+    title: "Разбавленная HNO3 дает NO"
+    why: "В разбавленной кислоте основной газ - NO; NO2 диспропорционирует."
+    if: {acid_conc_below: {acid: HNO3, M: 6.0}, reagent_present: HNO3}
+    then: {forbid_new: ["NO2", "N2O4"]}
+
+  - id: sulfate_inert
+    title: "Сульфат не восстанавливается"
+    why: "SO4(2-) кинетически инертен: разбавленная H2SO4 окисляет металлы ионом H+, а не серой(VI)."
+    if: {T_below: 400, no_conc_sulfuric_hot: true, no_strong_oxidant: true}
+    then: {decouple: {element: S, groups: [[6], [others]]}}
+
+  - id: conc_sulfuric_so2
+    title: "Горячая концентрированная H2SO4 восстанавливается до SO2"
+    why: "Концентрированная серная кислота при нагревании - окислитель; основной продукт восстановления - SO2."
+    if: {conc_sulfuric_hot: true}
+    then: {decouple: {element: S, groups: [[6, 4], [others]]}}
+
+  - id: chlorine_oxoanions
+    title: "Хлорат и перхлорат инертны при низкой температуре"
+    why: "ClO3- и ClO4- в разбавленных растворах кинетически устойчивы."
+    if: {T_below: 400, acid_conc_below: {acid: HCl, M: 6.0}}
+    then: {decouple: {element: Cl, groups: [[7], [5], [others]]}}
+
+  - id: no_perchlorate
+    title: "Перхлорат не образуется"
+    why: "Образование ClO4- требует специальных условий (электролиз, длительный нагрев без катализатора)."
+    if: {}
+    then: {forbid_new: ["ClO4-", "KClO4", "NaClO4", "HClO4"]}
+
+  - id: no_new_o2
+    title: "O2 не выделяется из воды и оксоанионов"
+    why: "Окисление воды до O2 (например, перманганатом) кинетически заторможено; O2 выделяется только из пероксидов или при нагреве выше 450 K."
+    if: {T_below: 450, no_peroxide: true}
+    then: {forbid_new: ["O2", "O3"]}
+
+  - id: no_new_ozone
+    title: "Озон не образуется"
+    why: "Озон при обычных условиях термодинамически и кинетически не образуется."
+    if: {}
+    then: {forbid_new: ["O3"]}
+
+  - id: no_new_peroxide
+    title: "Пероксиды не образуются"
+    why: "Пероксиды метастабильны; при равновесии распадаются."
+    if: {}
+    then: {forbid_new: ["H2O2", "Na2O2", "BaO2", "K2O2", "KO2"]}
+
+  - id: hydroxides_not_oxides
+    title: "Из раствора осаждаются гидроксиды, а не оксиды"
+    why: "Оксиды металлов термодинамически устойчивее гидроксидов, но из водного раствора (до 100 °C) выпадают гидроксиды; их обезвоживание идет при прокаливании или годами."
+    if: {aqueous: true, T_below: 400}
+    then: {forbid_new_class: oxide_if_hydroxide}
+
+  - id: no_pyrite_lowT
+    title: "Дисульфиды (пирит) не образуются при низкой температуре"
+    why: "FeS2 образуется медленно (геологические времена); в лабораторных условиях из FeS не получается."
+    if: {T_below: 400}
+    then: {forbid_new: ["FeS2"]}
+
+  - id: no_radicals
+    title: "Радикалы и атомарные газы не образуются"
+    why: "Частицы с неспаренным электроном (H, OH, HO2, Cl и т. п.) и атомарные газы живут доли секунды; кроме устойчивых NO, NO2, ClO2."
+    if: {T_below: 2000}
+    then: {forbid_new_class: radicals}
+
+  - id: no_hydrides_in_water
+    title: "Гидриды металлов не образуются в воде"
+    why: "Солеобразные гидриды (NaH, MgH2, CaH2) бурно разлагаются водой."
+    if: {aqueous: true}
+    then: {forbid_new_class: metal_hydrides}
+
+  - id: water_not_reduced
+    title: "Вода не восстанавливается малоактивными металлами"
+    why: "Без кислоты H2 выделяют только щелочные и щелочноземельные металлы (Mg - при нагревании) и амфотерные металлы в щелочи; у остальных реакция заторможена оксидной пленкой."
+    if: {aqueous: true, no_acid: true, no_water_reducer: true}
+    then: {forbid_new: ["H2"]}
+
+  - id: organic_no_new
+    title: "Органические вещества не образуются из неорганических"
+    why: "Синтез органики (например, CO2 + H2 -> CH4) без катализатора не идет."
+    if: {organic_reagent: false}
+    then: {forbid_new_class: organic}
+
+  - id: no_new_carbon_lowT
+    title: "Графит не образуется при низкой температуре"
+    why: "Распад органики и CO до углерода при T < 600 K кинетически заторможен."
+    if: {T_below: 600}
+    then: {forbid_new: ["C"]}
+
+  - id: carbon_redox_lowT
+    title: "Углерод(IV) не восстанавливается при низкой температуре"
+    why: "Карбонаты и CO2 при T < 600 K кинетически устойчивы к восстановлению."
+    if: {T_below: 600, no_strong_oxidant: true}
+    then: {decouple: {element: C, groups: [[4], [others]]}}
+
+  - id: carbon_redox_lowT_oxidant
+    title: "Сильный окислитель окисляет органику и оксалат до CO2"
+    why: "Перманганат, дихромат окисляют оксалат до CO2 (классическое титрование)."
+    if: {T_below: 600, strong_oxidant: true}
+    then: {decouple: {element: C, groups: [[4, 3], [others]]}}
+
+  - id: dry_lowT_inert
+    title: "Твердые неметаллы не горят при низкой температуре"
+    why: "C, S, P, Si в твердом виде при T < 500 K с O2 практически не реагируют (нужно поджечь)."
+    if: {T_below: 500}
+    then: {inert_reagent: {formulas: ["C", "S", "Si"]}}
+
+  - id: passivation_conc_acids
+    title: "Пассивация Fe, Al, Cr в концентрированных HNO3 и H2SO4"
+    why: "На холоду концентрированные азотная и серная кислоты покрывают Fe, Al, Cr оксидной пленкой."
+    if: {T_below: 340, passivating_acid: true}
+    then: {inert_reagent: {formulas: ["Fe", "Al", "Cr"]}}
