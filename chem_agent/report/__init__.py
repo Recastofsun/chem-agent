@@ -21,9 +21,44 @@ def file_stem(data: dict) -> str:
     return f"chem-agent_{data['reaction_id']}_{stamp}"
 
 
+_KEEP_LAST_REPORTS = 3
+
+
+def _rotate_reports(out_dir: Path, keep: int = _KEEP_LAST_REPORTS) -> None:
+    """Удалить старые отчёты, оставив только `keep` новейших наборов.
+
+    Набор = все файлы с одинаковым stem (chem-agent_<uuid>_<timestamp>).
+    Сортировка по mtime файла — свежие побеждают.
+    """
+    try:
+        entries = [p for p in out_dir.iterdir() if p.is_file()
+                   and p.name.startswith("chem-agent_")
+                   and p.suffix.lower() in (".json", ".html", ".md", ".markdown")]
+    except OSError:
+        return
+    if not entries:
+        return
+    # группируем по stem (без расширения)
+    groups: dict[str, list[Path]] = {}
+    for p in entries:
+        groups.setdefault(p.stem, []).append(p)
+    if len(groups) <= keep:
+        return
+    # сортируем группы по времени самого свежего файла в группе
+    def group_time(files: list[Path]) -> float:
+        return max((f.stat().st_mtime for f in files if f.exists()), default=0.0)
+    ordered = sorted(groups.items(), key=lambda kv: group_time(kv[1]), reverse=True)
+    for _, files in ordered[keep:]:
+        for f in files:
+            try:
+                f.unlink()
+            except OSError:
+                pass
+
+
 def save_all(result, output_dir=None, formats=None) -> dict[str, Path]:
     data = result.data if hasattr(result, "data") else result
-    formats = formats or data["options"].get("output_formats") or ["json"]
+    formats = ["json"]
     out_dir = Path(output_dir or data["options"].get("output_dir") or reports_dir())
     ensure_dir(out_dir)
     stem = file_stem(data)
@@ -37,4 +72,5 @@ def save_all(result, output_dir=None, formats=None) -> dict[str, Path]:
         elif f == "markdown":
             from .markdown import save
             paths["markdown"] = save(data, out_dir / f"{stem}.md")
+    _rotate_reports(out_dir, keep=_KEEP_LAST_REPORTS)
     return paths
