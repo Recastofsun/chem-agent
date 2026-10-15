@@ -36,6 +36,11 @@ direct:
   - {formula: "Fe3O4", phase: s, dGf: -1015.4, dHf: -1118.4, S: 146.4, sigma: 2.0}
   - {formula: "FeO", phase: s, dGf: -251.4, dHf: -272.0, S: 60.75, sigma: 3.0}
   - {formula: "NaNO2", phase: s, dGf: -284.6, dHf: -358.7, S: 103.8, sigma: 1.5}
+ # Добавлено 16.10.2026: пробелы в базе, мешавшие h049, h070, h099
+  - {formula: "Fe(SCN)3", phase: aq, dGf: 255.0, sigma: 5.0, note: "оценка через log b3 = 2.9; требует верификации"}
+  - {formula: "SnCl2", phase: aq, dGf: -429.0, dHf: -524.0, S: 130.0, sigma: 4.0, note: "оценка; требует верификации"}
+  - {formula: "SnCl4", phase: aq, dGf: -530.0, dHf: -570.0, S: 195.0, sigma: 4.0, note: "оценка; требует верификации"}
+  - {formula: "H3PO3", phase: aq, dGf: -848.9, dHf: -964.4, S: 163.0, sigma: 3.0, note: "NBS-1982 (phosphorous acid, aqueous)"}
 
 ksp:
   # Fe(OH)3 и Al(OH)3 - аморфные свежеосажденные фазы: log Ksp = log_k(phreeqc.dat) - 3*14,0
