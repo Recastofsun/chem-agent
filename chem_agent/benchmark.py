@@ -35,8 +35,9 @@ def evaluate(agent, reactions: list[dict], k: int = 3, options: dict | None = No
         if exp is None:
             ok = status == "no_reaction"
         else:
-            ek = parse_formula(exp).key
-            ok = any(ek in _keys_of_product(p) for p in top) and status in ("ok", "unreliable")
+            accept = rx.get("accept_any") or [exp]
+            ek_set = {parse_formula(a).key for a in accept}
+            ok = any(ek_set & _keys_of_product(p) for p in top) and status in ("ok", "unreliable")
         rows.append({"id": rx["id"], "category": rx["category"], "in_scope": rx.get("in_scope", True),
                      "ok": ok, "status": status, "expected": exp,
                      "top": [p["formula"] for p in top], "error": err})

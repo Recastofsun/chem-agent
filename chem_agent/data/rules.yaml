@@ -166,3 +166,15 @@ rules:
     why: "На холоду концентрированные азотная и серная кислоты покрывают Fe, Al, Cr оксидной пленкой."
     if: {T_below: 340, passivating_acid: true}
     then: {inert_reagent: {formulas: ["Fe", "Al", "Cr"]}}
+
+  - id: mn_alkaline_stop
+    title: "Марганец в щелочной среде: остановка на манганате (Mn6+)"
+    why: "В щелочной среде MnO4- + e- -> MnO4^2- (зелёный манганат). Дальнейшее восстановление до MnO2 или Mn2+ кинетически не идёт."
+    if: {aqueous: true, T_below: 450, alkaline_reagent: true}
+    then: {decouple: {element: Mn, groups: [[7, 6], [4], [2, 3], [others]]}}
+
+  - id: mn_neutral_stop
+    title: "Марганец в нейтральной среде: остановка на MnO2 (Mn4+)"
+    why: "В нейтральной среде MnO4- + 2 H2O + 3 e- -> MnO2 + 4 OH-. Дальнейшее восстановление до Mn2+ не идёт."
+    if: {aqueous: true, T_below: 450, no_acid: true, no_alkaline: true}
+    then: {decouple: {element: Mn, groups: [[7, 6, 4], [2, 3], [others]]}}

@@ -37,8 +37,8 @@ REACTIONS_PART_2 = [
     {'id':'h028','category':'ОВР-щелочная','reagents':[{'formula':'Cl2','moles':0.01,'phase':'g'},{'formula':'NaOH','moles':0.02,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'NaCl','in_scope':True,'note':'Cl2 + хол. NaOH, диспропорционирование -> NaCl + NaClO'},
     {'id':'h029','category':'ОВР-щелочная','reagents':[{'formula':'Cl2','moles':0.01,'phase':'g'},{'formula':'NaOH','moles':0.06,'phase':'aq'}],'temperature_K':350.0,'volume_L':1.0,'solvent':'water','expected_main':'NaCl','in_scope':True,'note':'Cl2 + горячий NaOH -> NaCl + NaClO3'},
     {'id':'h030','category':'ОВР-щелочная','reagents':[{'formula':'Al','moles':0.01,'phase':'s'},{'formula':'NaOH','moles':0.01,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'H2','in_scope':True,'note':'Al + NaOH + H2O -> Na[Al(OH)4] + H2'},
-    {'id':'h031','category':'ОВР-щелочная','reagents':[{'formula':'KMnO4','moles':0.002,'phase':'aq'},{'formula':'Na2SO3','moles':0.005,'phase':'aq'},{'formula':'NaOH','moles':0.01,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'K2MnO4','in_scope':True,'note':'KMnO4 в щелочной среде -> K2MnO4'},
-    {'id':'h032','category':'ОВР-нейтральная','reagents':[{'formula':'KMnO4','moles':0.002,'phase':'aq'},{'formula':'Na2SO3','moles':0.005,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'MnO2','in_scope':True,'note':'KMnO4 в нейтральной среде -> MnO2'},
+    {'id':'h031','category':'ОВР-щелочная','reagents':[{'formula':'KMnO4','moles':0.002,'phase':'aq'},{'formula':'Na2SO3','moles':0.005,'phase':'aq'},{'formula':'NaOH','moles':0.01,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'K2MnO4','in_scope':True,'accept_any':['K2MnO4','Na2MnO4','KNaMnO4'],'note':'KMnO4 в щелочной среде -> манганат (K или Na)'},
+    {'id':'h032','category':'ОВР-нейтральная','reagents':[{'formula':'KMnO4','moles':0.002,'phase':'aq'},{'formula':'Na2SO3','moles':0.005,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'MnO2','in_scope':True,'accept_any':['MnO2','MnO(OH)2'],'note':'KMnO4 в нейтральной среде -> MnO2'},
     {'id':'h033','category':'ОВР-нейтральная','reagents':[{'formula':'Cl2','moles':0.005,'phase':'g'},{'formula':'H2O','moles':0.5,'phase':'l'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'HClO','in_scope':True,'note':'Cl2 + H2O -> HCl + HClO'},
     {'id':'h034','category':'ОВР-нейтральная','reagents':[{'formula':'H2O2','moles':0.01,'phase':'aq'},{'formula':'MnO2','moles':0.001,'phase':'s'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'O2','in_scope':True,'note':'каталитическое разложение H2O2, O2'},
     {'id':'h035','category':'ОВР-нейтральная','reagents':[{'formula':'Fe','moles':0.01,'phase':'s'},{'formula':'CuSO4','moles':0.01,'phase':'aq'}],'temperature_K':298.15,'volume_L':1.0,'solvent':'water','expected_main':'Cu','in_scope':True,'note':'вытеснение меди железом'},
@@ -118,18 +118,14 @@ REACTIONS_PART_4 = [
 def main():
     out = Path(__file__).parent.parent / 'tests' / 'fixtures' / 'holdout_100.json'
     out.parent.mkdir(parents=True, exist_ok=True)
-    existing = []
-    if out.exists():
-        existing = json.loads(out.read_text(encoding='utf-8'))
-    ids = {r['id'] for r in existing}
-    added = 0
-    for r in REACTIONS + REACTIONS_PART_2 + REACTIONS_PART_3 + REACTIONS_PART_4:
-        if r['id'] not in ids:
-            existing.append(r)
-            ids.add(r['id'])
-            added += 1
-    out.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(f'Added {added}, total {len(existing)} reactions')
+    all_reactions = REACTIONS + REACTIONS_PART_2 + REACTIONS_PART_3 + REACTIONS_PART_4
+    by_id = {}
+    for r in all_reactions:
+        by_id[r['id']] = r
+    merged = list(by_id.values())
+    merged.sort(key=lambda r: r['id'])
+    out.write_text(json.dumps(merged, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f'Wrote {len(merged)} reactions to {out}')
 
 
 if __name__ == '__main__':

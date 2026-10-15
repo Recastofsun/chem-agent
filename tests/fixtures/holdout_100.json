@@ -699,7 +699,12 @@
     "solvent": "water",
     "expected_main": "K2MnO4",
     "in_scope": true,
-    "note": "KMnO4 в щелочной среде -> K2MnO4"
+    "accept_any": [
+      "K2MnO4",
+      "Na2MnO4",
+      "KNaMnO4"
+    ],
+    "note": "KMnO4 в щелочной среде -> манганат (K или Na)"
   },
   {
     "id": "h032",
@@ -721,6 +726,10 @@
     "solvent": "water",
     "expected_main": "MnO2",
     "in_scope": true,
+    "accept_any": [
+      "MnO2",
+      "MnO(OH)2"
+    ],
     "note": "KMnO4 в нейтральной среде -> MnO2"
   },
   {

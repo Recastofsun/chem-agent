@@ -143,6 +143,12 @@ class RuleContext:
             return any(self.is_organic(r.comp) for r in self.reagents) == bool(arg)
         if name == "active_metal_reagent":
             return bool(self.metals_elemental() & ACTIVE_METALS) == bool(arg)
+        if name == "alkaline_reagent":
+            alk = any(self.is_strong_base(r.comp) for r in self.reagents)
+            return alk == bool(arg)
+        if name == "no_alkaline":
+            alk = any(self.is_strong_base(r.comp) for r in self.reagents)
+            return (not alk) == bool(arg)
         if name == "no_water_reducer":
             m = self.metals_elemental()
             reducer = bool(m & WATER_REDUCERS) or ("Mg" in m and T >= 340)

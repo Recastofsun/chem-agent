@@ -172,6 +172,20 @@ def build_system(db_species: list[Species], reagents: list[Reagent], *, T: float
             _mmol = sum(n * r.moles for r in active for e, n in r.comp.elements if e == _el)
             if _mmol > 0 and nh3_mol >= 4.0 * _mmol:
                 ammonia_dissolves.add(_el)
+    AMPHOTERIC_METALS = ("Al", "Zn", "Be", "Sn", "Pb", "Ga", "Cr")
+    _strong_base_metals = ("Na", "K")
+    _oh_mol = 0.0
+    for r in active:
+        els = dict(r.comp.elements)
+        if any(m in els for m in _strong_base_metals) and "O" in els and "H" in els \
+                and els.get("O", 0) == els.get("H", 0):
+            _oh_mol += r.moles * els["O"]
+    alkali_dissolves: set[str] = set()
+    if _oh_mol > 0:
+        for _el in AMPHOTERIC_METALS:
+            _mmol = sum(n * r.moles for r in active for e, n in r.comp.elements if e == _el)
+            if _mmol > 0 and _oh_mol >= 4.0 * _mmol:
+                alkali_dissolves.add(_el)
     if "oxide_if_hydroxide" in rules.forbid_new_class:
         for s in db_species:
             els = dict(s.elements)
@@ -231,6 +245,14 @@ def build_system(db_species: list[Species], reagents: list[Reagent], *, T: float
                 _metal = next(iter(set(_els) - {"O", "H"}))
                 if _metal in ammonia_dissolves:
                     return skip("гидроксид растворяется в избытке аммиака")
+        if alkali_dissolves and not present and s.phase == "s":
+            _els = dict(s.elements)
+            if ("O" in _els and "H" in _els
+                    and _els.get("O") == _els.get("H")
+                    and len(set(_els) - {"O", "H"}) == 1):
+                _metal = next(iter(set(_els) - {"O", "H"}))
+                if _metal in alkali_dissolves:
+                    return skip("амфотерный гидроксид растворяется в избытке щёлочи")
         if "organic" in rules.forbid_new_class and is_organic(els) and not present:
             return skip("органика не образуется")
         if organic_reagents and is_organic(els) and not present:
