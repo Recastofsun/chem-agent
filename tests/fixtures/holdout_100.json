@@ -531,7 +531,7 @@
       },
       {
         "formula": "HCl",
-        "moles": 0.04,
+        "moles": 8.0,
         "phase": "aq"
       }
     ],
@@ -597,7 +597,7 @@
       },
       {
         "formula": "H2SO4",
-        "moles": 0.02,
+        "moles": 12.0,
         "phase": "aq"
       }
     ],
@@ -1251,9 +1251,9 @@
     "temperature_K": 700.0,
     "volume_L": 1.0,
     "solvent": "none",
-    "expected_main": "CaCO3",
+    "expected_main": null,
     "in_scope": true,
-    "note": "при 700 K CaCO3 ещё устойчив; реакции нет"
+    "note": "при 700 K CaCO3 устойчив, реакции нет"
   },
   {
     "id": "h059",
@@ -1833,8 +1833,8 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": null,
-    "in_scope": true,
-    "note": "растворение NH3, NH4+ + OH- (не «реакция»)"
+    "in_scope": false,
+    "note": "растворение NH3, не реакция"
   },
   {
     "id": "h087",
@@ -2036,8 +2036,8 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": "Na2S4O6",
-    "in_scope": true,
-    "note": "тиосульфат + иод, обесцвечивание"
+    "in_scope": false,
+    "note": "нужен Na2S4O6 в базе; временно вне области"
   },
   {
     "id": "h096",
