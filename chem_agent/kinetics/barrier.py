@@ -50,7 +50,7 @@ def resolve(user: dict | None, T: float, reaction_class: str, catalyst: dict | N
     if reaction_class == "proton_transfer":
         k = PROTON_TRANSFER_K
         return BarrierInfo(eyring.barrier_from_rate(k, T), 2.0, k, 2, "diffusion-limit (Eigen)",
-                           "Нейтрализация H+ + OH- ограничена диффузией, k ≈ 1,4·10^11 М^-1·с^-1 (25 °C)")
+                           "Нейтрализация H+ + OH- ограничена диффузией, k ≈ 1,4·10¹¹ М⁻¹·с⁻¹ (25 °C)")
     if reaction_class == "acid_base":
         return BarrierInfo(None, None, None, 2, "класс: кислотно-основная",
                            "Перенос протона обычно быстрый (мс и быстрее), но константа для этой пары "

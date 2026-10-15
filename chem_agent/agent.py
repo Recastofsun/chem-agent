@@ -754,7 +754,7 @@ class Agent:
         catalyst = cond.get("catalyst") if opts.get("include_catalysis") or (cond.get("catalyst") or {}).get("barrier_kJ_mol") else None
         info = barrier_mod.resolve(user, T, klass, catalyst)
         out = {"barrier_kJ_mol": info.barrier_kJ_mol, "rate_constant": info.rate_constant,
-               "rate_constant_units": "М^-1·с^-1" if info.order >= 2 else "с^-1", "order": info.order,
+               "rate_constant_units": "М⁻¹·с⁻¹" if info.order >= 2 else "с⁻¹", "order": info.order,
                "half_life_s": None, "model": info.model, "uncertainty": info.sigma_kJ, "note": info.note,
                "requested_model": opts.get("kinetics_model"), "profile": None}
         if opts.get("kinetics_model") in ("ml_ts", "neb"):
