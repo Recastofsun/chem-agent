@@ -178,3 +178,11 @@ rules:
     why: "В нейтральной среде MnO4- + 2 H2O + 3 e- -> MnO2 + 4 OH-. Дальнейшее восстановление до Mn2+ не идёт."
     if: {aqueous: true, T_below: 450, no_acid: true, no_alkaline: true}
     then: {decouple: {element: Mn, groups: [[7, 6, 4], [2, 3], [others]]}}
+
+  - id: phosphorus_iii_stable
+    title: "Фосфор(III) не диспропорционирует в воде"
+    why: "H3PO3 (фосфористая кислота) кинетически устойчива; P(+3) не переходит в P(-3) и P(+5) без окислителя или нагрева выше 400 K."
+    if: {aqueous: true, T_below: 400}
+    then: {forbid_new: ["H3P", "PH3", "P2H4"]}
+
+ 
