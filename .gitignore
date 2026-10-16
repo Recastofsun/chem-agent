@@ -12,3 +12,7 @@ report/
 .idea/
 *.swp
 *.log
+# PyInstaller
+build/
+dist/
+*.manifest
