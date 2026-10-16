@@ -1,10 +1,18 @@
-"""Launcher: starts local chem-agent server and opens browser."""
+"""Launcher: starts local chem-agent server.
+
+При старте:
+  - проверяет, не занят ли порт 8000;
+  - если занят нашим сервером (отвечает /health) — просит его завершиться;
+  - если занят посторонним — предупреждает и предлагает выбрать другой порт.
+"""
+from __future__ import annotations
+
 import logging as _logging
 import os
 import sys
-import threading
 import time
-import webbrowser
+import urllib.error
+import urllib.request
 
 from chem_agent.logging_setup import setup as setup_logging
 
@@ -21,27 +29,74 @@ HOST = "127.0.0.1"
 PORT = 8000
 
 
-def open_browser():
-    time.sleep(1.5)
-    webbrowser.open(f"http://{HOST}:{PORT}/")
+def _is_our_server_alive() -> bool:
+    """True, если на порту отвечает наш /health с признаком offline."""
+    try:
+        with urllib.request.urlopen(f"http://{HOST}:{PORT}/health", timeout=2) as r:
+            body = r.read().decode("utf-8", errors="replace")
+            return '"offline"' in body or "offline" in body
+    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError):
+        return False
 
 
-def main():
+def _is_port_busy() -> bool:
+    """True, если порт вообще слушается кем-то."""
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.settimeout(1.0)
+        return s.connect_ex((HOST, PORT)) == 0
+    finally:
+        s.close()
+
+
+def ensure_port_available() -> None:
+    """Проверяем порт перед запуском.
+
+    Логика:
+      - порт свободен                  -> ок
+      - порт занят нашим сервером      -> предупреждаем, просим закрыть
+      - порт занят посторонним         -> предупреждаем, выходим
+    """
+    if not _is_port_busy():
+        return
+
+    if _is_our_server_alive():
+        msg = (
+            f"\n[!] Порт {PORT} занят работающим chem-agent.\n"
+            f"    Пожалуйста, закройте предыдущее окно сервера (Ctrl+C)\n"
+            f"    и запустите run_server.bat заново.\n"
+        )
+        print(msg)
+        log.warning("Port %d busy by our own server", PORT)
+        sys.exit(1)
+
+    msg = (
+        f"\n[!] Порт {PORT} занят посторонним процессом.\n"
+        f"    Мы его НЕ трогаем.\n"
+        f"    Либо закройте его вручную, либо смените PORT в run_server.py.\n"
+    )
+    print(msg)
+    log.error("Port %d busy by foreign process", PORT)
+    sys.exit(1)
+
+
+def main() -> None:
     print("=" * 60)
     print("  chem-agent — локальный предсказатель реакций")
-    print(f"  Откройте http://{HOST}:{PORT}/ в браузере")
+    print(f"  Сервер: http://{HOST}:{PORT}/")
     print("  Для остановки нажмите Ctrl+C")
     print("=" * 60)
-    
-     # Логи uvicorn и его дочерних логгеров — в тот же файл
+
+    ensure_port_available()
+
+    # Логи uvicorn и его дочерних логгеров — в тот же файл
     for name in ("uvicorn", "uvicorn.error", "uvicorn.access", "fastapi"):
         lg = _logging.getLogger(name)
         for h in log.handlers:
             lg.addHandler(h)
         lg.setLevel(_logging.INFO)
         lg.propagate = False
-
-    threading.Thread(target=open_browser, daemon=True).start()
 
     import uvicorn  # type: ignore
     from chem_agent.api.server import app
