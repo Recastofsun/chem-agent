@@ -605,8 +605,12 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": "CuSO4",
+    "accept_any": [
+      "CuSO4",
+      "Cu(HSO4)2"
+    ],
     "in_scope": true,
-    "note": "горячая конц. H2SO4 + Cu, SO2"
+    "note": "горячая конц. H2SO4 + Cu, SO2; в конц. среде продукт может быть Cu(HSO4)2"
   },
   {
     "id": "h028",

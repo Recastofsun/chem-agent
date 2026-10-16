@@ -128,7 +128,14 @@ def analyze(system: ChemSystem, n: np.ndarray, reagent_keys: set | None = None) 
             major = [i for i, k in enumerate(kinds) if k == AQ and sp[i].charge != 0 and n[i] > sig
                      and pairable(i)]
             # name salts after the fully deprotonated strong-acid anion (MnSO4, not Mn(HSO4)2)
-            parent = {"HSO4-": "SO4-2"}
+            # But if HSO4- dominates (e.g. NaOH + H2SO4 at 1:1), keep it as its own salt (NaHSO4).
+            _hso4_i = next((i for i, s in enumerate(sp) if s.formula == "HSO4-" and s.phase == "aq"), None)
+            _so4_i = next((i for i, s in enumerate(sp) if s.formula == "SO4-2" and s.phase == "aq"), None)
+            if (_hso4_i is not None and _so4_i is not None
+                    and n[_hso4_i] > sig and n[_hso4_i] >= n[_so4_i]):
+                parent = {}
+            else:
+                parent = {"HSO4-": "SO4-2"}
             n = n.copy()
             for i, (j, _k) in hydroxo_parents(sp).items():
                 if n[i] > sig:
