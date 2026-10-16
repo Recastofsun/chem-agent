@@ -34,6 +34,7 @@ direct:
   - {formula: "Zn(OH)4-2", phase: aq, dGf: -874.0, sigma: 2.5}
   - {formula: "I3-", phase: aq, dGf: -51.4, dHf: -51.5, S: 239.3, sigma: 1.5}
   - {formula: "Ag2S", phase: s, dGf: -40.67, dHf: -32.59, S: 144.01, sigma: 1.5}
+  - {formula: "CaC2", phase: s, dGf: -64.9, dHf: -59.8, S: 70.0, sigma: 2.0}
   - {formula: "Fe3O4", phase: s, dGf: -1015.4, dHf: -1118.4, S: 146.4, sigma: 2.0}
   - {formula: "FeO", phase: s, dGf: -251.4, dHf: -272.0, S: 60.75, sigma: 3.0}
   - {formula: "NaNO2", phase: s, dGf: -284.6, dHf: -358.7, S: 103.8, sigma: 1.5}

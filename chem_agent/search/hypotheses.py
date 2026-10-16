@@ -52,21 +52,30 @@ class ChemSystem:
 
 def is_organic(sp_elements: dict) -> bool:
     """Organic = contains C-H or C-C bonds (heuristic on composition).
-
-    Inorganic carbon: CO, CO2, carbonates, HCO3-, H2CO3, cyanides/thiocyanates/cyanates, carbides.
+    Inorganic carbon: CO, CO2, carbonates, HCO3-, H2CO3, cyanides/thiocyanates/cyanates,
+    carbides, and small hydrocarbons C1-C2 (CH4, C2H2, C2H4, C2H6) which are classical
+    inorganic-chemistry products (from carbides, CO + H2, etc.).
     """
     c = sp_elements.get("C", 0)
     h = sp_elements.get("H", 0)
     o = sp_elements.get("O", 0)
     if c == 0:
         return False
+    # Small C1-C2 hydrocarbons: methane, acetylene, ethylene, ethane — inorganic-chemistry products
+    if c == 1 and h >= 1 and o == 0:
+        return False  # CH4
+    if c == 2 and h >= 2 and o == 0:
+        return False  # C2H2, C2H4, C2H6
+    if c == 2 and h == 0 and o == 0:
+        return False  # C2 carbides
+    if c == 2 and o == 4:
+        return False  # oxalate
     if c >= 2:
-        # C2O4 (oxalate) and C2 carbides are not organic in the sense of the rules
-        return not (c == 2 and h <= 2 and o == 4) and not (c == 2 and h == 0 and o == 0)
+        return True
     if h == 0:
         return False
     if o >= 3:
-        return False  # HCO3-, H2CO3, NaHCO3
+        return False  # HCO3-, H2CO3
     if ("N" in sp_elements or "S" in sp_elements) and h <= 1 and o <= 1:
         return False  # HCN, HSCN, HOCN
     return True

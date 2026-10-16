@@ -185,3 +185,14 @@ rules:
     if: {aqueous: true, T_below: 400}
     then: {forbid_new: ["H3P", "PH3", "P2H4"]}
 
+  - id: carbide_hydrolysis_acetylene
+    title: "Гидролиз карбида кальция даёт ацетилен"
+    why: "CaC2 + 2 H2O -> Ca(OH)2 + C2H2 — классическая лабораторная реакция. Термодинамически выгоднее CH4 и карбонат, но связь C≡C в ацетилене кинетически не разрывается в воде."
+    if: {aqueous: true, reagent_present: CaC2, T_below: 400}
+    then: {forbid_new: ["CH4", "C2H6", "C2H4", "H6C2", "H4C2"]}
+
+  - id: carbide_hydrolysis_methane
+    title: "Гидролиз карбида алюминия даёт метан"
+    why: "Al4C3 + 12 H2O -> 4 Al(OH)3 + 3 CH4 — ацетилен образуется только из CaC2 и подобных; Al4C3 даёт метан."
+    if: {aqueous: true, reagent_present: Al4C3, T_below: 400}
+    then: {forbid_new: ["C2H2", "CaC2O4"]}
