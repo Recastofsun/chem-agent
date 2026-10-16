@@ -7,6 +7,7 @@ offline_cache/wheels/
 tests/fixtures/outputs/*
 !tests/fixtures/outputs/.gitkeep
 reports/
+report/
 .vscode/
 .idea/
 *.swp
