@@ -160,3 +160,20 @@ run_cli.bat benchmark -v # Accuracy@3 на эталоне
 ## Структура
 
 См. ТЗ, раздел 5. Отличия от ТЗ перечислены в `CHANGELOG.md`.
+
+## Документация проекта
+
+- `CONTEXT.md` — как восстановить контекст работы над проектом.
+- `DEVLOG.md` — дневник разработки: хронология, уроки, планы.
+- `TZ_chem-agent_v2_desktop.md` — ТЗ на следующую версию (desktop).
+- `LIMITATIONS.md` — что не работает и почему.
+- `CHANGELOG.md` — история версий.
+- `IMPLEMENTATION_REPORT.md` — отчёт о реализации v1.0.
+- `SELF_TEST_RESULTS.txt` — результаты self-test (152 теста).
+
+## Быстрые ссылки
+
+- Репозиторий: https://github.com/Recastofsun/chem-agent
+- Слепая выборка: `tests/fixtures/holdout_100.json`
+- Генератор выборки: `scripts/build_holdout.py`
+- Точность: **97.9%** (Accuracy@3 на 95 реакциях в области)
