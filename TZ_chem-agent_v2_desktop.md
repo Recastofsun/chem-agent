@@ -39,8 +39,20 @@ chem-agent Desktop v2 — нативное десктоп-приложение
 
   - OS: Windows 10/11 (x64)
   - Python: 3.11.x
-  - WebView: WebView2 (встроен в Windows 10 1803+)
+  - WebView: WebView2 Runtime
   - Без установки Node.js, без браузера, без cmd
+
+  ВАЖНО про WebView2:
+    - WebView2 Runtime — это ОТДЕЛЬНЫЙ компонент (Evergreen), а не часть Windows.
+      На чистой машине без интернета он может отсутствовать.
+    - При старте приложение обязано проверить наличие Runtime.
+    - Если Runtime не найден:
+        * показать понятное диалоговое окно (не краш, не пустой экран);
+        * предложить два пути: установить Evergreen Runtime (нужен интернет/офлайн-инсталлятор)
+          или запустить сборку с приложенным Fixed Version Runtime.
+    - Для полностью офлайн-поставки предусмотреть вариант сборки, в которую вложен
+      Fixed Version Runtime (см. §15.2, флаг WEBVIEW2_FIXED=1). Это увеличивает размер
+      exe (см. §16.13).
 
 --------------------------------------------------------------------------------
 3. СТЕК
@@ -52,6 +64,7 @@ chem-agent Desktop v2 — нативное десктоп-приложение
   3D:           Three.js (локально, в static/vendor/)
   Анимации:     GSAP (локально, в static/vendor/)
   Графики:      существующий SVG-рендер из chem_agent/report/charts.py
+                (Plotly НЕ используем — см. §5)
   Сборка:       PyInstaller (one-file)
   Хранение:     SQLite (%LOCALAPPDATA%\chem-agent\) для истории
   Настройки:    JSON (%LOCALAPPDATA%\chem-agent\settings.json)
@@ -146,15 +159,26 @@ chem-agent/
     vendor/
       three.min.js
       gsap.min.js
-      plotly.min.js             ← опционально, если нужны графики
     assets/
       icons/
       fonts/
-      molecules/                ← 3D-структуры молекул (.json / .gltf)
+      molecules/                ← 3D-структуры молекул (.json)
+    # Plotly НЕ включаем: графики — существующий SVG-рендер (см. §3)
 
   models/                       ← 3D-модели (опционально)
+  scripts/
+    sdf_to_json.py              ← НОВОЕ: офлайн-конвертер PubChem .sdf → molecules/*.json
+    build_3d_cache.py           ← НОВОЕ: пакетная подготовка 3D-кэша и keyframes
   tests/                        ← без изменений
   examples/                     ← без изменений
+
+  Хранилище пользователя (создаётся при первом запуске, вне папки проекта):
+    %LOCALAPPDATA%\chem-agent\
+      settings.json             ← настройки (§8.4)
+      presets.json              ← пользовательские пресеты (отдельно от настроек)
+      history.db                ← история (SQLite, §8.5)
+      reports\                  ← отчёты
+      logs\                     ← логи
 
 --------------------------------------------------------------------------------
 6. ЭКРАНЫ
@@ -257,7 +281,7 @@ chem-agent/
 
   Пресеты:
     - Встроенные (10-15 типовых)
-    - Пользовательские (сохраняются в settings.json)
+    - Пользовательские (сохраняются в presets.json, см. §8.4)
 
   Клик — загружает в конструктор.
 
@@ -306,7 +330,7 @@ chem-agent/
     - Анимация превращения реагентов в продукты
     - Подсветка разрыва/образования связей
     - Подписи атомов и связей
-    - Тактильная подсказка (тултип с названием)
+    - Всплывающая подсказка (тултип с названием молекулы/атома)
 
   Источник 3D-структур:
     - PubChem 3D (.sdf → .json)
@@ -393,8 +417,88 @@ chem-agent/
   const result = await api.predict({
       reagents: [{formula: "NaOH", moles: 0.1, phase: "aq"},
                  {formula: "HCl", moles: 0.1, phase: "aq"}],
-      conditions: {temperature_K: 298.15, solvent: {name: "water"}},
+      conditions: {
+          temperature_K: 298.15,
+          pressure_atm: 1.0,
+          volume_L: 1.0,
+          solvent: {name: "water"},
+          atmosphere: "air",
+          ph: null,
+          catalyst: null,
+      },
   });
+
+### 8.3. Единый контракт ответа Bridge
+
+  КАЖДЫЙ метод Bridge возвращает объект одного вида (никаких «то строка, то список»):
+
+    {
+      "status": "ok" | "no_reaction" | "error" | "unknown",
+      "data":   <object | array | null>,   // полезная нагрузка при status="ok"
+      "error":  {                          // только при status="error"|"unknown"
+        "code":    "NO_WEBVIEW2" | "DB_NOT_FOUND" | "PARSE_ERROR" | "INTERNAL",
+        "message": "понятный человеку текст",
+        "hint":    "что сделать пользователю"
+      }
+    }
+
+  Правила:
+    - UI никогда не получает исключение Python — оно ловится в bridge и превращается
+      в status="error".
+    - "no_reaction" — расчёт выполнен, но реакция не идёт (data содержит объяснение).
+    - "unknown" — не хватает данных/условий для однозначного ответа.
+
+### 8.4. Схема settings.json
+
+    {
+      "version": 1,
+      "theme": "light" | "dark" | "system",
+      "language": "ru" | "en",
+      "modules": {
+        "constructor": true,
+        "3d": false,
+        "learning": false,
+        "reference": false
+      },
+      "advanced": {
+        "show_json": false
+      },
+      "reports_dir": "C:\\Users\\<user>\\...\\reports",
+      "onboarding_done": false,
+      "learning_progress": {
+        "points": 0,
+        "level": "novice",
+        "achievements": []
+      }
+    }
+
+  Пользовательские пресеты — отдельный файл presets.json (не мешаем с настройками):
+
+    {
+      "custom": [
+        {"id": "...", "name": "Мой пресет",
+         "reagents": [...], "conditions": {...}}
+      ]
+    }
+
+  Встроенные пресеты (10-15) — статический список в коде/JSON внутри бандла.
+
+### 8.5. Схема history.db (SQLite)
+
+    CREATE TABLE reactions (
+      id          TEXT PRIMARY KEY,      -- uuid4 hex
+      created_at  TEXT NOT NULL,         -- ISO-8601 (локальное время)
+      reagents    TEXT NOT NULL,         -- JSON-массив
+      conditions  TEXT NOT NULL,         -- JSON-объект
+      product     TEXT,                  -- основной продукт (кратко)
+      equation    TEXT,                  -- строка уравнения
+      delta_g     REAL,                  -- кДж/моль
+      status      TEXT NOT NULL,         -- ok|no_reaction|error|unknown
+      report_path TEXT                   -- путь к HTML-отчёту (может быть NULL)
+    );
+    CREATE INDEX idx_reactions_created ON reactions(created_at);
+
+  Экспорт CSV/JSON (§6.5) строится из этой таблицы.
 
 --------------------------------------------------------------------------------
 9. БАЗА ДАННЫХ СОЕДИНЕНИЙ (для таблицы Менделеева)
@@ -449,14 +553,21 @@ chem-agent/
       ]
     }
 
-  Источник: PubChem 3D (.sdf → .json скриптом).
+  Источник: PubChem 3D (.sdf).
+  Подготовка — ОФЛАЙН, ДО сборки, скриптом scripts/sdf_to_json.py
+  (скачивание .sdf выполняется разработчиком один раз; рантайм в интернет не ходит).
+  Альтернатива: RDKit (генерация из SMILES) — если .sdf недоступен.
 
 ### 10.3. Анимация реакции
 
   - Реагенты — слева, продукты — справа.
   - Анимация: атомы перемещаются, связи рвутся/образуются.
   - Управление: play/pause, скорость, поворот мышью.
-  - Данные анимации — заранее подготовленные keyframes.
+  - Источник keyframes — scripts/build_3d_cache.py: атомы реагентов и продуктов
+    приводятся к общему началу координат, кадры строятся линейной интерполяцией
+    (без физического моделирования). Для анимаций без кэша — упрощённый режим
+    «пересадка атомов» (только перемещение, без разрыва связей).
+  - Если для реакции нет 3D-данных — кнопка 3D неактивна с пояснением.
 
 ### 10.4. Игровые элементы (учебная версия)
 
@@ -518,8 +629,10 @@ chem-agent/
   - %LOCALAPPDATA%\chem-agent\logs\ — логи
 
   Экспорт:
-    - Отчёт (HTML) — сохранить как
-    - Отчёт (PDF) — через печать
+    - Отчёт (HTML) — «Сохранить как» через нативный диалог (pywebview.create_file_dialog)
+    - Отчёт (PDF) — через печать: window.print() в WebView2 → «Сохранить как PDF».
+      (Встроенная генерация PDF не требуется; если WebView2 недоступен — открыть
+      HTML во внешнем браузере через Bridge.open_report_external)
     - JSON (отладка)
     - CSV истории
 
@@ -527,10 +640,11 @@ chem-agent/
 14. ОФЛАЙН-ТРЕБОВАНИЯ
 --------------------------------------------------------------------------------
 
-  - Никаких запросов в интернет.
+  - Никаких запросов в интернет в рантайме.
   - Все ресурсы локальные.
-  - WebView2 — системный компонент.
-  - 3D-модели — в static/assets/molecules/.
+  - WebView2 Runtime — проверяется при старте; для офлайн-поставки используется
+    Fixed Version Runtime, вложенный в сборку (см. §2 и §15.2).
+  - 3D-модели — в static/assets/molecules/ (готовый кэш, интернет в рантайме не нужен).
   - Three.js, GSAP — в static/vendor/.
 
 --------------------------------------------------------------------------------
@@ -543,14 +657,28 @@ chem-agent/
   import sys
   import webview
   from chem_agent.api.bridge import Bridge
+  from chem_agent.config import resource_path, ensure_user_dirs, check_webview2
 
   os.environ.setdefault("CHEM_AGENT_OFFLINE", "1")
 
   if __name__ == "__main__":
+      # 1. Проверка WebView2 Runtime (см. §2). При отсутствии — понятный диалог.
+      if not check_webview2():
+          # Fixed Version: указать webview.start(private_mode=..., ...) либо
+          # показать сообщение и завершиться, не открывая пустое окно.
+          raise SystemExit("WebView2 Runtime не найден. Установите его или используйте "
+                           "сборку с вложенным Fixed Version Runtime.")
+
+      # 2. Каталоги пользователя (%LOCALAPPDATA%\chem-agent\...) — создать при старте.
+      ensure_user_dirs()
+
+      # 3. Путь к UI через resource_path(): работает и в dev, и в one-file (sys._MEIPASS).
+      index_html = resource_path("static/index.html")
+
       api = Bridge()
       window = webview.create_window(
           "chem-agent",
-          url="static/index.html",
+          url=index_html,
           js_api=api,
           width=1280,
           height=800,
@@ -558,12 +686,26 @@ chem-agent/
       )
       webview.start(debug=False)
 
+  Добавить в существующий chem_agent/config.py:
+
+      def resource_path(rel: str) -> str:
+          base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)) + "/..")
+          return os.path.abspath(os.path.join(base, rel))
+
+  ВАЖНО: относительный url="static/index.html" в one-file НЕ работает —
+  PyInstaller распаковывает данные в sys._MEIPASS.
+
 ### 15.2. chem-agent.spec
 
-  - datas: chem_agent/data/, templates/, static/, chem_agent/static/
-  - hiddenimports: pywebview, webview, clr (для Windows)
+  - datas (единый список, соответствует структуре §5):
+      chem_agent/data/          ← база crc.db
+      templates/                ← шаблоны отчётов (используются report/)
+      static/                   ← весь frontend (index.html, modules/, vendor/, assets/)
+  - hiddenimports: pywebview, webview, clr, pythonnet (для Windows)
   - icon: chem-agent.ico
   - one-file
+  - офлайн-вариант: флаг окружения WEBVIEW2_FIXED=1 добавляет Fixed Version Runtime
+    в datas и увеличивает размер exe (см. §16.13)
 
 ### 15.3. Команда сборки
 
@@ -578,16 +720,23 @@ chem-agent/
   3. UI на русском, приветливый, адаптивный.
   4. Экран «Конструктор» позволяет выбрать реагенты через таблицу Менделеева.
   5. Расчёт работает — результат появляется без задержки.
-  6. HTML-отчёт встроен через iframe.
+  6. HTML-отчёт встроен через iframe
+     (в WebView2 при file:// требуется, чтобы отчёт лежал в доверенной папке
+      пользователя — %LOCALAPPDATA%\chem-agent\reports\; при необходимости
+      используется src="data:text/html" или загрузка через Bridge).
   7. История сохраняется в SQLite и переживает перезапуск.
-  8. Пресеты работают (встроенные + пользовательские).
-  9. Настройки сохраняются.
+  8. Пресеты работают (встроенные + пользовательские из presets.json).
+  9. Настройки сохраняются в settings.json.
   10. Экран «3D» загружается с Three.js, показывает молекулу.
   11. Модули включаются/выключаются через настройки.
-  12. Работает офлайн.
-  13. Размер exe ≤ 400 МБ.
-  14. Запуск ≤ 5 секунд.
-  15. Все существующие тесты (152 pytest) проходят.
+  12. Работает офлайн (проверен WebView2: Evergreen либо вложенный Fixed Version).
+  13. Размер exe ≤ 400 МБ без Fixed Version Runtime; ≤ 600 МБ с вложенным
+      Fixed Version Runtime.
+  14. Запуск ≤ 5 секунд (при one-file учитывать распаковку; мерить «до первого
+      отрисованного кадра», а не только до появления процесса).
+  15. Существующий набор тестов (pytest) проходит без регрессий.
+  16. При отсутствии WebView2 приложение показывает понятное сообщение,
+      а не пустое окно/краш.
 
 --------------------------------------------------------------------------------
 17. ЭТАПЫ (агент проходит все, отдаёт готовое)
@@ -635,10 +784,22 @@ chem-agent/
     - Анимации, тултипы, плейсхолдеры.
     - Пустые состояния.
 
-  Этап 9. Сборка exe
-    - PyInstaller one-file.
-    - Проверка на чистой Windows.
-    - README, CHANGELOG.
+   Этап 9. Сборка exe
+     - PyInstaller one-file.
+     - Проверка на чистой Windows.
+     - README, CHANGELOG.
+
+   Этап 10. Тестирование и приёмка
+     - Прогон существующего pytest без регрессий (§16.15).
+     - Проверка сценариев: отсутствие WebView2, пустая история, нет 3D-данных,
+       не-реакция (no_reaction), ошибки ввода.
+     - Проверка офлайн-режима (сетевой адаптер отключён).
+
+  ОГРАНИЧЕНИЕ СБОРКИ:
+     - Windows one-file exe собирается ТОЛЬКО на Windows.
+     - На Linux/macOS агент отдаёт исходники + chem-agent.spec + run_app.py +
+       инструкцию по сборке; сам exe собирает пользователь либо CI на windows-latest.
+     - Результат self-test фиксируется в IMPLEMENTATION_REPORT.md.
 
 --------------------------------------------------------------------------------
 18. ЧТО НЕ ВХОДИТ В ЭТУ ВЕРСИЮ
@@ -658,7 +819,8 @@ chem-agent/
 
 После реализации — одним архивом:
   - Исходники.
-  - chem-agent.exe (собранный, one-file).
+  - chem-agent.exe (собранный на Windows, one-file; если сборка выполняется вне
+    Windows — вместо exe приложить spec + инструкцию по сборке, см. §17).
   - chem-agent.ico.
   - README.md (инструкция для пользователя).
   - CHANGELOG.md.
