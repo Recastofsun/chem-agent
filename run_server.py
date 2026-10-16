@@ -1,9 +1,19 @@
 """Launcher: starts local chem-agent server and opens browser."""
+import logging as _logging
 import os
 import sys
 import threading
 import time
 import webbrowser
+
+from chem_agent.logging_setup import setup as setup_logging
+
+log = setup_logging()
+log.info("=" * 60)
+log.info("chem-agent server starting")
+log.info(f"Python: {sys.version.split()[0]}")
+log.info(f"Working directory: {os.getcwd()}")
+log.info("=" * 60)
 
 os.environ.setdefault("CHEM_AGENT_OFFLINE", "1")
 
@@ -23,11 +33,17 @@ def main():
     print("  Для остановки нажмите Ctrl+C")
     print("=" * 60)
 
+    # Все логи uvicorn — в тот же файл, что и логи приложения
+    uvicorn_log = _logging.getLogger("uvicorn")
+    for h in log.handlers:
+        uvicorn_log.addHandler(h)
+    uvicorn_log.setLevel(_logging.INFO)
+
     threading.Thread(target=open_browser, daemon=True).start()
 
-    import uvicorn
+    import uvicorn  # type: ignore
     from chem_agent.api.server import app
-    uvicorn.run(app, host=HOST, port=PORT, log_level="warning")
+    uvicorn.run(app, host=HOST, port=PORT, log_level="info")
 
 
 if __name__ == "__main__":
