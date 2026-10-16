@@ -32,12 +32,14 @@ def main():
     print(f"  Откройте http://{HOST}:{PORT}/ в браузере")
     print("  Для остановки нажмите Ctrl+C")
     print("=" * 60)
-
-    # Все логи uvicorn — в тот же файл, что и логи приложения
-    uvicorn_log = _logging.getLogger("uvicorn")
-    for h in log.handlers:
-        uvicorn_log.addHandler(h)
-    uvicorn_log.setLevel(_logging.INFO)
+    
+     # Логи uvicorn и его дочерних логгеров — в тот же файл
+    for name in ("uvicorn", "uvicorn.error", "uvicorn.access", "fastapi"):
+        lg = _logging.getLogger(name)
+        for h in log.handlers:
+            lg.addHandler(h)
+        lg.setLevel(_logging.INFO)
+        lg.propagate = False
 
     threading.Thread(target=open_browser, daemon=True).start()
 
