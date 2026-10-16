@@ -30,7 +30,7 @@ direct:
   - {formula: "Cu(NH3)4+2", phase: aq, dGf: -111.07, dHf: -348.5, S: 273.6, sigma: 2.0}
   - {formula: "Ag(NH3)2+", phase: aq, dGf: -17.12, dHf: -111.29, S: 245.2, sigma: 2.0}
   - {formula: "Zn(NH3)4+2", phase: aq, dGf: -301.9, dHf: -533.5, S: 301.0, sigma: 2.5}
-  - {formula: "Zn(OH)4-2", phase: aq, dGf: -858.52, sigma: 2.5}
+  - {formula: "Zn(OH)4-2", phase: aq, dGf: -874.0, sigma: 2.5}
   - {formula: "I3-", phase: aq, dGf: -51.4, dHf: -51.5, S: 239.3, sigma: 1.5}
   - {formula: "Ag2S", phase: s, dGf: -40.67, dHf: -32.59, S: 144.01, sigma: 1.5}
   - {formula: "Fe3O4", phase: s, dGf: -1015.4, dHf: -1118.4, S: 146.4, sigma: 2.0}

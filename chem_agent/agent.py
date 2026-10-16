@@ -268,7 +268,28 @@ class Agent:
         n = eq.n
         for m in eq.messages:
             warnings.append(m)
+                # Spontaneous gas-phase pairs: no igniter needed.
+        _SPONTANEOUS_GAS_PAIRS = (
+            {"NH3", "HCl"}, {"NH3", "HBr"}, {"NH3", "HI"},
+            {"NO", "O2"},
+        )
+        _reagent_formulas = {r.formula for r in system.reagents}
+        _spontaneous_pair = any(pair <= _reagent_formulas for pair in _SPONTANEOUS_GAS_PAIRS)
+        _gas_mix_no_igniter = (
+            not aqueous
+            and T < 700
+            and len(system.reagents) > 1
+            and all(r.phase == "g" for r in system.reagents)
+            and not _spontaneous_pair
+            and not (cond.get("catalyst") or {}).get("formula")
+        )
+        if _gas_mix_no_igniter:
+            warnings.append("Смесь газов при T < 700 K без катализатора не реагирует самопроизвольно "
+                            "(нужна искра, пламя или освещение): реакция считается не идущей")
         an = analyze(system, n)
+        if _gas_mix_no_igniter:
+            an.reaction_occurred = False
+            an.products = []
         reliability: list[str] = []
         if not eq.converged:
             reliability.append("расчет равновесия не сошелся с нужной точностью (невязка баланса "
@@ -284,10 +305,6 @@ class Agent:
                            if not solver.tdep[i] and (eq.n[i] > 1e-6 or system.initial[i] > 0)})
             if no_t:
                 warnings.append("Нет ΔfH, зависимость от температуры не учтена для: " + ", ".join(no_t[:10]))
-        if not aqueous and T < 700 and all(r.phase == "g" for r in system.reagents) and len(system.reagents) > 1 \
-                and not (cond.get("catalyst") or {}).get("formula"):
-            warnings.append("Смесь газов при T < 700 K без катализатора обычно реагирует только после поджигания "
-                            "(искра, пламя, свет): показано равновесие, а не то, что произойдет само")
         explanation.append({"step": "Генерация гипотез и равновесие",
                             "text": f"Минимизация энергии Гиббса при T = {T:.2f} K, P = {P_bar:.4g} бар. "
                                     f"Итераций: {eq.iterations}, невязка баланса масс {eq.residual:.1e}."})

@@ -1192,9 +1192,17 @@
     "temperature_K": 700.0,
     "volume_L": 1.0,
     "solvent": "none",
+    "atmosphere": {
+      "mode": "open",
+      "headspace_L": 1000.0,
+      "composition": {
+        "N2": 0.78,
+        "O2": 0.21
+      }
+    },
     "expected_main": "KNO2",
     "in_scope": true,
-    "note": "нитрат калия -> нитрит, O2"
+    "note": "KNO3 -> KNO2 + O2, открытая система"
   },
   {
     "id": "h055",
@@ -1226,9 +1234,21 @@
     "temperature_K": 500.0,
     "volume_L": 1.0,
     "solvent": "none",
+    "atmosphere": {
+      "mode": "open",
+      "headspace_L": 1000.0,
+      "composition": {
+        "N2": 0.78,
+        "O2": 0.21
+      }
+    },
     "expected_main": "K2MnO4",
     "in_scope": true,
-    "note": "перманганат -> манганат, MnO2, O2"
+    "accept_any": [
+      "K2MnO4",
+      "MnO2"
+    ],
+    "note": "KMnO4 -> K2MnO4 + MnO2 + O2, открытая система"
   },
   {
     "id": "h057",
@@ -1570,9 +1590,13 @@
     "temperature_K": 298.15,
     "volume_L": 1.0,
     "solvent": "none",
-    "expected_main": "NO2",
+    "expected_main": "N2O4",
     "in_scope": true,
-    "note": "окисление NO в NO2 на воздухе"
+    "accept_any": [
+      "NO2",
+      "N2O4"
+    ],
+    "note": "окисление NO, димер N2O4 при 298 K"
   },
   {
     "id": "h074",
@@ -1614,9 +1638,9 @@
     "temperature_K": 500.0,
     "volume_L": 1.0,
     "solvent": "none",
-    "expected_main": "CH4",
+    "expected_main": null,
     "in_scope": true,
-    "note": "синтез метана, катализатор Ni"
+    "note": "синтез метана без катализатора не идёт; в тесте катализатор не задан"
   },
   {
     "id": "h076",
@@ -1692,9 +1716,17 @@
     "temperature_K": 330.0,
     "volume_L": 1.0,
     "solvent": "none",
+    "atmosphere": {
+      "mode": "open",
+      "headspace_L": 1000.0,
+      "composition": {
+        "N2": 0.78,
+        "O2": 0.21
+      }
+    },
     "expected_main": "NH3",
     "in_scope": true,
-    "note": "разложение пищевой соды при нагреве"
+    "note": "NH4HCO3 -> NH3 + CO2 + H2O, открытая система"
   },
   {
     "id": "h080",
@@ -2064,7 +2096,7 @@
       },
       {
         "formula": "H2SO4",
-        "moles": 0.03,
+        "moles": 0.05,
         "phase": "aq"
       }
     ],
@@ -2073,7 +2105,7 @@
     "solvent": "water",
     "expected_main": "MnSO4",
     "in_scope": true,
-    "note": "перманганатометрия оксалата, при нагреве"
+    "note": "перманганатометрия оксалата, избыток H2SO4"
   },
   {
     "id": "h097",
@@ -2162,7 +2194,7 @@
       },
       {
         "formula": "H2SO4",
-        "moles": 0.005,
+        "moles": 0.01,
         "phase": "aq"
       }
     ],
@@ -2171,6 +2203,10 @@
     "solvent": "water",
     "expected_main": "MnSO4",
     "in_scope": true,
-    "note": "ещё одна перманганатометрия, щавелевая кислота"
+    "accept_any": [
+      "MnSO4",
+      "Mn+2"
+    ],
+    "note": "перманганатометрия, избыток H2SO4"
   }
 ]

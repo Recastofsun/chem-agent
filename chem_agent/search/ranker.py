@@ -12,7 +12,7 @@ from ..thermo.equilibrium import AQ, COND, GAS, SOLVENT
 from .hypotheses import WATER_KEY, ChemSystem
 
 WEIGHTS = {"precipitate": 3.0, "gas": 3.0, "solid": 3.0, "liquid": 2.5, "dissolved_gas": 2.6,
-           "molecule_aq": 2.2, "salt_solution": 2.0, "ion": 1.5, "water": 1.2}
+           "molecule_aq": 2.2, "salt_solution": 2.0, "ion": 1.5, "water": 0.5}
 KIND_RU = {"precipitate": "осадок", "gas": "газ", "solid": "твердое вещество", "liquid": "жидкость",
            "dissolved_gas": "растворенный газ", "molecule_aq": "молекулы в растворе",
            "salt_solution": "соль в растворе", "ion": "ион в растворе", "water": "вода"}

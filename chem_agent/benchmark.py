@@ -22,6 +22,8 @@ def evaluate(agent, reactions: list[dict], k: int = 3, options: dict | None = No
     for rx in reactions:
         cond = {"temperature_K": rx["temperature_K"], "volume_L": rx.get("volume_L", 1.0),
                 "solvent": rx.get("solvent", "water")}
+        if "atmosphere" in rx:
+            cond["atmosphere"] = rx["atmosphere"]
         opts = {"include_uncertainty": False, "include_kinetics": False, **(options or {})}
         try:
             res = agent.predict(reagents=rx["reagents"], conditions=cond, options=opts).data
