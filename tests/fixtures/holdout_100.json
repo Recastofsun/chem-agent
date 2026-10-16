@@ -1125,6 +1125,10 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": "Ni(NH3)6SO4",
+    "accept_any": [
+      "Ni(NH3)6SO4",
+      "Ni(NH3)6+2"
+    ],
     "in_scope": true,
     "note": "гексаамминникеля(II), сине-фиолетовый"
   },
