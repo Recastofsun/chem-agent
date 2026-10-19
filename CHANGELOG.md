@@ -3,15 +3,18 @@
 ## [Unreleased]
 
 ### Added
-- Нативный десктопный каркас на PyWebView (v2.0 desktop foundation).
-- Bridge API (контракт `{status, data, error}`) для связи UI ↔ Python.
-- Лаунчер `run_app.py` с обработкой отсутствия WebView2.
-- Статический UI-каркас (`static/index.html`, `app.js`, `style.css`).
-- Базовые тесты для Bridge (`tests/test_bridge.py`).
+- **Шаг 1 (Desktop Core):** Нативный десктопный каркас на PyWebView.
+- **Шаг 1 (Desktop Core):** Bridge API (контракт `{status, data, error}`) для связи UI ↔ Python.
+- **Шаг 1 (Desktop Core):** Лаунчер `run_app.py` с обработкой отсутствия WebView2.
+- **Шаг 2 (Constructor):** Сквозной метод `predict` в Bridge (передача запроса из UI в `Agent` и обратно).
+- **Шаг 2 (Constructor):** Модульный фронтенд-роутер (`app.js`, `modules/core.js`, `modules/constructor.js`, `modules/sandbox.js`).
+- **Шаг 2 (Constructor):** Экран «Конструктор» для ввода реагентов и условий с выводом уравнения и ΔG.
+- Базовые тесты для Bridge и сквозного расчета (`tests/test_bridge.py`, `tests/test_bridge_predict.py`).
 
 ### Changed
-- HTTP-стек (FastAPI, uvicorn, pydantic) перенесен в `requirements-dev.txt` (dev-only).
-- `requirements.txt` обновлен под десктопную сборку (добавлены `pywebview`, `pythonnet`, `clr-loader`, удалены зависимости HTTP-сервера).
+- **Инфраструктура:** HTTP-стек (FastAPI, uvicorn, pydantic) перенесен в `requirements-dev.txt` (dev-only).
+- **Инфраструктура:** `requirements.txt` обновлен под десктопную сборку (добавлены `pywebview`, `pythonnet`, `clr-loader`).
+- **Ядро:** Внедрена ленивая инициализация `Agent` (база данных загружается только при первом расчете, чтобы окно открывалось мгновенно).
 
 ---
 
@@ -61,7 +64,7 @@
 | Слепая выборка `tests/fixtures/holdout.json` | 60 | 100 % |
 
 Эталон составлен отдельным агентом до настройки правил, но правила настраивались при его прогонах,
-поэтому оценка на нем оптимистична. Слепую выборку писал другой агент без доступа к коду и правилам;
+поэтому оценка на нем оптимистична. Слепая выборка писалась другим агентом без доступа к коду и правилам;
 реакции в ней типовые. Разбор 18 промахов эталона:
 
 - 6 - нет данных о веществе в базе: реагент (CaSO3, (NH4)2CO3, Cu(NO3)2 - ответ «неизвестно») или
