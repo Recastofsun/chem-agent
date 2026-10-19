@@ -9,12 +9,19 @@
 - **Шаг 2 (Constructor):** Сквозной метод `predict` в Bridge (передача запроса из UI в `Agent` и обратно).
 - **Шаг 2 (Constructor):** Модульный фронтенд-роутер (`app.js`, `modules/core.js`, `modules/constructor.js`, `modules/sandbox.js`).
 - **Шаг 2 (Constructor):** Экран «Конструктор» для ввода реагентов и условий с выводом уравнения и ΔG.
+- **Шаг 3 (History & Settings):** Локальное хранилище на SQLite (`%LOCALAPPDATA%\chem-agent\history.db`) и файл настроек (`settings.json`).
+- **Шаг 3 (History & Settings):** Автосохранение каждого расчета в локальную историю.
+- **Шаг 3 (History & Settings):** Методы Bridge для работы с историей (`get_history`, `get_history_entry`, `delete_history_entry`, `clear_history`) и настройками (`get_settings`, `save_settings`).
+- **Шаг 3 (History & Settings):** Экран «История» с возможностью просмотра деталей реакции в модальном окне.
+- **UX:** Модальное окно истории закрывается по клику на крестик, по клику на затемненный фон (backdrop) и по нажатию клавиши Escape.
 - Базовые тесты для Bridge и сквозного расчета (`tests/test_bridge.py`, `tests/test_bridge_predict.py`).
+- Тесты для модуля хранения истории (`tests/test_storage.py`).
 
 ### Changed
 - **Инфраструктура:** HTTP-стек (FastAPI, uvicorn, pydantic) перенесен в `requirements-dev.txt` (dev-only).
 - **Инфраструктура:** `requirements.txt` обновлен под десктопную сборку (добавлены `pywebview`, `pythonnet`, `clr-loader`).
 - **Ядро:** Внедрена ленивая инициализация `Agent` (база данных загружается только при первом расчете, чтобы окно открывалось мгновенно).
+- **Хранилище:** В `server.py` (v1.0) история хранилась в памяти (`_store`), в v2.0 она перенесена в постоянную базу SQLite.
 
 ---
 

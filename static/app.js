@@ -1,9 +1,11 @@
 import { waitForApi } from "./modules/core.js";
 import * as Constructor from "./modules/constructor.js";
 import * as Sandbox from "./modules/sandbox.js";
+import * as History from "./modules/history.js"; 
 
 const routes = {
   constructor: Constructor,
+  history: History, 
   sandbox: Sandbox
 };
 
