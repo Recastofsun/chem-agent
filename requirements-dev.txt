@@ -1,4 +1,28 @@
+# ============================================================
+# Chem-Agent v2.0 — development requirements
+# ------------------------------------------------------------
+# Установка: pip install -r requirements-dev.txt
+# Включает в себя prod-зависимости и инструменты для разработки.
+# ============================================================
+
 -r requirements.txt
+
+# --- dev-only: HTTP-режим (chem_agent/api/server.py) ---
+# Этот стек нужен ТОЛЬКО для запуска FastAPI-сервера при разработке.
+# В финальную сборку .exe (PyInstaller) он не попадает.
+fastapi==0.118.0
+starlette==0.48.0
+pydantic==2.13.3
+pydantic_core==2.46.3
+annotated-types==0.8.0
+typing-inspection==0.4.4
+anyio==4.15.1
+idna==3.20
+uvicorn==0.46.0
+click==8.5.0
+h11==0.16.0
+
+# --- dev-only: тестирование ---
 pytest==9.1.1
 iniconfig==2.3.0
 packaging==26.3

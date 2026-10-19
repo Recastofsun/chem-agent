@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [Unreleased]
+
+### Added
+- Нативный десктопный каркас на PyWebView (v2.0 desktop foundation).
+- Bridge API (контракт `{status, data, error}`) для связи UI ↔ Python.
+- Лаунчер `run_app.py` с обработкой отсутствия WebView2.
+- Статический UI-каркас (`static/index.html`, `app.js`, `style.css`).
+- Базовые тесты для Bridge (`tests/test_bridge.py`).
+
+### Changed
+- HTTP-стек (FastAPI, uvicorn, pydantic) перенесен в `requirements-dev.txt` (dev-only).
+- `requirements.txt` обновлен под десктопную сборку (добавлены `pywebview`, `pythonnet`, `clr-loader`, удалены зависимости HTTP-сервера).
+
+---
+
 ## 1.0.0 - 2026-09-29
 
 Первая версия по «ТЗ химия.txt» (версия ТЗ 1.0).

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chem-Agent 2.0</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Chem-Agent <span class="ver" id="ver">v2.0-dev</span></div>
+    <div class="status" id="status" data-state="pending">загрузка…</div>
+  </header>
+
+  <main class="container">
+    <h1>Проверка связи UI ↔ Python</h1>
+    <p>Каркас десктопного приложения. Кнопки вызывают методы Bridge.</p>
+
+    <div class="row">
+      <button id="btn-ping">Ping</button>
+      <button id="btn-version">Версия</button>
+      <button id="btn-broken">Вызвать ошибку (predict)</button>
+    </div>
+
+    <pre id="output" class="output">—</pre>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

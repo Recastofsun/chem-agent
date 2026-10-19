@@ -6,6 +6,17 @@
 
 ---
 
+## 19 октября 2026 (Шаг 1: Каркас Desktop-приложения v2.0)
+- Переведен prod-стек с FastAPI/uvicorn на `pywebview` + `pythonnet`. HTTP-стек перенесен в `requirements-dev.txt`.
+- Создан `run_app.py` для запуска нативного окна WebView2 без консоли.
+- Реализован `Bridge` (контракт `{status, data, error}`) в `chem_agent/api/bridge.py`.
+- Настроен статический UI-каркас (`static/index.html`, `app.js`, `style.css`).
+- Добавлены базовые тесты `tests/test_bridge.py`.
+- **Проблема с Python 3.14:** `pythonnet` не поддерживает Python 3.14 (имеет ограничение `<3.14`). Пришлось пересоздать виртуальное окружение на Python 3.11, как и указано в ТЗ.
+- **Проблема с clr-loader:** версия `0.2.7` не устанавливалась через pip. Решено жесткой фиксацией версии `0.2.7.post0` в requirements.txt.
+
+---
+
 ## Октябрь 2026 — путь к 97.9% accuracy
 
 ### Контекст
