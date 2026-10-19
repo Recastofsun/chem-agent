@@ -46,6 +46,16 @@ export function render(container) {
   `;
 
   const list = document.getElementById("reagents-list");
+
+  // Функция сохранения текущего состояния в localStorage
+  const saveState = () => {
+    const reagents = Array.from(document.querySelectorAll(".reagent-row")).map(row => ({
+      formula: row.querySelector(".reag-formula").value.trim(),
+      moles: parseFloat(row.querySelector(".reag-moles").value)
+    }));
+    localStorage.setItem("constructor_reagents", JSON.stringify(reagents));
+  };
+
   const addReagentRow = (formula = "", moles = 1.0) => {
     const row = document.createElement("div");
     row.className = "row reagent-row";
@@ -60,13 +70,44 @@ export function render(container) {
       </div>
       <button class="secondary btn-remove" style="margin-bottom: 2px;">✕</button>
     `;
-    row.querySelector(".btn-remove").onclick = () => row.remove();
+    
+    // Сохраняем стейт при любом изменении в полях
+    row.querySelector(".reag-formula").addEventListener("input", saveState);
+    row.querySelector(".reag-moles").addEventListener("input", saveState);
+    
+    row.querySelector(".btn-remove").onclick = () => {
+      row.remove();
+      saveState(); // Сохраняем после удаления
+    };
+    
     list.appendChild(row);
   };
 
-  document.getElementById("btn-add-reagent").onclick = () => addReagentRow();
-  addReagentRow("NaOH", 1.0);
-  addReagentRow("HCl", 1.0);
+  // Восстанавливаем состояние при загрузке
+  const savedState = localStorage.getItem("constructor_reagents");
+  if (savedState) {
+    try {
+      const reagents = JSON.parse(savedState);
+      if (reagents.length > 0) {
+        reagents.forEach(r => addReagentRow(r.formula, r.moles));
+      } else {
+        addReagentRow("NaOH", 1.0);
+        addReagentRow("HCl", 1.0);
+      }
+    } catch (e) {
+      addReagentRow("NaOH", 1.0);
+      addReagentRow("HCl", 1.0);
+    }
+  } else {
+    // Самый первый запуск
+    addReagentRow("NaOH", 1.0);
+    addReagentRow("HCl", 1.0);
+  }
+
+  document.getElementById("btn-add-reagent").onclick = () => {
+    addReagentRow();
+    saveState();
+  };
    
   document.getElementById("btn-load-preset").onclick = async () => {
     const res = await apiCall("get_presets");
@@ -74,7 +115,6 @@ export function render(container) {
     const presets = res.data;
     if (!presets || presets.length === 0) return alert("Пресеты не найдены");
     
-    // Простое меню выбора
     const names = presets.map((p, i) => `${i + 1}. ${p.name}`).join("\n");
     const choice = prompt("Выберите пресет (введите номер):\n\n" + names);
     if (!choice) return;
@@ -84,6 +124,7 @@ export function render(container) {
     const p = presets[idx];
     list.innerHTML = ""; // Очищаем текущие реагенты
     p.reagents.forEach(r => addReagentRow(r.formula, r.moles));
+    saveState(); // Сохраняем пресет
     
     if (p.conditions) {
       document.getElementById("cond-t").value = p.conditions.temperature_K;
