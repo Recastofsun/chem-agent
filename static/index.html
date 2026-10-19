@@ -7,24 +7,27 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Chem-Agent <span class="ver" id="ver">v2.0-dev</span></div>
-    <div class="status" id="status" data-state="pending">загрузка…</div>
-  </header>
+  <div class="app-layout">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+      <div class="brand">Chem-Agent <span class="ver">v2.0</span></div>
+      <nav class="nav-menu">
+        <a href="#constructor" class="nav-link active" data-target="constructor">Конструктор</a>
+        <a href="#sandbox" class="nav-link" data-target="sandbox">Sandbox (Тест API)</a>
+      </nav>
+      <div class="status-wrap">
+        <div class="status" id="status" data-state="pending">загрузка…</div>
+      </div>
+    </aside>
 
-  <main class="container">
-    <h1>Проверка связи UI ↔ Python</h1>
-    <p>Каркас десктопного приложения. Кнопки вызывают методы Bridge.</p>
+    <!-- Основной контент -->
+    <main class="main-content">
+      <div id="view-container">
+        <!-- Сюда роутер будет вставлять модули -->
+      </div>
+    </main>
+  </div>
 
-    <div class="row">
-      <button id="btn-ping">Ping</button>
-      <button id="btn-version">Версия</button>
-      <button id="btn-broken">Вызвать ошибку (predict)</button>
-    </div>
-
-    <pre id="output" class="output">—</pre>
-  </main>
-
-  <script src="app.js"></script>
+  <script src="app.js" type="module"></script>
 </body>
 </html>

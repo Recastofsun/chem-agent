@@ -1,10 +1,10 @@
 """
 Bridge между UI (JS) и ядром (Python).
 Контракт ответа: {status: 'ok' | 'error', data: Any, error: {code, message, details} | None}.
-UI никогда не получает исключение Python.
 """
 from __future__ import annotations
 
+import json
 import logging
 import traceback
 from typing import Any, Callable
@@ -18,15 +18,27 @@ CORE_VERSION = "1.0"
 class Bridge:
     def __init__(self) -> None:
         self._window = None
+        self._agent = None
         log.info("Bridge initialized")
 
     def attach_window(self, window) -> None:
-        """Даёт Bridge доступ к окну (закрытие, диалоги и т.п. — на будущее)."""
         self._window = window
+
+    @property
+    def agent(self):
+        """Ленивая инициализация ядра (чтобы не тормозить запуск окна)."""
+        if self._agent is None:
+            log.info("Инициализация Agent (загрузка базы данных)...")
+            from chem_agent.agent import Agent
+            self._agent = Agent(offline=True)
+            log.info("Agent готов к работе.")
+        return self._agent
 
     # --- контракт -----------------------------------------------------
     def _ok(self, data: Any = None) -> dict:
-        return {"status": "ok", "data": data, "error": None}
+        # Очищаем данные от возможных numpy-типов, чтобы JSON.stringify в JS не падал
+        safe_data = json.loads(json.dumps(data, default=float))
+        return {"status": "ok", "data": safe_data, "error": None}
 
     def _err(self, code: str, message: str, details: str = "") -> dict:
         return {"status": "error", "data": None,
@@ -39,21 +51,22 @@ class Bridge:
             log.exception("Bridge error in %s", getattr(fn, "__name__", "?"))
             return self._err("INTERNAL_ERROR", str(e), traceback.format_exc())
 
-    # --- публичные методы (доступны из JS как pywebview.api.*) --------
+    # --- публичные методы ---------------------------------------------
     def ping(self) -> dict:
-        return self._ok({"message": "pong", "app_version": APP_VERSION,
-                         "core_version": CORE_VERSION})
+        return self._ok({"message": "pong", "app_version": APP_VERSION, "core_version": CORE_VERSION})
 
     def get_version(self) -> dict:
-        return self._ok({"app": "Chem-Agent", "version": APP_VERSION,
-                         "core": CORE_VERSION})
+        return self._ok({"app": "Chem-Agent", "version": APP_VERSION, "core": CORE_VERSION})
 
-    # --- заглушки следующих шагов -------------------------------------
-    def predict(self, reactants: list[str], conditions: dict | None = None) -> dict:
-        return self._err("NOT_IMPLEMENTED", "predict() появится на шаге 2")
+    def predict(self, request_data: dict) -> dict:
+        """Принимает запрос из UI, вызывает ядро, возвращает результат."""
+        def _do_predict():
+            result = self.agent.predict(request=request_data)
+            return result.data
+        return self._safe(_do_predict)
 
     def get_history(self, limit: int = 50) -> dict:
         return self._err("NOT_IMPLEMENTED", "get_history() появится на шаге 3")
 
     def get_element_compounds(self, element: str) -> dict:
-        return self._err("NOT_IMPLEMENTED", "появится на шаге 4 (таблица Менделеева)")
+        return self._err("NOT_IMPLEMENTED", "появится на шаге 4")
