@@ -1,4 +1,5 @@
 import { apiCall } from "./core.js";
+import { show as show3D } from "./viewer3d.js";
 
 export function render(container) {
   container.innerHTML = `
@@ -74,7 +75,7 @@ export function render(container) {
     });
   }
 
-  async function showDetails(id) {
+ async function showDetails(id) {
     modalBody.innerHTML = '<p>Загрузка...</p>';
     modal.style.display = "flex";
     const res = await apiCall("get_history_entry", id);
@@ -82,7 +83,37 @@ export function render(container) {
       modalBody.innerHTML = `<p style="color: var(--err);">${res.error.message}</p>`;
       return;
     }
-    modalBody.innerHTML = `<pre class="output">${JSON.stringify(res.data, null, 2)}</pre>`;
+    
+    const data = res.data;
+    const eq = data.balanced_equations?.[0];
+    const mainProduct = data.summary?.main_product;
+
+    let formulasToShow = [];
+    if (data.products && data.products.length > 0) {
+        // Берем только уникальные формулы
+        formulasToShow = [...new Set(data.products.map(p => p.formula))];
+    }
+    
+    // Кнопка 3D
+    let btn3dHtml = "";
+    if (formulasToShow.length > 0) {
+      btn3dHtml = `<button id="btn-show-3d" style="margin-bottom: 16px;">👁 Показать 3D-структуру (${formulasToShow.join(" + ")})</button>
+                   <div id="3d-container" style="margin-bottom: 16px; display: none;"></div>`;
+    }
+
+    modalBody.innerHTML = `
+      ${btn3dHtml}
+      <pre class="output">${JSON.stringify(data, null, 2)}</pre>
+    `;
+
+    if (formulasToShow.length > 0) {
+      document.getElementById("btn-show-3d").onclick = () => {
+        const c = document.getElementById("3d-container");
+        c.style.display = "block";
+        show3D(c, formulasToShow); // Передаем массив формул
+        document.getElementById("btn-show-3d").style.display = "none";
+      };
+    }
   }
 
   document.getElementById("btn-refresh").onclick = loadHistory;

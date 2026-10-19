@@ -1,0 +1,11 @@
+{
+  "formula": "CH4", "name": "Метан",
+  "atoms": [
+    {"element": "C", "x": 0.0, "y": 0.0, "z": 0.0, "color": "#333333", "radius": 0.6},
+    {"element": "H", "x": 0.62, "y": 0.62, "z": 0.62, "color": "#ffffff", "radius": 0.3},
+    {"element": "H", "x": -0.62, "y": -0.62, "z": 0.62, "color": "#ffffff", "radius": 0.3},
+    {"element": "H", "x": -0.62, "y": 0.62, "z": -0.62, "color": "#ffffff", "radius": 0.3},
+    {"element": "H", "x": 0.62, "y": -0.62, "z": -0.62, "color": "#ffffff", "radius": 0.3}
+  ],
+  "bonds": [[0, 1], [0, 2], [0, 3], [0, 4]]
+}

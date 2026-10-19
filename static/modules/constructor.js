@@ -6,6 +6,8 @@ export function render(container) {
     <p>Введите реагенты и условия. Ядро рассчитает продукты методом минимизации энергии Гиббса.</p>
     
     <div class="card">
+      <div style="margin-bottom: 12px;">
+      <button id="btn-load-preset" class="secondary" style="width: 100%; border-style: dashed;">📚 Выбрать из готовых пресетов</button></div>
       <div id="reagents-list"></div>
       <button id="btn-add-reagent" class="secondary" style="margin-top: 10px;">+ Добавить реагент</button>
       
@@ -65,6 +67,30 @@ export function render(container) {
   document.getElementById("btn-add-reagent").onclick = () => addReagentRow();
   addReagentRow("NaOH", 1.0);
   addReagentRow("HCl", 1.0);
+   
+  document.getElementById("btn-load-preset").onclick = async () => {
+    const res = await apiCall("get_presets");
+    if (res.status === "error") return alert("Ошибка загрузки пресетов");
+    const presets = res.data;
+    if (!presets || presets.length === 0) return alert("Пресеты не найдены");
+    
+    // Простое меню выбора
+    const names = presets.map((p, i) => `${i + 1}. ${p.name}`).join("\n");
+    const choice = prompt("Выберите пресет (введите номер):\n\n" + names);
+    if (!choice) return;
+    const idx = parseInt(choice) - 1;
+    if (isNaN(idx) || !presets[idx]) return;
+
+    const p = presets[idx];
+    list.innerHTML = ""; // Очищаем текущие реагенты
+    p.reagents.forEach(r => addReagentRow(r.formula, r.moles));
+    
+    if (p.conditions) {
+      document.getElementById("cond-t").value = p.conditions.temperature_K;
+      document.getElementById("cond-p").value = p.conditions.pressure_atm;
+      document.getElementById("cond-v").value = p.conditions.volume_L;
+    }
+  };
 
   document.getElementById("btn-predict").onclick = async (e) => {
     const btn = e.target;

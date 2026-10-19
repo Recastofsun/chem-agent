@@ -70,6 +70,18 @@ class Bridge:
     def get_version(self) -> dict:
         return self._ok({"app": "Chem-Agent", "version": APP_VERSION, "core": CORE_VERSION})
 
+    def get_presets(self) -> dict:
+        def _get():
+            import json
+            from pathlib import Path
+            # Ищем файл в корне проекта
+            path = Path(__file__).parent.parent.parent / "data" / "presets.json"
+            if not path.exists():
+                return []
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        return self._safe(_get)
+
     def predict(self, request_data: dict) -> dict:
         def _do_predict():
             result = self.agent.predict(request=request_data)
@@ -119,4 +131,23 @@ class Bridge:
                 })
             res.sort(key=lambda x: (len(x["formula"]) > 2, x["formula"]))
             return res
+        return self._safe(_get)
+
+    def get_3d_structures(self, formulas: list[str]) -> dict:
+        def _get():
+            import json
+            from pathlib import Path
+            base_path = Path(__file__).parent.parent.parent / "data" / "3d_cache"
+            results = []
+            for formula in formulas:
+                safe_formula = "".join(c for c in formula if c.isalnum())
+                path = base_path / f"{safe_formula}.json"
+                if path.exists():
+                    with open(path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        data["formula"] = formula
+                        results.append(data)
+            if not results:
+                raise ValueError("3D-структуры для этих продуктов пока не подготовлены.")
+            return results
         return self._safe(_get)

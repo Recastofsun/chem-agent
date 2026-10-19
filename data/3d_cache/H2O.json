@@ -1,0 +1,9 @@
+{
+  "formula": "H2O", "name": "Вода",
+  "atoms": [
+    {"element": "O", "x": 0.0, "y": 0.0, "z": 0.0, "color": "#ff0000", "radius": 0.6},
+    {"element": "H", "x": 0.75, "y": 0.58, "z": 0.0, "color": "#ffffff", "radius": 0.3},
+    {"element": "H", "x": -0.75, "y": 0.58, "z": 0.0, "color": "#ffffff", "radius": 0.3}
+  ],
+  "bonds": [[0, 1], [0, 2]]
+}
