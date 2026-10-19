@@ -90,6 +90,14 @@ class ThermoDB:
     def with_elements(self, allowed: set[str]) -> list[Species]:
         return [s for s in self.species if all(e in allowed for e, _ in s.elements)]
 
+    def find_compounds_by_element(self, symbol: str) -> list[Species]:
+        """Возвращает все вещества, в состав которых входит указанный элемент."""
+        out = []
+        for s in self.species:
+            if any(el == symbol for el, _ in s.elements):
+                out.append(s)
+        return out
+
     def summary(self) -> dict:
         counts: dict[str, int] = {}
         srcs: dict[str, int] = {}

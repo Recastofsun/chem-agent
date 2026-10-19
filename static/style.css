@@ -69,3 +69,43 @@ button.secondary { background: transparent; border: 1px solid var(--border); col
   position: absolute; top: 12px; right: 16px; font-size: 24px; cursor: pointer; color: var(--muted);
 }
 .close-btn:hover { color: var(--fg); }
+
+/* Periodic Table */
+.ptable-wrapper { overflow-x: auto; padding: 16px; padding-bottom: 20px; }
+.ptable {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  grid-template-rows: repeat(10, 1fr); /* Изменено с 7 на 10 для Лантаноидов/Актиноидов */
+  gap: 4px;
+  min-width: 980px; /* Уменьшили с 1000 до 980, чтобы плитки стали чуть меньше */
+}
+.ptable-cell {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  cursor: pointer; transition: transform 0.1s, border-color 0.1s;
+  user-select: none; position: relative;
+}
+.ptable-cell:hover { transform: scale(1.06); z-index: 10; border-color: var(--fg); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+.ptable-cell .num { font-size: 10px; color: var(--muted); position: absolute; top: 4px; left: 6px; }
+.ptable-cell .sym { font-size: 18px; font-weight: bold; }
+.ptable-cell .name { font-size: 9px; color: var(--muted); text-align: center; line-height: 1.1; padding: 0 2px; word-break: break-word; }
+.ptable-cell .mass { font-size: 9px; color: var(--muted); }
+
+/* Цвета категорий */
+.cat-nonmetal { background: rgba(78, 161, 255, 0.15); border-color: rgba(78, 161, 255, 0.4); }
+.cat-noble { background: rgba(162, 63, 191, 0.15); border-color: rgba(162, 63, 191, 0.4); }
+.cat-alkali { background: rgba(255, 92, 92, 0.15); border-color: rgba(255, 92, 92, 0.4); }
+.cat-alkaline { background: rgba(255, 158, 102, 0.15); border-color: rgba(255, 158, 102, 0.4); }
+.cat-metalloid { background: rgba(95, 209, 154, 0.15); border-color: rgba(95, 209, 154, 0.4); }
+.cat-halogen { background: rgba(230, 195, 92, 0.15); border-color: rgba(230, 195, 92, 0.4); }
+.cat-transition { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.15); }
+.cat-post-transition { background: rgba(138, 147, 161, 0.15); border-color: rgba(138, 147, 161, 0.4); }
+.cat-lanthanide { background: rgba(255, 127, 163, 0.15); border-color: rgba(255, 127, 163, 0.4); }
+.cat-actinide { background: rgba(212, 166, 255, 0.15); border-color: rgba(212, 166, 255, 0.4); }
+
+.ptable-cell.active { border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent); }
+
+/* Split view для элемента */
+.element-details { margin-top: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+.element-details h2 { margin: 0 0 12px 0; display: flex; align-items: baseline; gap: 12px; }
+.element-details h2 span { font-size: 14px; color: var(--muted); font-weight: normal; }

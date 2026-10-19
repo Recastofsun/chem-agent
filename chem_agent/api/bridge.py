@@ -17,10 +17,30 @@ class Bridge:
         self._agent = None
         self.history_db = HistoryDB()
         self.settings = SettingsManager()
+        self._is_fullscreen = False  # <-- НОВОЕ: Отслеживаем состояние
         log.info("Bridge initialized")
 
     def attach_window(self, window) -> None:
         self._window = window
+
+    def toggle_fullscreen(self) -> dict:
+        """Переключает полноэкранный режим нативного окна."""
+        def _toggle():
+            if not self._window:
+                raise ValueError("Окно еще не инициализировано")
+            self._window.toggle_fullscreen()
+            self._is_fullscreen = not self._is_fullscreen
+            return {"is_fullscreen": self._is_fullscreen}
+        return self._safe(_toggle)
+
+    def exit_fullscreen(self) -> dict:
+        """Принудительно выходит из полноэкранного режима."""
+        def _exit():
+            if self._window and self._is_fullscreen:
+                self._window.toggle_fullscreen()
+                self._is_fullscreen = False
+            return {"is_fullscreen": self._is_fullscreen}
+        return self._safe(_exit)
 
     @property
     def agent(self):
@@ -53,7 +73,6 @@ class Bridge:
     def predict(self, request_data: dict) -> dict:
         def _do_predict():
             result = self.agent.predict(request=request_data)
-            # Сохраняем в SQLite при любом статусе (ok, error, no_reaction)
             self.history_db.add_entry(result.data)
             return result.data
         return self._safe(_do_predict)
@@ -83,3 +102,21 @@ class Bridge:
     def save_settings(self, new_settings: dict) -> dict:
         self._safe(self.settings.save, new_settings)
         return self._ok(self.settings.get_all())
+
+    def get_element_compounds(self, symbol: str) -> dict:
+        def _get():
+            compounds = self.agent.db.find_compounds_by_element(symbol)
+            res = []
+            for c in compounds:
+                res.append({
+                    "id": c.id,
+                    "formula": c.formula,
+                    "phase": c.phase,
+                    "phase_ru": {"aq": "р-р", "s": "тв", "l": "ж", "g": "г"}.get(c.phase, c.phase),
+                    "dGf": c.dGf,
+                    "dHf": c.dHf,
+                    "name_ru": c.name_ru or c.name_en
+                })
+            res.sort(key=lambda x: (len(x["formula"]) > 2, x["formula"]))
+            return res
+        return self._safe(_get)
