@@ -17,6 +17,7 @@ from ..parser.elements import is_metal
 from ..parser.oxidation import oxidation_states
 from ..thermo.equilibrium import AQ, COND, GAS, M_W, SOLVENT
 from .rules import Reagent, RuleContext, RuleOutcome, component_of
+from ..parser import classifier
 
 WATER_KEY = parse_formula("H2O").key
 R_GAS = 0.082057366  # L atm / (mol K)
@@ -56,6 +57,8 @@ def is_organic(sp_elements: dict) -> bool:
     carbides, and small hydrocarbons C1-C2 (CH4, C2H2, C2H4, C2H6) which are classical
     inorganic-chemistry products (from carbides, CO + H2, etc.).
     """
+    if any(is_metal(e) for e in sp_elements):
+        return False
     c = sp_elements.get("C", 0)
     h = sp_elements.get("H", 0)
     o = sp_elements.get("O", 0)
@@ -262,8 +265,17 @@ def build_system(db_species: list[Species], reagents: list[Reagent], *, T: float
                 _metal = next(iter(set(_els) - {"O", "H"}))
                 if _metal in alkali_dissolves:
                     return skip("амфотерный гидроксид растворяется в избытке щёлочи")
-        if "organic" in rules.forbid_new_class and is_organic(els) and not present:
-            return skip("органика не образуется")
+        if rules.forbid_new_class:
+            # 1. Органика (уже была)
+            if "organic" in rules.forbid_new_class and is_organic(els) and not present:
+                return skip("органика не образуется")
+            
+            # 2. Новые классы (алканы, алкины, пероксиды и т.д.)
+            for cls in rules.forbid_new_class:
+                if cls in ("organic", "oxide_if_hydroxide", "radicals", "metal_hydrides"):
+                    continue # Пропускаем, они обрабатываются отдельно
+                if not present and classifier.classify(s.comp, cls):
+                    return skip(f"класс {cls} запрещен")
         if organic_reagents and is_organic(els) and not present:
             # allow only conjugate acid/base forms of organic reagents
             ok = False

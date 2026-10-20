@@ -9,6 +9,7 @@ import yaml
 from ..parser.elements import ALKALI, ALKALINE_EARTH, NONMETALS, is_metal
 from ..parser.formula import Composition, parse_formula
 from ..parser.oxidation import oxidation_states
+from ..parser import classifier
 from ..utils.paths import DATA_DIR
 
 WATER_REDUCERS = ALKALI | {"Ca", "Sr", "Ba"}
@@ -32,6 +33,7 @@ class RuleContext:
     reagents: list[Reagent]
     volume_L: float
     atmosphere_species: list[Composition] = field(default_factory=list)
+    open_system: bool = False  # <-- ДОБАВЛЕНО ДЛЯ h054
 
     def elements(self) -> set[str]:
         els = {e for r in self.reagents for e, _ in r.comp.elements}
@@ -43,6 +45,9 @@ class RuleContext:
     def has(self, formula: str) -> bool:
         key = parse_formula(formula).key
         return any(r.comp.key == key for r in self.reagents)
+
+    def has_class(self, class_name: str) -> bool:
+        return any(classifier.classify(r.comp, class_name) for r in self.reagents)
 
     def conc(self, formula: str) -> float:
         key = parse_formula(formula).key
@@ -58,11 +63,11 @@ class RuleContext:
         if any(is_metal(e) for e in els):
             return False
         if els.get("C") and els.get("H", 0) > 1 and "O" not in els:
-            return False  # hydrocarbons
+            return False
         key = tuple(sorted(els.items()))
         if key in ((("H", 3), ("N", 1)), (("H", 2), ("O", 1)), (("H", 2), ("O", 2)),
                    (("C", 2), ("H", 6), ("O", 1)), (("C", 1), ("H", 4), ("O", 1)), (("H", 4), ("N", 2))):
-            return False  # NH3, H2O, H2O2, alcohols, hydrazine
+            return False
         return True
 
     @staticmethod
@@ -76,26 +81,11 @@ class RuleContext:
 
     @staticmethod
     def is_strong_oxidant(c: Composition) -> bool:
-        st = oxidation_states(c.elements, c.charge)
-        els = c.as_dict
-        if len(els) == 1 and next(iter(els)) in ("F", "Cl", "Br", "O") and c.charge == 0:
-            return True
-        if st is None:
-            return False
-        if st.get("Mn", 0) >= 4 or st.get("Cr", 0) >= 6 or st.get("Pb", 0) >= 4:
-            return True
-        if st.get("Cl", -1) >= 1 or st.get("Br", -1) >= 1:
-            return True
-        if "O" in st and abs(st["O"] + 1) < 1e-9:
-            return True  # peroxide
-        if st.get("Fe", 0) >= 6:
-            return True
-        return False
+        return classifier.is_strong_oxidizer(c)
 
     @staticmethod
     def is_peroxide(c: Composition) -> bool:
-        st = oxidation_states(c.elements, c.charge)
-        return bool(st and "O" in st and st["O"] > -2 + 1e-9 and st["O"] < 0)
+        return classifier.is_peroxide(c)
 
     @staticmethod
     def is_organic(c: Composition) -> bool:
@@ -112,6 +102,18 @@ class RuleContext:
                     out.add(el)
         return out
 
+    def has_strong_reducer(self) -> bool:
+        m = self.metals_elemental()
+        if m & (ACTIVE_METALS | AMPHOTERIC | WATER_REDUCERS):
+            return True
+        for r in self.reagents:
+            if r.comp.as_dict.keys() == {"C"} or r.comp.as_dict.keys() == {"H"}:
+                return True
+            # ДОБАВЛЯЕМ ПРОВЕРКУ АНИОНОВ
+            if classifier.is_reducing_anion(r.comp):
+                return True
+        return False
+
     # ---- predicates
     def pred(self, name: str, arg) -> bool:
         T = self.T
@@ -123,6 +125,14 @@ class RuleContext:
             return not self.has(arg) and not any(a.key == parse_formula(arg).key for a in self.atmosphere_species)
         if name == "reagent_present":
             return self.has(arg)
+        if name == "reagents_present": 
+            return all(self.has(f) for f in arg)
+        if name == "reagent_class":
+            return self.has_class(arg)
+        if name == "open_system":
+            return self.open_system == bool(arg)
+        if name == "no_strong_reducer":
+            return (not self.has_strong_reducer()) == bool(arg)
         if name == "no_strong_oxidant":
             return not any(self.is_strong_oxidant(r.comp) for r in self.reagents) == bool(arg)
         if name == "strong_oxidant":
@@ -154,7 +164,6 @@ class RuleContext:
             reducer = bool(m & WATER_REDUCERS) or ("Mg" in m and T >= 340)
             base = any(self.is_strong_base(r.comp) for r in self.reagents)
             reducer = reducer or bool(m & AMPHOTERIC and base)
-            # hydrides (NaH, CaH2) also reduce water
             for r in self.reagents:
                 st = oxidation_states(r.comp.elements, r.comp.charge)
                 if st and st.get("H", 1) < 0:
@@ -171,10 +180,10 @@ class RuleContext:
 
 @dataclass
 class RuleOutcome:
-    decouple: dict[str, list[list]] = field(default_factory=dict)  # element -> groups
-    forbid_new: set = field(default_factory=set)                   # composition keys
+    decouple: dict[str, list[list]] = field(default_factory=dict)
+    forbid_new: set = field(default_factory=set)
     forbid_new_class: set = field(default_factory=set)
-    inert_formulas: set = field(default_factory=set)                # composition keys
+    inert_formulas: set = field(default_factory=set)
     fired: list[dict] = field(default_factory=list)
 
 
@@ -212,17 +221,25 @@ def evaluate(ctx: RuleContext, disabled: set[str] | None = None) -> RuleOutcome:
                     if all(e in sys_els for e, _ in c.elements):
                         effect = True
         if "forbid_new_class" in then:
-            out.forbid_new_class.add(then["forbid_new_class"])
-            cls = then["forbid_new_class"]
-            els = ctx.elements()
-            if cls == "organic":
-                effect = "C" in els and "H" in els
-            elif cls in ("oxide_if_hydroxide", "metal_hydrides"):
-                effect = any(is_metal(e) for e in els) and (cls != "metal_hydrides" or "H" in els)
-            elif cls == "radicals":
-                effect = False  # recorded as fired only when it actually removes a species
-            else:
-                effect = True
+            cls_val = then["forbid_new_class"]
+            classes = cls_val if isinstance(cls_val, list) else [cls_val]
+            
+            for cls in classes:
+                out.forbid_new_class.add(cls)
+                
+                els = ctx.elements()
+                effect_cls = False
+                if cls == "organic":
+                    effect_cls = "C" in els and "H" in els
+                elif cls in ("oxide_if_hydroxide", "metal_hydrides"):
+                    effect_cls = any(is_metal(e) for e in els) and (cls != "metal_hydrides" or "H" in els)
+                elif cls == "radicals":
+                    effect_cls = False
+                else:
+                    effect_cls = True
+                    
+                if effect_cls:
+                    effect = True
         if "inert_reagent" in then:
             for f in then["inert_reagent"]["formulas"]:
                 if ctx.has(f):
@@ -234,7 +251,6 @@ def evaluate(ctx: RuleContext, disabled: set[str] | None = None) -> RuleOutcome:
 
 
 def component_of(element: str, state: float | None, groups: list[list]) -> str:
-    """Pseudo-element name for element in given oxidation state under decoupling groups."""
     other_idx = None
     for i, grp in enumerate(groups):
         if "others" in grp:

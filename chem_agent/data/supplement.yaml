@@ -43,6 +43,7 @@ direct:
   - {formula: "SnCl2", phase: aq, dGf: -429.0, dHf: -524.0, S: 130.0, sigma: 4.0, note: "оценка; требует верификации"}
   - {formula: "SnCl4", phase: aq, dGf: -530.0, dHf: -570.0, S: 195.0, sigma: 4.0, note: "оценка; требует верификации"}
   - {formula: "H3PO3", phase: aq, dGf: -848.9, dHf: -964.4, S: 163.0, sigma: 3.0, note: "NBS-1982 (phosphorous acid, aqueous)"}
+  - {formula: "Na2S4O6", phase: aq, dGf: -1024.0, dHf: -1064.0, S: 300.0, sigma: 10.0, note: "оценка для тетратионата натрия"}
 
 ksp:
   # Fe(OH)3 и Al(OH)3 - аморфные свежеосажденные фазы: log Ksp = log_k(phreeqc.dat) - 3*14,0

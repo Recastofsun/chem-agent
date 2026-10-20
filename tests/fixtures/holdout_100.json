@@ -1494,7 +1494,7 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": null,
-    "in_scope": false,
+    "in_scope": true,
     "note": "гидролиз по аниону; в равновесии — HCO3-, OH-; продукты не «новое вещество»"
   },
   {
@@ -1511,7 +1511,7 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": null,
-    "in_scope": false,
+    "in_scope": true,
     "note": "слабый гидролиз по катиону; продукты не «новое вещество»"
   },
   {
@@ -1882,7 +1882,7 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": null,
-    "in_scope": false,
+    "in_scope": true,
     "note": "растворение NH3, не реакция"
   },
   {
@@ -2063,7 +2063,7 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": null,
-    "in_scope": false,
+    "in_scope": true,
     "note": "гексацианоферрат(III) стабилен в щёлочи"
   },
   {
@@ -2085,7 +2085,7 @@
     "volume_L": 1.0,
     "solvent": "water",
     "expected_main": "Na2S4O6",
-    "in_scope": false,
+    "in_scope": true,
     "note": "нужен Na2S4O6 в базе; временно вне области"
   },
   {
@@ -2216,5 +2216,125 @@
       "Mn+2"
     ],
     "note": "перманганатометрия, избыток H2SO4"
+  },
+  {
+    "id": "h101",
+    "category": "комплексы",
+    "reagents": [
+      {
+        "formula": "FeCl3",
+        "moles": 0.01,
+        "phase": "aq"
+      },
+      {
+        "formula": "KSCN",
+        "moles": 0.03,
+        "phase": "aq"
+      }
+    ],
+    "temperature_K": 298.15,
+    "volume_L": 1.0,
+    "solvent": "water",
+    "expected_main": "Fe(SCN)3",
+    "in_scope": true,
+    "note": "проверка нового правила"
+  },
+  {
+    "id": "h102",
+    "category": "разложение-сухое",
+    "reagents": [
+      {
+        "formula": "KNO3",
+        "moles": 0.1,
+        "phase": "s"
+      }
+    ],
+    "temperature_K": 700.0,
+    "volume_L": 1.0,
+    "solvent": "none",
+    "atmosphere": {
+      "mode": "open",
+      "headspace_L": 1000.0,
+      "composition": {
+        "N2": 0.78,
+        "O2": 0.21
+      }
+    },
+    "expected_main": "KNO2",
+    "in_scope": true,
+    "note": "проверка open_system"
+  },
+  {
+    "id": "h103",
+    "category": "разложение-сухое",
+    "reagents": [
+      {
+        "formula": "KMnO4",
+        "moles": 0.1,
+        "phase": "s"
+      }
+    ],
+    "temperature_K": 500.0,
+    "volume_L": 1.0,
+    "solvent": "none",
+    "atmosphere": {
+      "mode": "open",
+      "headspace_L": 1000.0,
+      "composition": {
+        "N2": 0.78,
+        "O2": 0.21
+      }
+    },
+    "expected_main": "K2MnO4",
+    "in_scope": true,
+    "accept_any": [
+      "K2MnO4",
+      "MnO2"
+    ],
+    "note": "проверка KMnO4"
+  },
+  {
+    "id": "h104",
+    "category": "гидролиз",
+    "reagents": [
+      {
+        "formula": "CaC2",
+        "moles": 0.01,
+        "phase": "s"
+      },
+      {
+        "formula": "H2O",
+        "moles": 0.5,
+        "phase": "l"
+      }
+    ],
+    "temperature_K": 298.15,
+    "volume_L": 1.0,
+    "solvent": "water",
+    "expected_main": "C2H2",
+    "in_scope": true,
+    "note": "проверка алкинов"
+  },
+  {
+    "id": "h105",
+    "category": "ОВР-комплексы",
+    "reagents": [
+      {
+        "formula": "K3(Fe(CN)6)",
+        "moles": 0.01,
+        "phase": "aq"
+      },
+      {
+        "formula": "KOH",
+        "moles": 0.02,
+        "phase": "aq"
+      }
+    ],
+    "temperature_K": 298.15,
+    "volume_L": 1.0,
+    "solvent": "water",
+    "expected_main": null,
+    "in_scope": true,
+    "note": "проверка цианидного комплекса"
   }
 ]

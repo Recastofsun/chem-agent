@@ -1,27 +1,4 @@
 # Кинетические правила-фильтры.
-# Термодинамика говорит, что возможно; эти правила отсекают то, что при данных условиях
-# кинетически заторможено (известные метастабильные системы). Каждое сработавшее правило
-# попадает в раздел «Объяснение» отчета.
-#
-# Условия (if): все должны выполняться.
-#   T_below / T_at_least: K
-#   reagent_absent / reagent_present: формула (сравнение по составу)
-#   no_strong_oxidant / strong_oxidant: true
-#   acid_conc_at_least / acid_conc_below: {acid: HNO3, M: 6}
-#   no_acid / acid: true           - есть ли кислота среди реагентов (кроме воды)
-#   aqueous: true|false            - водная система или «сухая»
-#   no_peroxide: true              - нет пероксидов среди реагентов
-#   no_water_reducer: true         - нет металлов, восстанавливающих воду (щелочные, Ca, Sr, Ba; Mg при T>=340 K;
-#                                    амфотерные Al, Zn, Be, Sn, Pb, Ga в присутствии щелочи)
-#   organic_reagent: true|false
-#   active_metal_reagent: true     - Mg, Zn, Al, Fe, Mn среди реагентов
-# Действия (then):
-#   decouple: {element: S, groups: [[6], [others]]} - степени окисления из разных групп
-#             не переходят друг в друга (редокс-развязка, как master species в PHREEQC)
-#   forbid_new: ["O2", "O3"]  - частица не образуется, если ее нет среди исходных веществ
-#   forbid_new_class: organic
-#   inert_reagent: {metals: [Fe, Al, Cr]} - реагент не участвует (пассивация)
-
 rules:
   - id: n2_inert
     title: "N2 кинетически инертен"
@@ -31,7 +8,7 @@ rules:
 
   - id: nitrogen_redox_lowT
     title: "Азот: нитрат восстанавливается только до NO/NO2/HNO2"
-    why: "При T < 450 K нитрат и азотная кислота восстанавливаются до оксидов азота; NH4+, N2O, N2 из нитрата кинетически не образуются, аммоний и нитрат друг с другом не реагируют."
+    why: "При T < 450 K нитрат и азотная кислота восстанавливаются до оксидов азота; NH4+, N2O, N2 из нитрата кинетически не образуются."
     if: {T_below: 450}
     then: {decouple: {element: N, groups: [[5, 4, 3, 2], [-3], [1], [0], [others]]}}
 
@@ -43,13 +20,13 @@ rules:
 
   - id: nitrate_neutral_inert
     title: "Нитрат в нейтральной среде не окисляет металлы"
-    why: "Без кислоты нитрат-ион кинетически инертен: металлы вытесняют катионы из растворов нитратов, а не восстанавливают NO3-."
+    why: "Без кислоты нитрат-ион кинетически инертен."
     if: {T_below: 450, no_acid: true}
     then: {decouple: {element: N, groups: [[5], [4, 3, 2], [-3], [1], [0], [others]]}}
 
   - id: conc_nitric_no2
     title: "Концентрированная HNO3 дает NO2"
-    why: "В концентрированной азотной кислоте NO окисляется до NO2 (3NO2 + H2O ⇌ 2HNO3 + NO смещено влево); модели активности при > 6 М ненадежны, поэтому используется правило."
+    why: "В концентрированной азотной кислоте NO окисляется до NO2."
     if: {acid_conc_at_least: {acid: HNO3, M: 6.0}}
     then: {forbid_new: ["NO", "HNO2", "NO2-"]}
 
@@ -79,13 +56,13 @@ rules:
 
   - id: no_perchlorate
     title: "Перхлорат не образуется"
-    why: "Образование ClO4- требует специальных условий (электролиз, длительный нагрев без катализатора)."
+    why: "Образование ClO4- требует специальных условий."
     if: {}
-    then: {forbid_new: ["ClO4-", "KClO4", "NaClO4", "HClO4"]}
+    then: {forbid_new_class: "perchlorate"} # В будущем добавим в classifier
 
   - id: no_new_o2
     title: "O2 не выделяется из воды и оксоанионов"
-    why: "Окисление воды до O2 (например, перманганатом) кинетически заторможено; O2 выделяется только из пероксидов или при нагреве выше 450 K."
+    why: "Окисление воды до O2 кинетически заторможено; O2 выделяется только из пероксидов или при T > 450 K."
     if: {T_below: 450, no_peroxide: true}
     then: {forbid_new: ["O2", "O3"]}
 
@@ -99,11 +76,11 @@ rules:
     title: "Пероксиды не образуются"
     why: "Пероксиды метастабильны; при равновесии распадаются."
     if: {}
-    then: {forbid_new: ["H2O2", "Na2O2", "BaO2", "K2O2", "KO2"]}
+    then: {forbid_new_class: "peroxide"} # <-- ИСПОЛЬЗУЕМ КЛАСС
 
   - id: hydroxides_not_oxides
     title: "Из раствора осаждаются гидроксиды, а не оксиды"
-    why: "Оксиды металлов термодинамически устойчивее гидроксидов, но из водного раствора (до 100 °C) выпадают гидроксиды; их обезвоживание идет при прокаливании или годами."
+    why: "Оксиды металлов термодинамически устойчивее гидроксидов, но из водного раствора (до 100 °C) выпадают гидроксиды."
     if: {aqueous: true, T_below: 400}
     then: {forbid_new_class: oxide_if_hydroxide}
 
@@ -111,11 +88,11 @@ rules:
     title: "Дисульфиды (пирит) не образуются при низкой температуре"
     why: "FeS2 образуется медленно (геологические времена); в лабораторных условиях из FeS не получается."
     if: {T_below: 400}
-    then: {forbid_new: ["FeS2"]}
+    then: {forbid_new_class: "pyrite"} # <-- ИСПОЛЬЗУЕМ КЛАСС
 
   - id: no_radicals
     title: "Радикалы и атомарные газы не образуются"
-    why: "Частицы с неспаренным электроном (H, OH, HO2, Cl и т. п.) и атомарные газы живут доли секунды; кроме устойчивых NO, NO2, ClO2."
+    why: "Частицы с неспаренным электроном (H, OH, HO2, Cl и т. п.) живут доли секунды."
     if: {T_below: 2000}
     then: {forbid_new_class: radicals}
 
@@ -127,7 +104,7 @@ rules:
 
   - id: water_not_reduced
     title: "Вода не восстанавливается малоактивными металлами"
-    why: "Без кислоты H2 выделяют только щелочные и щелочноземельные металлы (Mg - при нагревании) и амфотерные металлы в щелочи; у остальных реакция заторможена оксидной пленкой."
+    why: "Без кислоты H2 выделяют только щелочные/щелочноземельные металлы, Mg (при нагревании) и амфотерные металлы в щелочи."
     if: {aqueous: true, no_acid: true, no_water_reducer: true}
     then: {forbid_new: ["H2"]}
 
@@ -151,7 +128,7 @@ rules:
 
   - id: carbon_redox_lowT_oxidant
     title: "Сильный окислитель окисляет органику и оксалат до CO2"
-    why: "Перманганат, дихромат окисляют оксалат до CO2 (классическое титрование)."
+    why: "Перманганат, дихромат окисляют оксалат до CO2."
     if: {T_below: 600, strong_oxidant: true}
     then: {decouple: {element: C, groups: [[4, 3], [others]]}}
 
@@ -163,36 +140,84 @@ rules:
 
   - id: passivation_conc_acids
     title: "Пассивация Fe, Al, Cr в концентрированных HNO3 и H2SO4"
-    why: "На холоду концентрированные азотная и серная кислоты покрывают Fe, Al, Cr оксидной пленкой."
+    why: "На холоду концентрированные кислоты покрывают Fe, Al, Cr оксидной пленкой."
     if: {T_below: 340, passivating_acid: true}
     then: {inert_reagent: {formulas: ["Fe", "Al", "Cr"]}}
 
   - id: mn_alkaline_stop
     title: "Марганец в щелочной среде: остановка на манганате (Mn6+)"
-    why: "В щелочной среде MnO4- + e- -> MnO4^2- (зелёный манганат). Дальнейшее восстановление до MnO2 или Mn2+ кинетически не идёт."
+    why: "В щелочной среде MnO4- + e- -> MnO4^2- (зелёный манганат)."
     if: {aqueous: true, T_below: 450, alkaline_reagent: true}
     then: {decouple: {element: Mn, groups: [[7, 6], [4], [2, 3], [others]]}}
 
   - id: mn_neutral_stop
     title: "Марганец в нейтральной среде: остановка на MnO2 (Mn4+)"
-    why: "В нейтральной среде MnO4- + 2 H2O + 3 e- -> MnO2 + 4 OH-. Дальнейшее восстановление до Mn2+ не идёт."
+    why: "В нейтральной среде MnO4- + 2 H2O + 3 e- -> MnO2 + 4 OH-."
     if: {aqueous: true, T_below: 450, no_acid: true, no_alkaline: true}
     then: {decouple: {element: Mn, groups: [[7, 6, 4], [2, 3], [others]]}}
 
   - id: phosphorus_iii_stable
     title: "Фосфор(III) не диспропорционирует в воде"
-    why: "H3PO3 (фосфористая кислота) кинетически устойчива; P(+3) не переходит в P(-3) и P(+5) без окислителя или нагрева выше 400 K."
+    why: "H3PO3 (фосфористая кислота) кинетически устойчива."
     if: {aqueous: true, T_below: 400}
     then: {forbid_new: ["H3P", "PH3", "P2H4"]}
 
   - id: carbide_hydrolysis_acetylene
     title: "Гидролиз карбида кальция даёт ацетилен"
-    why: "CaC2 + 2 H2O -> Ca(OH)2 + C2H2 — классическая лабораторная реакция. Термодинамически выгоднее CH4 и карбонат, но связь C≡C в ацетилене кинетически не разрывается в воде."
-    if: {aqueous: true, reagent_present: CaC2, T_below: 400}
-    then: {forbid_new: ["CH4", "C2H6", "C2H4", "H6C2", "H4C2"]}
+    why: "CaC2 + 2 H2O -> Ca(OH)2 + C2H2. Термодинамически выгоднее CH4 и карбонат, но связь C≡C в ацетилене кинетически не разрывается в воде."
+    if: {aqueous: true, reagent_class: "alkaline_earth_carbide", T_below: 400}
+    then: {forbid_new_class: "alkane"} # <-- ИСПОЛЬЗУЕМ КЛАСС (запрещаем алканы)
 
   - id: carbide_hydrolysis_methane
     title: "Гидролиз карбида алюминия даёт метан"
-    why: "Al4C3 + 12 H2O -> 4 Al(OH)3 + 3 CH4 — ацетилен образуется только из CaC2 и подобных; Al4C3 даёт метан."
-    if: {aqueous: true, reagent_present: Al4C3, T_below: 400}
-    then: {forbid_new: ["C2H2", "CaC2O4"]}
+    why: "Al4C3 + 12 H2O -> 4 Al(OH)3 + 3 CH4."
+    if: {aqueous: true, reagent_present: "Al4C3", T_below: 400} # <--- Конкретно Al4C3
+    then: {forbid_new_class: "alkyne"}
+
+  - id: fe3_no_redox_without_reducer
+    title: "Fe3+ не окисляет SCN- без явного восстановителя"
+    why: "Железо(III) не восстанавливается тиоцианатом в отсутствие активного металла."
+    if: {reagent_present: "FeCl3", reagent_present: "KSCN", no_strong_reducer: true}
+    then: {forbid_new: ["Fe+2", "Fe(OH)2", "FeO", "S", "SO4-2", "SO3-2"]} 
+
+  - id: carbide_hydrolysis_acetylene
+    title: "Гидролиз карбида кальция даёт ацетилен"
+    why: "CaC2 + 2 H2O -> Ca(OH)2 + C2H2."
+    if: {aqueous: true, reagent_class: "alkaline_earth_carbide", T_below: 400}
+    then: {forbid_new_class: ["alkane", "alkene"]} 
+
+  - id: dry_manganese_redox
+    title: "Марганец при сухом нагреве не восстанавливается до Mn3+"
+    why: "Термическое разложение перманганатов и оксидов марганца идет до Mn(VI) (манганат) или Mn(IV) (MnO2). Прямое восстановление до Mn(III) (Mn2O3) кинетически заторможено."
+    if: {aqueous: false, T_below: 1000}
+    then: {decouple: {element: Mn, groups: [[7, 6, 4], [2], [others]]}}
+
+  - id: thiocyanate_inert
+    title: "Тиоцианат кинетически инертен"
+    why: "Связь C-S в тиоцианате прочная. Без сильных окислителей или высоких температур он не разлагается."
+    if: {reagent_class: "thiocyanate", aqueous: true, T_below: 400}
+    then: 
+      forbid_new: ["CO", "CO2", "S", "SO2", "SO3", "H2S", "CS2"]
+      forbid_new_class: "sulfate" 
+  
+  - id: cyanide_complexes_stable
+    title: "Прочные цианидные комплексы не разрушаются в воде"
+    why: "Гексацианоферраты (K3[Fe(CN)6], K4[Fe(CN)6]) кинетически инертны. Разрыв связи C-N требует жестких условий (кипячение с конц. кислотами)."
+    if: {aqueous: true, T_below: 400, no_strong_oxidant: true}
+    then: {forbid_new: ["NH3", "HCN", "CN-", "C2O4-2", "CO2", "CO"]}
+
+  - id: ferricyanide_stable
+    title: "Гексацианоферрат(III) не восстанавливается без восстановителя"
+    why: "В щелочной среде K3[Fe(CN)6] устойчив, так как цианидные лиганды прочно удерживают железо в степени окисления +3."
+    if: {aqueous: true, T_below: 400, no_strong_reducer: true}
+    then: {forbid_new: ["Fe(CN)6-4", "K4Fe(CN)6", "K4(Fe(CN)6)"]}
+
+  - id: thiosulfate_iodine_titration
+    title: "Йодометрия тиосульфата"
+    why: "Йод окисляет тиосульфат только до тетратионата (S4O6-2). Дальнейшее окисление серы (до сульфатов, персульфатов и т.д.) кинетически заторможено."
+    if: {reagents_present: ["Na2S2O3", "I2"]}
+    then: 
+      forbid_new: [
+        "SO4-2", "SO2", "HSO3-", "SO3-2", "NaHSO3", "Na2SO4", "HSO4-", "H2SO3", "S",
+        "S2O8-2", "Na2S2O8", "S2O6-2", "Na2S2O6"
+        ]

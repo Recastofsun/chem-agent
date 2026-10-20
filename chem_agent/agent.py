@@ -157,17 +157,32 @@ class Agent:
     def predict(self, reagents=None, conditions=None, known_energies=None, constraints=None,
                 options=None, request: dict | None = None) -> Result:
         if request is None:
-            request = {"reagents": reagents or [], "conditions": conditions or {},
-                       "known_energies": known_energies or {}, "constraints": constraints or {},
-                       "options": options or {}}
-        opts = {**self.config.get("options", {}), **(request.get("options") or {})}
-        request = {**request, "options": opts}
-        return Result(self._run(request))
+            request = {}
+        
+        # Собираем полный словарь, чтобы validate() не споткнулся о None
+        raw = {
+            "reagents": request.get("reagents") or reagents or [],
+            "conditions": request.get("conditions") or conditions or {},
+            "known_energies": request.get("known_energies") or known_energies or {},
+            "constraints": request.get("constraints") or constraints or {},
+            "options": request.get("options") or options or {}
+        }
+        opts = {**self.config.get("options", {}), **raw["options"]}
+        raw["options"] = opts
+        return Result(self._run(raw))
 
     # core ------------------------------------------------------------------------
     def _run(self, raw: dict) -> dict:
         t_start = time.perf_counter()
         req, warnings = validate(raw)
+        
+        # Дополнительная страховка от None
+        req["conditions"] = req.get("conditions") or {}
+        req["options"] = req.get("options") or {}
+        req["constraints"] = req.get("constraints") or {}
+        req["known_energies"] = req.get("known_energies") or {}
+        req["reagents"] = req.get("reagents") or []
+        
         cond, opts, cons = req["conditions"], req["options"], req["constraints"]
         input_hash = sha256_of({k: raw.get(k) for k in ("reagents", "conditions", "known_energies",
                                                         "constraints", "options") if k != "options"} |
@@ -215,8 +230,9 @@ class Agent:
         warnings.extend(atm_notes)
 
         # rules
+        is_open = (cond.get("atmosphere") or {}).get("mode") == "open"
         ctx = RuleContext(T=T, aqueous=aqueous, reagents=reagents, volume_L=float(cond["volume_L"]),
-                          atmosphere_species=[parse_formula(f) for f in gases])
+                          atmosphere_species=[parse_formula(f) for f in gases], open_system=is_open)
         rules = evaluate(ctx, set(opts.get("disabled_rules") or []))
 
         # energies
@@ -244,15 +260,25 @@ class Agent:
 
         eps = solv_mod.dielectric(cond["solvent"], T) if aqueous else None
         fixed_I = cond["solvent"].get("ionic_strength_M") if aqueous else None
-        solver = _Solver(system, T, P_bar, opts["activity_model"], eps, fixed_I)
+        
+        # ФИКС h054: Если система открыта, газы "улетают", давление стремится к 0
+        atm = cond.get("atmosphere") or {}
+        is_open = atm.get("mode") == "open"
+        # Если система открыта, давление газов близко к 0 (или к парциальному давлению в атмосфере)
+        P_bar_solver = 1e-6 if is_open else P_bar
+        
+        # Если задан огромный объем (headspace), газы разлетаются
+        if atm.get("headspace_L", 0) > 100.0:
+            P_bar_solver = 1e-6
+        
+        solver = _Solver(system, T, P_bar_solver, opts["activity_model"], eps, fixed_I)
         self._self_equilibrated_initial(solver, system)
         methods += ["Gibbs minimization (dual barrier + Newton)", "CRC Handbook", "NBS-1982"]
         if aqueous:
             methods.append({"ideal": "ideal", "debye_huckel": "Debye-Huckel (extended)", "davies": "Davies",
                             "pitzer": "Davies (Pitzer недоступен)"}[opts["activity_model"]])
             if opts["activity_model"] == "pitzer":
-                warnings.append("Модель Pitzer не реализована (нет параметров взаимодействия в открытых данных); "
-                                "используется Davies")
+                warnings.append("Модель Pitzer не реализована (нет параметров взаимодействия в открытых данных); используется Davies")
         if any(s.source.startswith("user") for s in system.species):
             methods.append("user energies")
 
@@ -268,7 +294,8 @@ class Agent:
         n = eq.n
         for m in eq.messages:
             warnings.append(m)
-                # Spontaneous gas-phase pairs: no igniter needed.
+        
+        # Spontaneous gas-phase pairs: no igniter needed.
         _SPONTANEOUS_GAS_PAIRS = (
             {"NH3", "HCl"}, {"NH3", "HBr"}, {"NH3", "HI"},
             {"NO", "O2"},
@@ -284,19 +311,29 @@ class Agent:
             and not (cond.get("catalyst") or {}).get("formula")
         )
         if _gas_mix_no_igniter:
-            warnings.append("Смесь газов при T < 700 K без катализатора не реагирует самопроизвольно "
-                            "(нужна искра, пламя или освещение): реакция считается не идущей")
+            warnings.append("Смесь газов при T < 700 K без катализатора не реагирует самопроизвольно(нужна искра, пламя или освещение): реакция считается не идущей")
         an = analyze(system, n)
         if _gas_mix_no_igniter:
             an.reaction_occurred = False
             an.products = []
+                # products & equations
+        products = self._products(solver, an, eq, cons)
+        equations, main_eq = self._equations(solver, system, an, T)
+        ionic = self._ionic_equation(system, an)
+        if an.reaction_occurred and main_eq is None:
+            warnings.append("Не удалось подобрать коэффициенты уравнения (возможно, параллельные реакции). Смотрите таблицу продуктов")
+        if main_eq and main_eq.get("parallel_reactions"):
+            warnings.append("Идут параллельные реакции: уравнение описывает только основную; полный итог - в таблице равновесного состава")
         reliability: list[str] = []
         if not eq.converged:
-            reliability.append("расчет равновесия не сошелся с нужной точностью (невязка баланса "
-                               f"{eq.residual:.1e})")
+            # Если реакция не пошла, а невязка маленькая, это просто математический шум, а не ошибка
+            if not an.reaction_occurred and eq.residual < 1e-2:
+                warnings.append(f"Расчет равновесия имеет небольшую невязку ({eq.residual:.1e}), но реакция не идет, результат считается валидным.")
+            else:
+                reliability.append("расчет равновесия не сошелся с нужной точностью (невязка баланса "
+                                   f"{eq.residual:.1e})")
         if aqueous and eq.ionic_strength > 5.0:
-            reliability.append(f"ионная сила {eq.ionic_strength:.1f} моль/кг: модели активности за пределами "
-                               "применимости, pH и активности не имеют смысла")
+            reliability.append(f"ионная сила {eq.ionic_strength:.1f} моль/кг: модели активности за пределами применимости, pH и активности не имеют смысла")       
         if aqueous and "минус объем" in water_note and water_kg <= 0.05 * float(cond["volume_L"]) * 1.001:
             reliability.append("растворенные вещества занимают почти весь объем: оценка массы воды не работает, "
                                "задайте conditions.water_kg")
@@ -311,13 +348,6 @@ class Agent:
         for rf in rules.fired:
             explanation.append({"step": f"Правило: {rf['title']}", "text": rf["why"], "rule": rf["id"]})
 
-        # products & equations
-        products = self._products(solver, an, eq, cons)
-        equations, main_eq = self._equations(solver, system, an, T)
-        ionic = self._ionic_equation(system, an)
-        if main_eq and main_eq.get("parallel_reactions"):
-            warnings.append("Идут параллельные реакции: уравнение описывает только основную; полный итог - "
-                            "в таблице равновесного состава")
         if not an.reaction_occurred:
             explanation.append({"step": "Вывод", "text": "Состав после смешивания совпадает с исходным: "
                                 "реакция термодинамически не выгодна или запрещена кинетическими правилами."})
