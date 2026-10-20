@@ -6,11 +6,21 @@
 
 ---
 
+## 20 октября 2026 (Шаг 6-7: Сборка exe и установщика)
+- **Сборка PyInstaller:** Создан новый `chem-agent.spec` (точка входа `run_app.py`). Убраны зависимости `uvicorn`/`fastapi`, добавлена папка `static` и `data`, отключена консоль (`console=False`).
+- **Проблема с PyInstaller (Silent Crash):** При запуске собранного `.exe` приложение молча закрывалось. Причина: PyInstaller не видел скрытые зависимости `pywebview` и `pythonnet`. Решение: в `chem-agent.spec` добавлены `collect_all('webview')`, `collect_all('pythonnet')` и явные `hiddenimports` (`clr`, `clr_loader`, `webview.platforms.edgechromium`).
+- **Отладка exe:** Чтобы поймать ошибку, пришлось временно включить `console=True` в `spec` и запускать `.exe` из командной строки. Также добавлено логирование в файл `%LOCALAPPDATA%\chem-agent\error.log` в `run_app.py` для windowed-режима.
+- **Установщик Inno Setup:** Написан скрипт `installer.iss`. В него встроена проверка реестра Windows на наличие WebView2 Runtime. Если рантайма нет — установщик предлагает скачать официальный Evergreen Bootstrapper.
+- **Фикс предупреждений Inno Setup:** Убрана поддержка устаревших версий Windows (`OnlyBelowVersion`) и исправлен конфликт прав (добавлено `PrivilegesRequired=lowest`, чтобы установка шла в профиль пользователя без запроса UAC).
+- **UX-мостик:** Реализована связка Таблицы Менделеева и Конструктора. Теперь Конструктор сохраняет стейт в `localStorage`, а при клике «➕ В Конструктор» новое вещество добавляется в конец списка, не затирая уже введенные данные.
+
+---
+
 ## 19 октября 2026 (Шаг 5: Пресеты и 3D-визуализация)
 - Создана система пресетов (`data/presets.json`). В Конструктор добавлена кнопка вызова готовых сценариев (нейтрализация, осаждение, горение).
 - Для 3D-визуализации без доступа к интернету (по ТЗ) библиотеки Three.js и OrbitControls были скачаны вручную и положены в `static/vendor`.
 - Поскольку в `crc.db` нет 3D-координат, был создан локальный кэш `data/3d_cache/` с JSON-описанием геометрии для базовых молекул (H2O, CH4, CO2, O2, NH3).
-- **Улучшение UX (Мульти-3D):** Изначально метод `get_3d_structure` возвращал только одну молекулу. По просьбе пользователя метод был переименован в `get_3d_structures` и теперь принимает массив формул. В `viewer3d.js` добавлена логика вычисления Bounding Box (ограничивающего контейнера) для каждой молекулы и их совместного размещения вдоль оси X. Теперь при горении метана можно увидеть CO2 и H2O рядом друг с другом.
+- **Улучшение UX (Мульти-3D):** Изначально метод `get_3d_structure` возвращал только одну молекулу. По просьбе пользователя метод был переименован в `get_3d_structures` и теперь принимает массив формул. В `viewer3d.js` добавлена логика вычисления Bounding Box для каждой молекулы и их совместного размещения вдоль оси X. Теперь при горении метана можно увидеть CO2 и H2O рядом друг с другом.
 
 ---
 
@@ -212,15 +222,11 @@ benchmark → видим эффект → коммит → следующая.
 
 ## Планы на будущее
 
-### v2.0 — desktop-приложение (в работе)
+### v2.1 — Визуальный конструктор молекул (Вариант Б)
 
-Переписать интерфейс на PyWebView (нативное окно вместо браузера + cmd). Добавить:
-- Таблицу Менделеева для выбора реагентов.
-- 3D-визуализацию (Three.js).
-- Учебную версию с геймификацией.
-- Модульную установку.
-
-ТЗ: TZ_chem-agent_v2_desktop.md.
+Начать с ядра: написать парсер сборки молекул на основе валентностей
+(например, C + 4H -> CH4). После этого сделать UI, где пользователь сможет
+перетаскивать атомы и собирать молекулы.
 
 ### Дальнейшие улучшения ядра
 
@@ -254,17 +260,20 @@ benchmark → видим эффект → коммит → следующая.
 - 3D через Three.js работает из коробки.
 - Python-функции вызываются из JS напрямую (pywebview.api.*).
 
-### Про сборку exe
+### Про сборку exe и установщика
 
-- PyInstaller one-file даёт 54 МБ.
+- PyInstaller one-file даёт ~60 МБ.
 - Запуск ~2 секунды.
 - Иконка — колба, сгенерирована через make_icon.py.
 - upx=False — UPX может испортить numpy/scipy DLLs.
+- Установщик собирается через Inno Setup (скрипт `installer.iss`).
+- В установщик встроена проверка реестра на наличие WebView2.
 
 ### Про git
 
 - Все правки — отдельными коммитами с осмысленными сообщениями.
 - dist/, build/, reports/, report/ — в .gitignore.
+- installer_output/ — в .gitignore (бинарники установщика).
 - crc.db — в git (5–10 МБ, нужна для работы).
 
 ### Про работу с ассистентом
@@ -279,13 +288,13 @@ benchmark → видим эффект → коммит → следующая.
 
 ## Хронология ключевых коммитов
 
-a97f26b  fix(ranker): вес воды 0.5; baseline 94.7%
-90ff8dc  feat(data): Ni(NH3)6+2 в базе; fix(ranker): вес воды 0.5; baseline 95.8%
-26975a3  feat(rules): правила марганца и амфотерных, accept_any, baseline 84.2%
-b3dbf78  feat(data): SnCl2, SnCl4, H3PO3, Fe(SCN)3 в базе; crc.db 1295 частиц; 85.3%
-a13f86c  feat(rules): phosphorus_iii_stable; h049 вне области; 87.4%
-fdfd1f0  chore: bat-скрипт для пересборки JSON и benchmark
-53be66f  fix(report): сохраняем только json, независимо от запроса
+feat(release): v2.0.0 native desktop app, PyInstaller and Inno Setup
+feat(ui): stateful constructor and append logic from periodic table
+feat(ui): presets and offline multi-molecule 3D viewer
+feat(ui): periodic table, settings screen, fullscreen mode and fixes
+feat(storage): sqlite history, settings manager, and history UI
+feat(ui): end-to-end predict flow + constructor screen
+feat(desktop): native PyWebView shell — bridge + launcher + smoke UI
 
 Полная история — git log --oneline.
 
