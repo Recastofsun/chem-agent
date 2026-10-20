@@ -17,3 +17,12 @@ installer_output/
 build/
 dist/
 *.manifest
+docker-compose.offline.yml 
+Dockerfile.offline 
+build_offline_bundle.ps1 
+install_offline.ps1 
+setup_offline.ps1 
+self_test.bat 
+self_test.ps1 
+run_server.bat 
+run_server.py

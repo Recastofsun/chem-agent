@@ -1,8 +1,0 @@
-# Опционально (Linux-контейнер). Колеса должны быть собраны под manylinux: pip download --platform manylinux2014_x86_64
-FROM python:3.11-slim
-WORKDIR /app
-COPY . /app
-RUN pip install --no-index --find-links=/app/offline_cache/wheels_linux -r requirements.txt
-ENV CHEM_AGENT_OFFLINE=1
-EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "chem_agent.api.server:app", "--host", "0.0.0.0", "--port", "8000"]
