@@ -3,14 +3,16 @@ __pycache__/
 *.pyc
 .pytest_cache/
 chem-agent-offline-*.zip
-offline_cache/wheels/
 tests/fixtures/outputs/*
 !tests/fixtures/outputs/.gitkeep
 reports/
 report/
 installer_output/
+example models/
+offline_cache/
 .vscode/
 .idea/
+examples/
 *.swp
 *.log
 # PyInstaller
