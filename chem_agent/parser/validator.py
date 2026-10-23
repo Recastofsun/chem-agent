@@ -28,6 +28,7 @@ DEFAULT_CONDITIONS = {
     "water_kg": None,
     "solvent": None, "pH": None, "atmosphere": None, "mixing": None, "catalyst": None,
     "time": {"mode": "equilibrium", "duration_s": None, "sample_points": 10},
+    "electrolysis": None, # <--- ДОБАВЛЕНО
 }
 
 DEFAULT_CONSTRAINTS = {"forbidden_products": [], "max_products": 10, "max_reaction_steps": 3,
@@ -137,12 +138,32 @@ def validate(req: dict[str, Any]) -> tuple[dict, list[str]]:
         solvent["dielectric_constant"] = _num(solvent["dielectric_constant"], "dielectric_constant", lo=1.0)
     if solvent.get("ionic_strength_M") is not None:
         solvent["ionic_strength_M"] = _num(solvent["ionic_strength_M"], "ionic_strength_M", lo=0.0, hi=20.0)
+    
     ph = cond.get("pH")
     if isinstance(ph, (int, float)):
         ph = {"initial": ph, "buffered": False}
     if ph and ph.get("initial") is not None:
         ph["initial"] = _num(ph["initial"], "pH.initial", lo=-1.0, hi=15.0)
     cond["pH"] = ph
+
+    # --- НОВОЕ: Валидация электролиза ---
+    elec = cond.get("electrolysis")
+    if elec is not None:
+        if isinstance(elec, bool):
+            elec = {"enabled": elec, "voltage_V": 1.23}
+        if not isinstance(elec, dict):
+            raise ValidationError("electrolysis должен быть объектом или boolean")
+        
+        elec["enabled"] = bool(elec.get("enabled", False))
+        if elec["enabled"]:
+            elec["voltage_V"] = _num(elec.get("voltage_V", 1.23), "electrolysis.voltage_V", lo=0.0, hi=20.0)
+            if "anode" in elec and not isinstance(elec["anode"], str):
+                raise ValidationError("electrolysis.anode должен быть строкой (материал анода)")
+            if "cathode" in elec and not isinstance(elec["cathode"], str):
+                raise ValidationError("electrolysis.cathode должен быть строкой (материал катода)")
+        cond["electrolysis"] = elec
+    # ------------------------------------
+
     prof = cond.get("temperature_profile")
     if prof:
         t = prof.get("type", "ramp")

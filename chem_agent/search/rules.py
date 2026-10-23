@@ -34,6 +34,7 @@ class RuleContext:
     volume_L: float
     atmosphere_species: list[Composition] = field(default_factory=list)
     open_system: bool = False  # <-- ДОБАВЛЕНО ДЛЯ h054
+    voltage_V: float = 0.0
 
     def elements(self) -> set[str]:
         els = {e for r in self.reagents for e, _ in r.comp.elements}
@@ -199,6 +200,8 @@ def evaluate(ctx: RuleContext, disabled: set[str] | None = None) -> RuleOutcome:
     for rule in load_rules():
         if rule["id"] in disabled:
             continue
+        if ctx.voltage_V > 0 and rule["id"] in ("no_new_o2", "water_not_reduced"):
+            continue
         conds = rule.get("if") or {}
         if not all(ctx.pred(k, v) for k, v in conds.items()):
             continue
@@ -220,6 +223,7 @@ def evaluate(ctx: RuleContext, disabled: set[str] | None = None) -> RuleOutcome:
                     out.forbid_new.add(key)
                     if all(e in sys_els for e, _ in c.elements):
                         effect = True
+
         if "forbid_new_class" in then:
             cls_val = then["forbid_new_class"]
             classes = cls_val if isinstance(cls_val, list) else [cls_val]
@@ -245,6 +249,7 @@ def evaluate(ctx: RuleContext, disabled: set[str] | None = None) -> RuleOutcome:
                 if ctx.has(f):
                     out.inert_formulas.add(parse_formula(f).key)
                     effect = True
+       
         if effect:
             out.fired.append({"id": rule["id"], "title": rule.get("title", ""), "why": rule.get("why", "")})
     return out

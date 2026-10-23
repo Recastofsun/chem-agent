@@ -74,19 +74,41 @@ class _Solver:
     """Wraps building g-vectors and solving for a fixed ChemSystem."""
 
     def __init__(self, system: ChemSystem, T: float, P_bar: float, act_model: str, eps: float | None,
-                 fixed_I: float | None):
+                 fixed_I: float | None, voltage_V: float = 0.0):
         self.system = system
         self.T = T
         self.P_bar = P_bar
-        # Для SIT передаем только водные виды, чтобы размерность матрицы совпала с массивом моляльностей
+        self.voltage_V = voltage_V
+        
         aqueous_species = [s for s in system.species if s.phase == "aq"]
         self.gamma_fn = make_gamma_fn(act_model, T, eps, 
                                       species_list=aqueous_species if system.aqueous else None,
                                       db=get_db() if system.aqueous else None) if system.aqueous else None
         self.fixed_I = fixed_I
+                          
         g, sig, tdep = [], [], []
+        F = 96485.332  # Постоянная Фарадея, Кл/моль
+        db = get_db()
+         # Собираем словарь сдвигов: формула -> (сдвиг в кДж/моль)
+        shifts = {}
+        if voltage_V != 0.0:
+            for (ox_f, red_f), pair in db.redox_pairs.items():
+                n = pair["n"]
+                ox_c = pair["ox_coeff"]
+                red_c = pair["red_coeff"]
+                
+                # Для окислителя энергия понижается (ему легче принять электроны)
+                shifts[ox_f] = shifts.get(ox_f, 0.0) - (ox_c * n * F * voltage_V / 1000.0)
+                # Для восстановителя энергия повышается (ему труднее отдать электроны)
+                shifts[red_f] = shifts.get(red_f, 0.0) + (red_c * n * F * voltage_V / 1000.0)
+
         for s in system.species:
             gg, ss, td = dGf_T(s, T)
+            
+            # Применяем сдвиг, если частица есть в словаре
+            if s.formula in shifts:
+                gg += shifts[s.formula]
+                
             g.append(gg)
             sig.append(ss)
             tdep.append(td)
@@ -213,7 +235,7 @@ class Agent:
         explanation.append({"step": "Парсинг и валидация",
                             "text": "Реагенты: " + ", ".join(f"{r.formula} ({r.phase}) {r.moles:g} моль" for r in reagents)
                                     + (f". Вода: {water_kg:.4g} кг ({water_note})" if aqueous else ". Без растворителя")})
-
+       
         # pH
         ph = cond.get("pH") or {}
         titration = None
@@ -221,8 +243,7 @@ class Agent:
             tr = ph_mod.titrant_for_initial_pH(ph["initial"], water_kg)
             if tr:
                 reagents.append(Reagent(tr[0], parse_formula(tr[0]), tr[1], "aq"))
-                warnings.append(f"Начальный pH {ph['initial']} задан добавкой {tr[1]:.3g} моль {tr[0]} "
-                                "к растворителю до смешивания реагентов")
+                warnings.append(f"Начальный pH {ph['initial']} задан добавкой {tr[1]:.3g} моль {tr[0]} к растворителю до смешивания реагентов")
         if aqueous and ph.get("initial") is not None and ph.get("buffered"):
             titration = float(ph["initial"])
             for f in ("HCl", "NaOH"):
@@ -233,10 +254,17 @@ class Agent:
         gases, atm_notes = atm_mod.gas_amounts(cond, T, bool(opts.get("include_atmosphere", True)))
         warnings.extend(atm_notes)
 
+        # Электролиз
+        electrolysis = cond.get("electrolysis") or {}
+        voltage_V = float(electrolysis.get("voltage_V", 0.0)) if electrolysis.get("enabled") else 0.0
+        if voltage_V > 0:
+            warnings.append(f"Включен электролиз: приложено напряжение {voltage_V} В.")
+
         # rules
         is_open = (cond.get("atmosphere") or {}).get("mode") == "open"
         ctx = RuleContext(T=T, aqueous=aqueous, reagents=reagents, volume_L=float(cond["volume_L"]),
-                          atmosphere_species=[parse_formula(f) for f in gases], open_system=is_open)
+                          atmosphere_species=[parse_formula(f) for f in gases], open_system=is_open,
+                          voltage_V=voltage_V) # <--- Теперь voltage_V передается в контекст
         rules = evaluate(ctx, set(opts.get("disabled_rules") or []))
 
         # energies
@@ -275,7 +303,7 @@ class Agent:
         if atm.get("headspace_L", 0) > 100.0:
             P_bar_solver = 1e-6
         
-        solver = _Solver(system, T, P_bar_solver, opts["activity_model"], eps, fixed_I)
+        solver = _Solver(system, T, P_bar_solver, opts["activity_model"], eps, fixed_I, voltage_V=voltage_V)
         self._self_equilibrated_initial(solver, system)
         methods += ["Gibbs minimization (dual barrier + Newton)", "CRC Handbook", "NBS-1982"]
         if aqueous:
