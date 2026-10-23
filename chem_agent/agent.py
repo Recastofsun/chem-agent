@@ -78,7 +78,11 @@ class _Solver:
         self.system = system
         self.T = T
         self.P_bar = P_bar
-        self.gamma_fn = make_gamma_fn(act_model, T, eps) if system.aqueous else None
+        # Для SIT передаем только водные виды, чтобы размерность матрицы совпала с массивом моляльностей
+        aqueous_species = [s for s in system.species if s.phase == "aq"]
+        self.gamma_fn = make_gamma_fn(act_model, T, eps, 
+                                      species_list=aqueous_species if system.aqueous else None,
+                                      db=get_db() if system.aqueous else None) if system.aqueous else None
         self.fixed_I = fixed_I
         g, sig, tdep = [], [], []
         for s in system.species:
@@ -275,8 +279,14 @@ class Agent:
         self._self_equilibrated_initial(solver, system)
         methods += ["Gibbs minimization (dual barrier + Newton)", "CRC Handbook", "NBS-1982"]
         if aqueous:
-            methods.append({"ideal": "ideal", "debye_huckel": "Debye-Huckel (extended)", "davies": "Davies",
-                            "pitzer": "Davies (Pitzer недоступен)"}[opts["activity_model"]])
+            act_names = {
+                "ideal": "ideal", 
+                "debye_huckel": "Debye-Huckel (extended)", 
+                "davies": "Davies",
+                "pitzer": "Davies (Pitzer недоступен)",
+                "sit": "SIT (Specific Ion Interaction)"
+            }
+            methods.append(act_names.get(opts["activity_model"], opts["activity_model"]))
             if opts["activity_model"] == "pitzer":
                 warnings.append("Модель Pitzer не реализована (нет параметров взаимодействия в открытых данных); используется Davies")
         if any(s.source.startswith("user") for s in system.species):
@@ -332,8 +342,12 @@ class Agent:
             else:
                 reliability.append("расчет равновесия не сошелся с нужной точностью (невязка баланса "
                                    f"{eq.residual:.1e})")
-        if aqueous and eq.ionic_strength > 5.0:
-            reliability.append(f"ионная сила {eq.ionic_strength:.1f} моль/кг: модели активности за пределами применимости, pH и активности не имеют смысла")       
+        if aqueous:
+            # Лимиты применимости для разных моделей
+            limits = {"ideal": 0.1, "debye_huckel": 0.5, "davies": 1.0, "sit": 6.0, "pitzer": 20.0}
+            max_I = limits.get(opts["activity_model"], 1.0)
+            if eq.ionic_strength > max_I:
+                reliability.append(f"ионная сила {eq.ionic_strength:.1f} моль/кг: модель '{opts['activity_model']}'f не применима (лимит {max_I} М)")      
         if aqueous and "минус объем" in water_note and water_kg <= 0.05 * float(cond["volume_L"]) * 1.001:
             reliability.append("растворенные вещества занимают почти весь объем: оценка массы воды не работает, "
                                "задайте conditions.water_kg")

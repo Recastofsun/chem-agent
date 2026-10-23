@@ -9,7 +9,7 @@ from .formula import FormulaError, parse_formula
 
 ACCURACY = ("fast", "balanced", "accurate")
 ENERGY_SOURCES = ("auto", "db_only", "ml_only", "dft_only")
-ACTIVITY = ("ideal", "debye_huckel", "davies", "pitzer")
+ACTIVITY = ("ideal", "debye_huckel", "davies", "pitzer", "sit")
 KINETICS = ("none", "eyring", "ml_ts", "neb")
 UNCERTAINTY = ("ensemble", "bootstrap", "none")
 

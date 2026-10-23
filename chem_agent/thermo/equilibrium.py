@@ -441,7 +441,7 @@ def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
         m_aq = n[ia] / W
         z = p.charges[ia]
         I_new = p.fixed_I if p.fixed_I is not None else 0.5 * float(np.sum(m_aq * z ** 2))
-        lg_new = p.gamma_fn(I_new, z)
+        lg_new = p.gamma_fn(I_new, z, m=m_aq) 
         diff = float(np.max(np.abs(lg_new - ln_gamma[ia]))) if len(ia) else 0.0
         ln_gamma[ia] = 0.5 * ln_gamma[ia] + 0.5 * lg_new if outer > 3 else lg_new
         I_val = I_new
