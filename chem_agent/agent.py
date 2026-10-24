@@ -85,45 +85,37 @@ class _Solver:
                                       species_list=aqueous_species if system.aqueous else None,
                                       db=get_db() if system.aqueous else None) if system.aqueous else None
         self.fixed_I = fixed_I
-                          
+        
+        # ВОЗВРАЩАЕМ РАСЧЕТ ЭНЕРГИЙ
         g, sig, tdep = [], [], []
-        F = 96485.332  # Постоянная Фарадея, Кл/моль
-        db = get_db()
-         # Собираем словарь сдвигов: формула -> (сдвиг в кДж/моль)
-        shifts = {}
-        if voltage_V != 0.0:
-            for (ox_f, red_f), pair in db.redox_pairs.items():
-                n = pair["n"]
-                ox_c = pair["ox_coeff"]
-                red_c = pair["red_coeff"]
-                
-                # Для окислителя энергия понижается (ему легче принять электроны)
-                shifts[ox_f] = shifts.get(ox_f, 0.0) - (ox_c * n * F * voltage_V / 1000.0)
-                # Для восстановителя энергия повышается (ему труднее отдать электроны)
-                shifts[red_f] = shifts.get(red_f, 0.0) + (red_c * n * F * voltage_V / 1000.0)
-
         for s in system.species:
             gg, ss, td = dGf_T(s, T)
-            
-            # Применяем сдвиг, если частица есть в словаре
-            if s.formula in shifts:
-                gg += shifts[s.formula]
-                
             g.append(gg)
             sig.append(ss)
             tdep.append(td)
+            
         self.G = np.array(g)          # kJ/mol
         self.sigma = np.array(sig)    # kJ/mol
         self.tdep = tdep
-
+                                  
     def run(self, dG_shift: np.ndarray | None = None, b: np.ndarray | None = None, warm=None):
         G = self.G if dG_shift is None else self.G + dG_shift
+        
+        fixed_lambda = None
+        if self.voltage_V > 0 and self.system.charge_col is not None:
+            # Моделируем внешнее напряжение через фиксацию электрохимического потенциала
+            # F = 96485.332 Кл/моль, R = 8.31446 Дж/(моль*К)
+            F = 96485.332
+            R_gas = 8.31446
+            fixed_lambda = {self.system.charge_col: -F * self.voltage_V / (R_gas * self.T)}
+
         p = EqProblem(A=self.system.A, g=G / (R * self.T), kind=self.system.kinds,
                       b=self.system.b if b is None else b,
                       charges=np.array([s.charge for s in self.system.species], dtype=float),
                       P_bar=self.P_bar, gamma_fn=self.gamma_fn, fixed_I=self.fixed_I,
                       charge_col=self.system.charge_col,
-                      warm=None if warm is None else (warm.lam, warm.n, warm.water_kg / 0.018015268, warm.gas_total))
+                      warm=None if warm is None else (warm.lam, warm.n, warm.water_kg / 0.018015268, warm.gas_total),
+                      fixed_lambda=fixed_lambda)
         return solve(p)
 
 
@@ -296,6 +288,8 @@ class Agent:
         # ФИКС h054: Если система открыта, газы "улетают", давление стремится к 0
         atm = cond.get("atmosphere") or {}
         is_open = atm.get("mode") == "open"
+        if voltage_V > 0:
+            is_open = True
         # Если система открыта, давление газов близко к 0 (или к парциальному давлению в атмосфере)
         P_bar_solver = 1e-6 if is_open else P_bar
         
@@ -359,14 +353,22 @@ class Agent:
         equations, main_eq = self._equations(solver, system, an, T)
         ionic = self._ionic_equation(system, an)
         if an.reaction_occurred and main_eq is None:
-            warnings.append("Не удалось подобрать коэффициенты уравнения (возможно, параллельные реакции). Смотрите таблицу продуктов")
+            if voltage_V > 0:
+                warnings.append("Электролиз: уравнение не сбалансировано из-за параллельных процессов, но продукты определены.")
+            else:
+                warnings.append("Не удалось подобрать коэффициенты уравнения (возможно, параллельные реакции). Смотрите таблицу продуктов")
         if main_eq and main_eq.get("parallel_reactions"):
             warnings.append("Идут параллельные реакции: уравнение описывает только основную; полный итог - в таблице равновесного состава")
         reliability: list[str] = []
         if not eq.converged:
-            # Если реакция не пошла, а невязка маленькая, это просто математический шум, а не ошибка
             if not an.reaction_occurred and eq.residual < 1e-2:
-                warnings.append(f"Расчет равновесия имеет небольшую невязку ({eq.residual:.1e}), но реакция не идет, результат считается валидным.")
+                warnings.append(f"Расчет равновесия имеет небольшую невязку ({eq.residual:.1e}), но реакция не идет.")
+            elif voltage_V > 0:
+                # При электролизе жесткие сдвиги ломают точность, но если продукты есть - это успех
+                if an.reaction_occurred:
+                    warnings.append("Электролиз: расчет имеет высокую невязку из-за экстремальных сдвигов энергий, но продукты определены.")
+                else:
+                    reliability.append("расчет не сошелся (возможно, напряжение слишком высокое для данной модели)")
             else:
                 reliability.append("расчет равновесия не сошелся с нужной точностью (невязка баланса "
                                    f"{eq.residual:.1e})")
@@ -654,6 +656,11 @@ class Agent:
             q.parts and p.species_idx[0] in [i for i, _ in q.parts] for q in an.products)]
         # keep a compact set: condensed, gases, salts, molecules, water, uncovered ions
         prods = prods[:8]
+        
+        # ИСПОЛЬЗУЕМ solver.voltage_V вместо локальной переменной
+        if solver.voltage_V > 0:
+            prods = [p for p in prods if p.formula not in ("H+", "OH-")]
+            
         reag = []
         for r in system.reagents:  # drop pH-stat placeholders, merge repeated formulas
             if r.moles <= 1e-10:

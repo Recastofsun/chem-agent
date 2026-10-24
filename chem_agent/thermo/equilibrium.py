@@ -39,6 +39,7 @@ class EqProblem:
     charge_col: int | None = None
     lam0: np.ndarray | None = None
     warm: tuple | None = None  # (lam, n, n_w, n_gas) of a nearby solution
+    fixed_lambda: dict[int, float] | None = None
 
 
 @dataclass
@@ -157,7 +158,14 @@ class _Barrier:
             h = s["gas"]
             grad += dh / h
             H += d2h / h - np.outer(dh, dh) / h ** 2
+        if self.p.fixed_lambda:
+            for idx in self.p.fixed_lambda:
+                grad[idx] = 0.0
+                H[idx, :] = 0.0
+                H[:, idx] = 0.0
+                H[idx, idx] = 1.0
         return grad, H
+        
 
     def amounts(self, lam, t, s) -> tuple[np.ndarray, float, float]:
         n = np.zeros(len(self.p.g))
@@ -223,6 +231,9 @@ def _center(bar: _Barrier, lam, t, max_iter=150, tol=1e-7):
         gk = V.T @ (grad * d)
         y = V[:, keep] @ (gk[keep] / w[keep])
         step = d * y
+        if bar.p.fixed_lambda:
+            for idx in bar.p.fixed_lambda:
+                step[idx] = 0.0
         dec = float(grad @ step)  # Newton decrement^2 (>= 0: ascent direction)
         if dec / 2 < tol or float(np.max(np.abs(step))) < 1e-12:
             break
@@ -302,6 +313,11 @@ def _polish(bar: _Barrier, lam, n, n_w, n_gas, scale, max_iter=60):
                 J[E + 2:, :E] = -Ac
             F[:E] = mass / scale
             J[:E] = Jm / scale
+            if p.fixed_lambda:
+                for idx, val in p.fixed_lambda.items():
+                    F[idx] = lam_[idx] - val
+                    J[idx, :] = 0.0
+                    J[idx, idx] = 1.0
             return F, J
 
         ok = False
