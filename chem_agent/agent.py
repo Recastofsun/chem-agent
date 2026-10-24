@@ -24,11 +24,11 @@ from .kinetics import barrier as barrier_mod
 from .kinetics.integration import integrate
 from .parser.formula import Composition, parse_formula
 from .parser.naming import display_formula, russian_name
-from .parser.validator import validate
+from .parser.validator import validate, ValidationError
 from .search.balance import balance, format_side
 from .search.hypotheses import ChemSystem, build_system, nominal_species_for_reagent
 from .search.ranker import KIND_RU, Analysis, ProductEntry, analyze
-from .search.rules import Reagent, RuleContext, evaluate
+from .search.rules import Reagent, RuleContext, evaluate, RuleOutcome
 from .thermo.activity import make_gamma_fn, validity_warning
 from .thermo.equilibrium import AQ, COND, GAS, SOLVENT, EqProblem, EquilibriumError, solve
 from .thermo.gibbs import R, T0, dGf_T
@@ -46,7 +46,7 @@ def _guess_phase(formula: str, aqueous: bool, db, T: float) -> str:
     els = comp.as_dict
     if aqueous:
         if len(els) == 1 and comp.charge == 0:
-            pass  # elements: standard phase
+            pass
         elif any(s.phase == "aq" for s in cands) or comp.charge != 0:
             return "aq"
         else:
@@ -60,7 +60,6 @@ def _guess_phase(formula: str, aqueous: bool, db, T: float) -> str:
                 if solids and all(ions):
                     g_ions = p * ions[0][0].dGf + q * ions[1][0].dGf
                     g_s = min(x.dGf for x in solids)
-                    # sparingly soluble (Ksp < 1e-2): given without a phase it is the solid
                     if g_ions - g_s > 11.4:
                         return "s"
                 return "aq"
@@ -79,32 +78,29 @@ class _Solver:
         self.T = T
         self.P_bar = P_bar
         self.voltage_V = voltage_V
-        
+
         aqueous_species = [s for s in system.species if s.phase == "aq"]
-        self.gamma_fn = make_gamma_fn(act_model, T, eps, 
+        self.gamma_fn = make_gamma_fn(act_model, T, eps,
                                       species_list=aqueous_species if system.aqueous else None,
                                       db=get_db() if system.aqueous else None) if system.aqueous else None
         self.fixed_I = fixed_I
-        
-        # ВОЗВРАЩАЕМ РАСЧЕТ ЭНЕРГИЙ
+
         g, sig, tdep = [], [], []
         for s in system.species:
             gg, ss, td = dGf_T(s, T)
             g.append(gg)
             sig.append(ss)
             tdep.append(td)
-            
-        self.G = np.array(g)          # kJ/mol
-        self.sigma = np.array(sig)    # kJ/mol
+
+        self.G = np.array(g)
+        self.sigma = np.array(sig)
         self.tdep = tdep
-                                  
+
     def run(self, dG_shift: np.ndarray | None = None, b: np.ndarray | None = None, warm=None):
         G = self.G if dG_shift is None else self.G + dG_shift
-        
+
         fixed_lambda = None
         if self.voltage_V > 0 and self.system.charge_col is not None:
-            # Моделируем внешнее напряжение через фиксацию электрохимического потенциала
-            # F = 96485.332 Кл/моль, R = 8.31446 Дж/(моль*К)
             F = 96485.332
             R_gas = 8.31446
             fixed_lambda = {self.system.charge_col: -F * self.voltage_V / (R_gas * self.T)}
@@ -176,8 +172,7 @@ class Agent:
                 options=None, request: dict | None = None) -> Result:
         if request is None:
             request = {}
-        
-        # Собираем полный словарь, чтобы validate() не споткнулся о None
+
         raw = {
             "reagents": request.get("reagents") or reagents or [],
             "conditions": request.get("conditions") or conditions or {},
@@ -185,22 +180,126 @@ class Agent:
             "constraints": request.get("constraints") or constraints or {},
             "options": request.get("options") or options or {}
         }
+        if "cell" in request:          
+            raw["cell"] = request["cell"]
+        try:
+            req, warnings = validate(raw)
+        except ValidationError as e:
+            return Result({"status": "error", "message": str(e)})
+
+        if req.get("mode") == "cell":
+            return Result(self._run_cell(req, warnings))
+
         opts = {**self.config.get("options", {}), **raw["options"]}
         raw["options"] = opts
         return Result(self._run(raw))
+
+    # --- НОВЫЙ МЕТОД ДЛЯ ДВУХКАМЕРНОЙ ЯЧЕЙКИ -----------------------------------
+    def _run_cell(self, req: dict, warnings: list[str]) -> dict:
+        from .thermo.constrained_lagrange import solve_kkt
+
+        cell = req["cell"]
+        T = 298.15
+        if req.get("conditions") and req["conditions"].get("temperature_K"):
+            T = float(req["conditions"]["temperature_K"])
+
+        # Берем напряжение из внешней цепи
+        U = cell["external_circuit"].get("voltage_V", 2.0)
+        
+        empty_rules = RuleOutcome()
+
+        def solve_chamber(side_name: str, phi_V: float):
+            side = cell[side_name]
+            sol = side["solution"]
+            species_list = sol["species"]
+            volume_L = sol.get("volume_L", 1.0)
+            water_kg = volume_L
+
+            reagents_list = [
+                Reagent(r["formula"], parse_formula(r["formula"]), r["moles"], r.get("phase", "aq"))
+                for r in species_list
+            ]
+
+            ctx = RuleContext(T=T, aqueous=True, reagents=reagents_list, volume_L=volume_L, voltage_V=abs(phi_V))
+            rules = evaluate(ctx, set())
+            
+            resolver = EnergyResolver.from_request(self.db, {}, species_list, "auto")
+            all_species = resolver.apply(self.db.species, True)
+
+            sys_chamber = build_system(
+                all_species, reagents_list,
+                T=T, P_bar=1.0, aqueous=True,
+                water_kg=water_kg,
+                rules=rules,  
+            )
+
+            if not sys_chamber.species:
+                return None, False, sys_chamber
+
+            g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
+            charges = np.array([s.charge for s in sys_chamber.species])
+            charge_idx = sys_chamber.charge_col
+            if charge_idx is not None:
+                A_electro = np.delete(sys_chamber.A, charge_idx, axis=1)
+                b_electro = np.delete(sys_chamber.b, charge_idx)
+            else:
+                A_electro = sys_chamber.A
+                b_electro = sys_chamber.b
+            n, lam, ok = solve_kkt(
+                A_electro, b_electro, g0, charges,
+                phi=phi_V, T=T, kinds=sys_chamber.kinds,
+                charge_col=None,  # Заряд отключен
+                gamma_fn=None, max_iter=200
+            )
+            return n, ok, sys_chamber
+
+        # Анод (окисление): забирает электроны, потенциал отрицательный
+        n_anode, ok_anode, sys_anode = solve_chamber("anode", phi_V=-U)
+
+        # Катод (восстановление): отдает электроны, потенциал положительный
+        n_cathode, ok_cathode, sys_cathode = solve_chamber("cathode", phi_V=U)
+
+        def summarize(n_arr, sys_obj, ok):
+            if not ok or n_arr is None:
+                return {"converged": False, "species": []}
+            out = []
+            for i, s in enumerate(sys_obj.species):
+                if n_arr[i] > 1e-3:
+                    out.append({
+                        "formula": s.formula,
+                        "phase": s.phase,
+                        "moles": float(n_arr[i]),
+                    })
+            out.sort(key=lambda x: -x["moles"])
+            return {"converged": True, "species": out}
+
+        status = "ok" if (ok_anode and ok_cathode) else "error"
+        msg = None
+        if status == "error":
+            msg = "Не удалось сойтись. Возможно, напряжение слишком высокое для данной модели."
+        
+        return {
+            "status": status,
+            "message": msg,
+            "mode": "cell",
+            "cell_result": {
+                "anode": summarize(n_anode, sys_anode, ok_anode),
+                "cathode": summarize(n_cathode, sys_cathode, ok_cathode),
+            },
+            "warnings": warnings,
+        }
 
     # core ------------------------------------------------------------------------
     def _run(self, raw: dict) -> dict:
         t_start = time.perf_counter()
         req, warnings = validate(raw)
-        
-        # Дополнительная страховка от None
+
         req["conditions"] = req.get("conditions") or {}
         req["options"] = req.get("options") or {}
         req["constraints"] = req.get("constraints") or {}
         req["known_energies"] = req.get("known_energies") or {}
         req["reagents"] = req.get("reagents") or []
-        
+
         cond, opts, cons = req["conditions"], req["options"], req["constraints"]
         input_hash = sha256_of({k: raw.get(k) for k in ("reagents", "conditions", "known_energies",
                                                         "constraints", "options") if k != "options"} |
@@ -213,7 +312,6 @@ class Agent:
         explanation: list[dict] = []
         methods: list[str] = []
 
-        # reagents & phases
         for r in req["reagents"]:
             if r["phase"] is None:
                 r["phase"] = _guess_phase(r["formula"], aqueous, self.db, T)
@@ -227,8 +325,7 @@ class Agent:
         explanation.append({"step": "Парсинг и валидация",
                             "text": "Реагенты: " + ", ".join(f"{r.formula} ({r.phase}) {r.moles:g} моль" for r in reagents)
                                     + (f". Вода: {water_kg:.4g} кг ({water_note})" if aqueous else ". Без растворителя")})
-       
-        # pH
+
         ph = cond.get("pH") or {}
         titration = None
         if aqueous and ph.get("initial") is not None and not ph.get("buffered"):
@@ -242,24 +339,20 @@ class Agent:
                 reagents.append(Reagent(f, parse_formula(f), 1e-12, "aq"))
             warnings.append(f"Буферный режим: pH поддерживается равным {titration} добавкой HCl/NaOH (pH-стат)")
 
-        # atmosphere
         gases, atm_notes = atm_mod.gas_amounts(cond, T, bool(opts.get("include_atmosphere", True)))
         warnings.extend(atm_notes)
 
-        # Электролиз
         electrolysis = cond.get("electrolysis") or {}
         voltage_V = float(electrolysis.get("voltage_V", 0.0)) if electrolysis.get("enabled") else 0.0
         if voltage_V > 0:
             warnings.append(f"Включен электролиз: приложено напряжение {voltage_V} В.")
 
-        # rules
         is_open = (cond.get("atmosphere") or {}).get("mode") == "open"
         ctx = RuleContext(T=T, aqueous=aqueous, reagents=reagents, volume_L=float(cond["volume_L"]),
                           atmosphere_species=[parse_formula(f) for f in gases], open_system=is_open,
-                          voltage_V=voltage_V) # <--- Теперь voltage_V передается в контекст
+                          voltage_V=voltage_V)
         rules = evaluate(ctx, set(opts.get("disabled_rules") or []))
 
-        # energies
         resolver = EnergyResolver.from_request(self.db, req.get("known_energies"), req["reagents"],
                                                opts["energy_source"])
         all_species = resolver.apply(self.db.species, aqueous)
@@ -284,26 +377,23 @@ class Agent:
 
         eps = solv_mod.dielectric(cond["solvent"], T) if aqueous else None
         fixed_I = cond["solvent"].get("ionic_strength_M") if aqueous else None
-        
-        # ФИКС h054: Если система открыта, газы "улетают", давление стремится к 0
+
         atm = cond.get("atmosphere") or {}
         is_open = atm.get("mode") == "open"
         if voltage_V > 0:
             is_open = True
-        # Если система открыта, давление газов близко к 0 (или к парциальному давлению в атмосфере)
         P_bar_solver = 1e-6 if is_open else P_bar
-        
-        # Если задан огромный объем (headspace), газы разлетаются
+
         if atm.get("headspace_L", 0) > 100.0:
             P_bar_solver = 1e-6
-        
+
         solver = _Solver(system, T, P_bar_solver, opts["activity_model"], eps, fixed_I, voltage_V=voltage_V)
         self._self_equilibrated_initial(solver, system)
         methods += ["Gibbs minimization (dual barrier + Newton)", "CRC Handbook", "NBS-1982"]
         if aqueous:
             act_names = {
-                "ideal": "ideal", 
-                "debye_huckel": "Debye-Huckel (extended)", 
+                "ideal": "ideal",
+                "debye_huckel": "Debye-Huckel (extended)",
                 "davies": "Davies",
                 "pitzer": "Davies (Pitzer недоступен)",
                 "sit": "SIT (Specific Ion Interaction)"
@@ -314,7 +404,6 @@ class Agent:
         if any(s.source.startswith("user") for s in system.species):
             methods.append("user energies")
 
-        # equilibrium (with optional pH-stat)
         try:
             eq, b_used = self._equilibrium(solver, titration)
             if b_used is not None:
@@ -326,8 +415,7 @@ class Agent:
         n = eq.n
         for m in eq.messages:
             warnings.append(m)
-        
-        # Spontaneous gas-phase pairs: no igniter needed.
+
         _SPONTANEOUS_GAS_PAIRS = (
             {"NH3", "HCl"}, {"NH3", "HBr"}, {"NH3", "HI"},
             {"NO", "O2"},
@@ -348,7 +436,6 @@ class Agent:
         if _gas_mix_no_igniter:
             an.reaction_occurred = False
             an.products = []
-                # products & equations
         products = self._products(solver, an, eq, cons)
         equations, main_eq = self._equations(solver, system, an, T)
         ionic = self._ionic_equation(system, an)
@@ -364,7 +451,6 @@ class Agent:
             if not an.reaction_occurred and eq.residual < 1e-2:
                 warnings.append(f"Расчет равновесия имеет небольшую невязку ({eq.residual:.1e}), но реакция не идет.")
             elif voltage_V > 0:
-                # При электролизе жесткие сдвиги ломают точность, но если продукты есть - это успех
                 if an.reaction_occurred:
                     warnings.append("Электролиз: расчет имеет высокую невязку из-за экстремальных сдвигов энергий, но продукты определены.")
                 else:
@@ -373,11 +459,10 @@ class Agent:
                 reliability.append("расчет равновесия не сошелся с нужной точностью (невязка баланса "
                                    f"{eq.residual:.1e})")
         if aqueous:
-            # Лимиты применимости для разных моделей
             limits = {"ideal": 0.1, "debye_huckel": 0.5, "davies": 1.0, "sit": 6.0, "pitzer": 20.0}
             max_I = limits.get(opts["activity_model"], 1.0)
             if eq.ionic_strength > max_I:
-                reliability.append(f"ионная сила {eq.ionic_strength:.1f} моль/кг: модель '{opts['activity_model']}'f не применима (лимит {max_I} М)")      
+                reliability.append(f"ионная сила {eq.ionic_strength:.1f} моль/кг: модель '{opts['activity_model']}' не применима (лимит {max_I} М)")
         if aqueous and "минус объем" in water_note and water_kg <= 0.05 * float(cond["volume_L"]) * 1.001:
             reliability.append("растворенные вещества занимают почти весь объем: оценка массы воды не работает, "
                                "задайте conditions.water_kg")
@@ -408,10 +493,8 @@ class Agent:
                                 "(считается закрытый сосуд с жидкой водой)")
         warnings.extend(self._saturation_warnings(solver, eq, system))
 
-        # kinetics
         kinetics = self._kinetics(opts, cond, system, an, main_eq, eq, T) if opts.get("include_kinetics") else None
 
-        # uncertainty
         unc = None
         confidence = None
         if opts.get("include_uncertainty") and opts["uncertainty_method"] != "none":
@@ -420,7 +503,6 @@ class Agent:
             methods.append("Monte Carlo ensemble" if opts["uncertainty_method"] == "ensemble" else "bootstrap (uniform)")
         if main_eq is not None:
             main_eq["confidence"] = confidence if confidence is not None else None
-        # temperature dependence
         tscan = self._temperature_scan(solver, main_eq, T, cond, system, opts, titration, all_species, reagents,
                                        gases, rules, P_bar, water_kg)
 
@@ -484,13 +566,10 @@ class Agent:
         }
 
     def _self_equilibrated_initial(self, solver: _Solver, system: ChemSystem) -> None:
-        """Initial state for mixing reactions: each aqueous reagent equilibrated alone in the same
-        amount of water. Then own hydrolysis/dissociation of a reagent is not reported as a reaction product.
-        Single-reagent systems keep the nominal state (their 'reaction' is exactly that equilibrium)."""
         if not system.aqueous or len(system.reagents) < 2:
             return
         from .search.hypotheses import species_components
-        share = system.water_mol  # each reagent alone in the full amount of water
+        share = system.water_mol
         wrow = species_components(parse_formula("H2O").elements, 0, system.rules.decouple)
         total = np.zeros(len(system.species))
         n_aq = 0
@@ -514,7 +593,7 @@ class Agent:
                     b[system.components.index(k)] += v * mult
             try:
                 eq = solver.run(b=b)
-            except Exception:  # noqa: BLE001
+            except Exception:
                 return
             if eq.residual > 1e-5:
                 return
@@ -567,7 +646,6 @@ class Agent:
         return best
 
     def _register_titrant(self, solver, system, b_used, target, eq, warnings) -> None:
-        """pH-stat: the added HCl/NaOH becomes part of the system (b, initial state, reagents)."""
         extra = b_used - system.b
         system.b = b_used
         from .search.hypotheses import species_components
@@ -613,7 +691,6 @@ class Agent:
         return 1.0 if eq.n[i] > 0 else None
 
     def _SI(self, solver: _Solver, eq, i: int) -> float:
-        """log10 saturation index of a condensed species from element potentials."""
         a = solver.system.A[i]
         return float((a @ eq.lam - solver.G[i] / (R * solver.T)) / LN10)
 
@@ -654,15 +731,13 @@ class Agent:
             return [], None
         prods = [p for p in an.products if p.kind != "ion" or not any(
             q.parts and p.species_idx[0] in [i for i, _ in q.parts] for q in an.products)]
-        # keep a compact set: condensed, gases, salts, molecules, water, uncovered ions
         prods = prods[:8]
-        
-        # ИСПОЛЬЗУЕМ solver.voltage_V вместо локальной переменной
+
         if solver.voltage_V > 0:
             prods = [p for p in prods if p.formula not in ("H+", "OH-")]
-            
+
         reag = []
-        for r in system.reagents:  # drop pH-stat placeholders, merge repeated formulas
+        for r in system.reagents:
             if r.moles <= 1e-10:
                 continue
             same = next((x for x in reag if x.comp.key == r.comp.key), None)
@@ -670,7 +745,6 @@ class Agent:
                 same.moles += r.moles
             else:
                 reag.append(Reagent(r.formula, r.comp, r.moles, r.phase))
-        # water and consumed atmospheric gases can be reagents of the overall equation
         net: dict[tuple, float] = {}
         for sp_, d in zip(system.species, an.delta):
             net[sp_.key] = net.get(sp_.key, 0.0) + d
@@ -691,7 +765,6 @@ class Agent:
         if res is None:
             res = balance(rc, rq, pc, pq)
         if res is None:
-            # several parallel reactions: equation of the main product with the smallest consistent set
             from itertools import combinations
             all_idx = list(range(len(prods)))
             for size in range(min(4, len(prods)), 0, -1):
@@ -717,7 +790,6 @@ class Agent:
             rnames = [r.formula for r in reag]
             pnames = [p.formula + ("↓" if p.kind == "precipitate" else "↑" if p.kind == "gas" else "") for p in prods]
             text = format_side(cr, rnames) + " -> " + format_side(cp, pnames)
-            # energetics
             parts: list[tuple[int, float]] = []
             srcs: dict[str, str] = {}
             ok = True
@@ -743,7 +815,7 @@ class Agent:
                 idx = [(i, c) for i, c in merged.items() if abs(c) > 1e-12]
                 dG, sG, dH = _species_G(solver, idx)
                 lnK = -dG / (R * T)
-                K = math.exp(lnK) if abs(lnK) < 700 else None  # outside float range: see log10_K
+                K = math.exp(lnK) if abs(lnK) < 700 else None
                 dS = (dH - dG) / T * 1000.0 if dH is not None else None
                 main = {"equation": text, "delta_G_kJ_mol": dG, "delta_G_uncertainty": sG,
                         "delta_H_kJ_mol": dH, "delta_S_J_mol_K": dS, "equilibrium_constant": K,
@@ -766,7 +838,6 @@ class Agent:
         if not an.reaction_occurred:
             return None
         sp = system.species
-        # net change per substance; strong-acid anion HSO4- is shown as SO4(2-) + H+
         net: dict[tuple, float] = {}
         rep: dict[tuple, int] = {}
         rep_d: dict[tuple, float] = {}
@@ -782,14 +853,13 @@ class Agent:
             for j, k in items:
                 key = sp[j].key
                 net[key] = net.get(key, 0.0) + k * d
-                # representative species of a substance: the phase with the largest change
                 if key not in rep or abs(k * d) > rep_d.get(key, 0.0):
                     rep[key] = j
                     rep_d[key] = abs(k * d)
         kH, kOH, kW = (parse_formula(f).key for f in ("H+", "OH-", "H2O"))
         if kH in net and kOH in net and kW in net and net[kH] * net[kOH] < 0:
             t = min(abs(net[kH]), abs(net[kOH]))
-            sgn = 1.0 if net[kOH] > 0 else -1.0  # OH- formed while H+ consumed -> fewer H+ consumed, water formed
+            sgn = 1.0 if net[kOH] > 0 else -1.0
             net[kOH] -= sgn * t
             net[kH] += sgn * t
             net[kW] += sgn * t
@@ -893,7 +963,6 @@ class Agent:
         contrib = np.zeros(len(system.species))
         for k in range(size):
             try:
-                # pH-stat titration is not repeated per member (cost); warm start from nominal
                 eqk = solver.run(dG_shift=D[k], warm=eq0)
             except Exception:
                 failed += 1
@@ -958,7 +1027,7 @@ class Agent:
                     ank = analyze(system, eq.n)
                     out["profile"].append({"T_K": pt["T_K"], "t_s": pt["t_s"], "pH": self._pH(sv, eq),
                                            "products": {p.formula: p.moles for p in ank.products[:6]}})
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:
                     out["profile"].append({"T_K": pt["T_K"], "t_s": pt["t_s"], "error": str(e)})
             out["profile_note"] = ("Набор кандидатов и кинетические правила взяты при основной температуре; "
                                    "равновесие пересчитано в каждой точке профиля")
