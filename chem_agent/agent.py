@@ -203,10 +203,52 @@ class Agent:
         if req.get("conditions") and req["conditions"].get("temperature_K"):
             T = float(req["conditions"]["temperature_K"])
 
-        # Берем напряжение из внешней цепи
-        U = cell["external_circuit"].get("voltage_V", 2.0)
+        # --- БЕРЕМ ПАРАМЕТРЫ ВНЕШНЕЙ ЦЕПИ ---
+        circuit = cell.get("external_circuit", {})
+        U = circuit.get("voltage_V", 2.0)
+        duration_s = circuit.get("duration_s", 3600)
         
-        empty_rules = RuleOutcome()
+        F = 96485.332 # Постоянная Фарадея
+        area = cell.get("membrane", {}).get("area_m2", 0.01)
+        
+        if circuit.get("mode") == "galvanostatic":
+            current_density = circuit.get("current_density_A_m2", 100)
+            current = current_density * area
+        else:
+            # Для потенциостатического режима используем дефолтный ток (100 А/м2)
+            current = 100 * area 
+            
+        # Максимальное количество молей электронов (Закон Фарадея)
+        max_electrons = (current * duration_s) / F
+        # ------------------------------------
+
+        def apply_faraday_limit(n_eq, n_initial, sys_obj, max_e):
+            """Ограничивает изменение количества вещества по закону Фарадея."""
+            if n_eq is None:
+                return n_eq
+            delta = n_eq - n_initial
+            prod_idx = np.argmax(delta)
+            
+            if delta[prod_idx] <= 1e-6:
+                return n_eq # Реакция не идет
+            
+            prod_formula = sys_obj.species[prod_idx].formula
+            
+            # Ищем, сколько электронов нужно для 1 моля этого продукта
+            n_el = 1
+            for (ox_f, red_f), pair in self.db.redox_pairs.items():
+                if ox_f == prod_formula or red_f == prod_formula:
+                    n_el = pair["n"]
+                    break
+                    
+            electrons_needed = delta[prod_idx] * n_el
+            
+            # Если для полного равновесия нужно больше электронов, чем мы можем дать
+            if electrons_needed > max_e:
+                scale = max_e / electrons_needed
+                n_eq = n_initial + delta * scale
+                
+            return n_eq
 
         def solve_chamber(side_name: str, phi_V: float):
             side = cell[side_name]
@@ -222,7 +264,7 @@ class Agent:
 
             ctx = RuleContext(T=T, aqueous=True, reagents=reagents_list, volume_L=volume_L, voltage_V=abs(phi_V))
             rules = evaluate(ctx, set())
-            
+
             resolver = EnergyResolver.from_request(self.db, {}, species_list, "auto")
             all_species = resolver.apply(self.db.species, True)
 
@@ -230,14 +272,16 @@ class Agent:
                 all_species, reagents_list,
                 T=T, P_bar=1.0, aqueous=True,
                 water_kg=water_kg,
-                rules=rules,  
+                rules=rules,
             )
 
             if not sys_chamber.species:
-                return None, False, sys_chamber
+                return None, False, sys_chamber, None
 
             g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
             charges = np.array([s.charge for s in sys_chamber.species])
+
+            # Отключаем баланс заряда для электролиза
             charge_idx = sys_chamber.charge_col
             if charge_idx is not None:
                 A_electro = np.delete(sys_chamber.A, charge_idx, axis=1)
@@ -245,26 +289,30 @@ class Agent:
             else:
                 A_electro = sys_chamber.A
                 b_electro = sys_chamber.b
+
             n, lam, ok = solve_kkt(
                 A_electro, b_electro, g0, charges,
                 phi=phi_V, T=T, kinds=sys_chamber.kinds,
-                charge_col=None,  # Заряд отключен
+                charge_col=None,
                 gamma_fn=None, max_iter=200
             )
-            return n, ok, sys_chamber
+            return n, ok, sys_chamber, sys_chamber.initial
 
         # Анод (окисление): забирает электроны, потенциал отрицательный
-        n_anode, ok_anode, sys_anode = solve_chamber("anode", phi_V=-U)
-
+        n_anode_eq, ok_anode, sys_anode, n_anode_init = solve_chamber("anode", phi_V=-U)
         # Катод (восстановление): отдает электроны, потенциал положительный
-        n_cathode, ok_cathode, sys_cathode = solve_chamber("cathode", phi_V=U)
+        n_cathode_eq, ok_cathode, sys_cathode, n_cathode_init = solve_chamber("cathode", phi_V=U)
+        
+        # Применяем Закон Фарадея (ограничиваем количество прореагировавшего вещества)
+        n_anode = apply_faraday_limit(n_anode_eq, n_anode_init, sys_anode, max_electrons)
+        n_cathode = apply_faraday_limit(n_cathode_eq, n_cathode_init, sys_cathode, max_electrons)
 
         def summarize(n_arr, sys_obj, ok):
             if not ok or n_arr is None:
                 return {"converged": False, "species": []}
             out = []
             for i, s in enumerate(sys_obj.species):
-                if n_arr[i] > 1e-3:
+                if n_arr[i] > 1e-4:  # Показываем > 0.0001 моль
                     out.append({
                         "formula": s.formula,
                         "phase": s.phase,
@@ -273,14 +321,8 @@ class Agent:
             out.sort(key=lambda x: -x["moles"])
             return {"converged": True, "species": out}
 
-        status = "ok" if (ok_anode and ok_cathode) else "error"
-        msg = None
-        if status == "error":
-            msg = "Не удалось сойтись. Возможно, напряжение слишком высокое для данной модели."
-        
         return {
-            "status": status,
-            "message": msg,
+            "status": "ok" if (ok_anode and ok_cathode) else "error",
             "mode": "cell",
             "cell_result": {
                 "anode": summarize(n_anode, sys_anode, ok_anode),
