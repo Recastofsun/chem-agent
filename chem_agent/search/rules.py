@@ -176,6 +176,10 @@ class RuleContext:
         if name == "passivating_acid":
             return ((self.has("HNO3") and self.conc("HNO3") >= 10.0) or
                     (self.has("H2SO4") and self.conc("H2SO4") >= 10.0)) == bool(arg)
+        if name == "voltage_below":
+            return self.voltage_V < float(arg)
+        if name == "voltage_above":
+            return self.voltage_V >= float(arg)
         raise ValueError(f"Неизвестное условие правила: {name}")
 
 

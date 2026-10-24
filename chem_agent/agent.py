@@ -197,122 +197,134 @@ class Agent:
     # --- НОВЫЙ МЕТОД ДЛЯ ДВУХКАМЕРНОЙ ЯЧЕЙКИ -----------------------------------
     def _run_cell(self, req: dict, warnings: list[str]) -> dict:
         from .thermo.constrained_lagrange import solve_kkt
+        from .electrochem.kinetics import select_dominant_reaction
 
         cell = req["cell"]
         T = 298.15
         if req.get("conditions") and req["conditions"].get("temperature_K"):
             T = float(req["conditions"]["temperature_K"])
 
-        # --- БЕРЕМ ПАРАМЕТРЫ ВНЕШНЕЙ ЦЕПИ ---
+        # 1. Параметры внешней цепи (Закон Фарадея)
         circuit = cell.get("external_circuit", {})
         U = circuit.get("voltage_V", 2.0)
         duration_s = circuit.get("duration_s", 3600)
         
-        F = 96485.332 # Постоянная Фарадея
+        F = 96485.332
         area = cell.get("membrane", {}).get("area_m2", 0.01)
         
         if circuit.get("mode") == "galvanostatic":
-            current_density = circuit.get("current_density_A_m2", 100)
-            current = current_density * area
+            current = circuit.get("current_density_A_m2", 100) * area
         else:
-            # Для потенциостатического режима используем дефолтный ток (100 А/м2)
-            current = 100 * area 
+            current = 100 * area # дефолт для потенциостатического
             
-        # Максимальное количество молей электронов (Закон Фарадея)
         max_electrons = (current * duration_s) / F
-        # ------------------------------------
 
-        def apply_faraday_limit(n_eq, n_initial, sys_obj, max_e):
-            """Ограничивает изменение количества вещества по закону Фарадея."""
-            if n_eq is None:
-                return n_eq
-            delta = n_eq - n_initial
-            prod_idx = np.argmax(delta)
-            
-            if delta[prod_idx] <= 1e-6:
-                return n_eq # Реакция не идет
-            
-            prod_formula = sys_obj.species[prod_idx].formula
-            
-            # Ищем, сколько электронов нужно для 1 моля этого продукта
-            n_el = 1
-            for (ox_f, red_f), pair in self.db.redox_pairs.items():
-                if ox_f == prod_formula or red_f == prod_formula:
-                    n_el = pair["n"]
-                    break
-                    
-            electrons_needed = delta[prod_idx] * n_el
-            
-            # Если для полного равновесия нужно больше электронов, чем мы можем дать
-            if electrons_needed > max_e:
-                scale = max_e / electrons_needed
-                n_eq = n_initial + delta * scale
-                
-            return n_eq
-
-        def solve_chamber(side_name: str, phi_V: float):
+        def solve_chamber(side_name: str, side_potential: float):
             side = cell[side_name]
             sol = side["solution"]
             species_list = sol["species"]
             volume_L = sol.get("volume_L", 1.0)
             water_kg = volume_L
 
+            # А) Строим начальную систему
             reagents_list = [
                 Reagent(r["formula"], parse_formula(r["formula"]), r["moles"], r.get("phase", "aq"))
                 for r in species_list
             ]
-
-            ctx = RuleContext(T=T, aqueous=True, reagents=reagents_list, volume_L=volume_L, voltage_V=abs(phi_V))
+            ctx = RuleContext(T=T, aqueous=True, reagents=reagents_list, volume_L=volume_L, voltage_V=abs(side_potential))
             rules = evaluate(ctx, set())
-
             resolver = EnergyResolver.from_request(self.db, {}, species_list, "auto")
             all_species = resolver.apply(self.db.species, True)
-
-            sys_chamber = build_system(
-                all_species, reagents_list,
-                T=T, P_bar=1.0, aqueous=True,
-                water_kg=water_kg,
-                rules=rules,
-            )
-
+            
+            sys_chamber = build_system(all_species, reagents_list, T=T, P_bar=1.0, aqueous=True, water_kg=water_kg, rules=rules)
             if not sys_chamber.species:
-                return None, False, sys_chamber, None
+                return None, False, sys_chamber
 
+            # Б) Выбираем реакцию (Нернст + Батлер-Фольмер)
+            concentrations = {s.formula: float(sys_chamber.initial[i]) / volume_L for i, s in enumerate(sys_chamber.species)}
+            dominant = select_dominant_reaction(self.db, U=abs(side_potential), concentrations=concentrations, T=T, side=side_name)
+            
+            if dominant is None:
+                # Реакции нет, возвращаем исходное равновесие
+                g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
+                charges = np.array([s.charge for s in sys_chamber.species])
+                n, lam, ok = solve_kkt(sys_chamber.A, sys_chamber.b, g0, charges, phi=0.0, T=T, kinds=sys_chamber.kinds)
+                return n, ok, sys_chamber
+
+            # В) ФИКС: Принудительно разрешаем продукты, даже если правила их запрещали
+            for p_formula in [dominant["ox"], dominant["red"]]:
+                p_key = parse_formula(p_formula).key
+                rules.forbid_new.discard(p_key) # Удаляем из черного списка
+                
+                if p_formula not in [s.formula for s in sys_chamber.species]:
+                    phase = "g" if p_formula in ("H2", "O2", "Cl2") else "aq"
+                    reagents_list.append(Reagent(p_formula, parse_formula(p_formula), 0.0, phase))
+
+            # Пересобираем систему (теперь продукты точно в ней)
+            sys_chamber = build_system(all_species, reagents_list, T=T, P_bar=1.0, aqueous=True, water_kg=water_kg, rules=rules)
+
+            # Г) Считаем исходное равновесие (с новыми продуктами)
             g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
             charges = np.array([s.charge for s in sys_chamber.species])
+            n_eq, lam, ok = solve_kkt(sys_chamber.A, sys_chamber.b, g0, charges, phi=0.0, T=T, kinds=sys_chamber.kinds)
+            
+            if n_eq is None:
+                return None, False, sys_chamber
 
-            # Отключаем баланс заряда для электролиза
-            charge_idx = sys_chamber.charge_col
-            if charge_idx is not None:
-                A_electro = np.delete(sys_chamber.A, charge_idx, axis=1)
-                b_electro = np.delete(sys_chamber.b, charge_idx)
-            else:
-                A_electro = sys_chamber.A
-                b_electro = sys_chamber.b
+            # Д) Применяем Закон Фарадея НАПРЯМУЮ
+            n_final = n_eq.copy()
+            
+            # Находим индексы частиц
+            ox_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == dominant["ox"]), None)
+            red_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == dominant["red"]), None)
+            h2o_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == "H2O" and s.phase == "l"), None)
+            oh_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == "OH-" and s.phase == "aq"), None)
+            
+            n_e = dominant["n"]
+            xi = max_electrons / n_e
 
-            n, lam, ok = solve_kkt(
-                A_electro, b_electro, g0, charges,
-                phi=phi_V, T=T, kinds=sys_chamber.kinds,
-                charge_col=None,
-                gamma_fn=None, max_iter=200
-            )
-            return n, ok, sys_chamber, sys_chamber.initial
+            if side_name == "anode" and red_idx is not None:
+                # Окисление: red -> ox
+                max_xi = float(n_eq[red_idx]) / 1.0
+                xi = min(xi, max_xi)
+                n_final[red_idx] = max(0, n_final[red_idx] - xi)
+                if ox_idx is not None:
+                    n_final[ox_idx] += xi
+                    
+            elif side_name == "cathode":
+                if dominant["red"] == "H2":
+                    # Восстановление воды: 2H2O + 2e -> H2 + 2OH-
+                    # Ограничиваем по количеству воды
+                    if h2o_idx is not None:
+                        xi = min(xi, n_final[h2o_idx] / 2.0)
+                    
+                    if red_idx is not None:
+                        n_final[red_idx] += xi  # Добавляем H2
+                    if oh_idx is not None:
+                        n_final[oh_idx] += 2 * xi  # Добавляем OH-
+                    if h2o_idx is not None:
+                        n_final[h2o_idx] -= 2 * xi  # Убираем воду
+                elif ox_idx is not None:
+                    # Обычное восстановление (например, Cu+2 -> Cu)
+                    max_xi = float(n_eq[ox_idx]) / 1.0
+                    xi = min(xi, max_xi)
+                    n_final[ox_idx] = max(0, n_final[ox_idx] - xi)
+                    if red_idx is not None:
+                        n_final[red_idx] += xi
 
-        # Анод (окисление): забирает электроны, потенциал отрицательный
-        n_anode_eq, ok_anode, sys_anode, n_anode_init = solve_chamber("anode", phi_V=-U)
-        # Катод (восстановление): отдает электроны, потенциал положительный
-        n_cathode_eq, ok_cathode, sys_cathode, n_cathode_init = solve_chamber("cathode", phi_V=U)
-        
-        # Применяем Закон Фарадея (ограничиваем количество прореагировавшего вещества)
-        n_anode = apply_faraday_limit(n_anode_eq, n_anode_init, sys_anode, max_electrons)
-        n_cathode = apply_faraday_limit(n_cathode_eq, n_cathode_init, sys_cathode, max_electrons)
+            sys_chamber.initial = n_eq
+            return n_final, True, sys_chamber
+
+        # Анод (-U), Катод (+U)
+        n_anode, ok_anode, sys_anode = solve_chamber("anode", -U)
+        n_cathode, ok_cathode, sys_cathode = solve_chamber("cathode", U)
 
         def summarize(n_arr, sys_obj, ok):
             if not ok or n_arr is None:
                 return {"converged": False, "species": []}
             out = []
             for i, s in enumerate(sys_obj.species):
-                if n_arr[i] > 1e-4:  # Показываем > 0.0001 моль
+                if n_arr[i] > 1e-4:
                     out.append({
                         "formula": s.formula,
                         "phase": s.phase,

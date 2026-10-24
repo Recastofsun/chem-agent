@@ -47,7 +47,7 @@ def main():
                 "solution": {"species": [{"formula": "Na2SO4", "moles": 0.1}]}
             },
             "membrane": {"type": "cation_exchange"},
-            "external_circuit": {"mode": "potentiostatic", "voltage_V": 2.5}
+            "external_circuit": {"mode": "potentiostatic", "voltage_V": 1.5}
         }
     )
 
@@ -68,6 +68,23 @@ def main():
             "external_circuit": {"mode": "potentiostatic", "voltage_V": 1.5}
         }
     )
+    # Тест 3: Электролиз HCl (получение водорода и хлора)
+    run_test(
+            "Электролиз HCl",
+            {
+                "anode": {
+                    "electrode": {"material": "C"},
+                    "solution": {"species": [{"formula": "HCl", "moles": 0.1}]}
+                },
+                "cathode": {
+                    "electrode": {"material": "C"},
+                    "solution": {"species": [{"formula": "HCl", "moles": 0.1}]}
+                },
+                "membrane": {"type": "cation_exchange"},
+                "external_circuit": {"mode": "potentiostatic", "voltage_V": 2.0}
+            }
+        )
+    
 
 if __name__ == "__main__":
     main()
