@@ -20,15 +20,16 @@ def select_dominant_reaction(db, U: float, concentrations: dict[str, float], T: 
     best_candidate = None
     max_current = -1.0
     
+    print(f"\n--- Поиск реакции для {side} (U={U:.2f} В) ---")
+    
     for (ox_f, red_f), pair in db.redox_pairs.items():
-        # Учитываем автоионизацию воды для H+ / OH-
         c_ox = concentrations.get(ox_f, 0.0)
         if ox_f == "H+":
-            c_ox = max(c_ox, 1e-7)  # Водород из воды (pH 7)
+            c_ox = max(c_ox, 1e-7)
             
         c_red = concentrations.get(red_f, 0.0)
         if red_f == "OH-":
-            c_red = max(c_red, 1e-7)  # Гидроксид из воды (pH 7)
+            c_red = max(c_red, 1e-7)
             
         if side == "anode" and c_red == 0.0:
             continue
@@ -37,12 +38,13 @@ def select_dominant_reaction(db, U: float, concentrations: dict[str, float], T: 
             
         e0 = pair["e0"]
         n = pair["n"]
-        eta_over = pair.get("overpotential_V", 0.0)
         
-        # 1. Равновесный потенциал по Нернсту
+        # ЧИТАЕМ ИЗ БАЗЫ ДАННЫХ
+        eta_over = pair.get("overpotential_V", 0.0)
+        j0 = pair.get("exchange_current_A_m2", 1e-3)
+            
         E_eq = nernst_potential(e0, n, max(c_ox, 1e-6), max(c_red, 1e-6), T)
         
-        # 2. Перенапряжение
         if side == "anode":
             eta = U - E_eq - eta_over
         else:
@@ -51,24 +53,23 @@ def select_dominant_reaction(db, U: float, concentrations: dict[str, float], T: 
         if eta <= 0:
             continue
             
-        # 3. Ток по Батлеру-Фольмеру (с ограничением)
-        eta_capped = min(eta, 0.2)
-        j0 = pair.get("exchange_current_A_m2", 1e-3)
+        eta_capped = min(eta, 0.2)  # Ограничиваем экспоненту
         alpha = 0.5
         
         exponent = (alpha * n * F * eta_capped) / (R_GAS * T)
         j = j0 * math.exp(exponent)
         
+        print(f"  {ox_f}/{red_f}: eta={eta:.2f}, j0={j0:.1e} -> Ток j = {j:.2e}")
+        
         if j > max_current:
             max_current = j
             best_candidate = {
-                "ox": ox_f,
-                "red": red_f,
-                "n": n,
-                "e0": e0,
-                "E_eq": E_eq,
-                "eta": eta,
-                "j": j
+                "ox": ox_f, "red": red_f, "n": n, "e0": e0,
+                "E_eq": E_eq, "eta": eta, "j": j
             }
             
+    if best_candidate:
+        print(f"  ПОБЕДИТЕЛЬ: {best_candidate['ox']}/{best_candidate['red']} (j={best_candidate['j']:.2e})")
     return best_candidate
+            
+    

@@ -204,7 +204,6 @@ class Agent:
         if req.get("conditions") and req["conditions"].get("temperature_K"):
             T = float(req["conditions"]["temperature_K"])
 
-        # 1. Параметры внешней цепи (Закон Фарадея)
         circuit = cell.get("external_circuit", {})
         U = circuit.get("voltage_V", 2.0)
         duration_s = circuit.get("duration_s", 3600)
@@ -215,7 +214,7 @@ class Agent:
         if circuit.get("mode") == "galvanostatic":
             current = circuit.get("current_density_A_m2", 100) * area
         else:
-            current = 100 * area # дефолт для потенциостатического
+            current = 100 * area
             
         max_electrons = (current * duration_s) / F
 
@@ -240,41 +239,52 @@ class Agent:
             if not sys_chamber.species:
                 return None, False, sys_chamber
 
-            # Б) Выбираем реакцию (Нернст + Батлер-Фольмер)
-            concentrations = {s.formula: float(sys_chamber.initial[i]) / volume_L for i, s in enumerate(sys_chamber.species)}
+            # Б) СНАЧАЛА СЧИТАЕМ РАВНОВЕСИЕ (чтобы получить реальные ионы)
+            g0_init = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
+            charges_init = np.array([s.charge for s in sys_chamber.species])
+            n_eq_init, _, ok_init = solve_kkt(
+                sys_chamber.A, sys_chamber.b, g0_init, charges_init, 
+                phi=0.0, T=T, kinds=sys_chamber.kinds, 
+                charge_col=sys_chamber.charge_col, gamma_fn=None, max_iter=200
+            )
+            
+            if n_eq_init is None:
+                return None, False, sys_chamber
+
+            # Теперь concentrations - это реальные ионы (Cu+2, Cl-, H+ и т.д.)
+            concentrations = {s.formula: float(n_eq_init[i]) / volume_L for i, s in enumerate(sys_chamber.species)}
+            
+            # В) ВЫБИРАЕМ РЕАКЦИЮ (Нернст + Батлер-Фольмер)
             dominant = select_dominant_reaction(self.db, U=abs(side_potential), concentrations=concentrations, T=T, side=side_name)
             
             if dominant is None:
-                # Реакции нет, возвращаем исходное равновесие
-                g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
-                charges = np.array([s.charge for s in sys_chamber.species])
-                n, lam, ok = solve_kkt(sys_chamber.A, sys_chamber.b, g0, charges, phi=0.0, T=T, kinds=sys_chamber.kinds)
-                return n, ok, sys_chamber
+                warnings.append(f"{side_name}: доминирующая реакция не найдена (напряжения недостаточно).")
+                return n_eq_init, ok_init, sys_chamber
 
-            # В) ФИКС: Принудительно разрешаем продукты, даже если правила их запрещали
+            # Г) ФИКС: Принудительно добавляем продукты, даже если правила их запрещали
             for p_formula in [dominant["ox"], dominant["red"]]:
                 p_key = parse_formula(p_formula).key
-                rules.forbid_new.discard(p_key) # Удаляем из черного списка
+                rules.forbid_new.discard(p_key)
                 
                 if p_formula not in [s.formula for s in sys_chamber.species]:
-                    phase = "g" if p_formula in ("H2", "O2", "Cl2") else "aq"
+                    sp_db = self.db.find_formula(p_formula)
+                    phase = sp_db[0].phase if sp_db else ("g" if p_formula in ("H2", "O2", "Cl2") else "aq")
                     reagents_list.append(Reagent(p_formula, parse_formula(p_formula), 0.0, phase))
 
-            # Пересобираем систему (теперь продукты точно в ней)
+            # Пересобираем систему с продуктами
             sys_chamber = build_system(all_species, reagents_list, T=T, P_bar=1.0, aqueous=True, water_kg=water_kg, rules=rules)
 
-            # Г) Считаем исходное равновесие (с новыми продуктами)
+            # Д) Считаем равновесие с новыми продуктами
             g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
             charges = np.array([s.charge for s in sys_chamber.species])
-            n_eq, lam, ok = solve_kkt(sys_chamber.A, sys_chamber.b, g0, charges, phi=0.0, T=T, kinds=sys_chamber.kinds)
+            n_eq, lam, ok = solve_kkt(sys_chamber.A, sys_chamber.b, g0, charges, phi=0.0, T=T, kinds=sys_chamber.kinds, charge_col=sys_chamber.charge_col, gamma_fn=None, max_iter=200)
             
             if n_eq is None:
                 return None, False, sys_chamber
 
-            # Д) Применяем Закон Фарадея НАПРЯМУЮ
+            # Е) ПРИМЕНЯЕМ ЗАКОН ФАРАДЕЯ
             n_final = n_eq.copy()
             
-            # Находим индексы частиц
             ox_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == dominant["ox"]), None)
             red_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == dominant["red"]), None)
             h2o_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == "H2O" and s.phase == "l"), None)
@@ -284,7 +294,6 @@ class Agent:
             xi = max_electrons / n_e
 
             if side_name == "anode" and red_idx is not None:
-                # Окисление: red -> ox
                 max_xi = float(n_eq[red_idx]) / 1.0
                 xi = min(xi, max_xi)
                 n_final[red_idx] = max(0, n_final[red_idx] - xi)
@@ -293,19 +302,15 @@ class Agent:
                     
             elif side_name == "cathode":
                 if dominant["red"] == "H2":
-                    # Восстановление воды: 2H2O + 2e -> H2 + 2OH-
-                    # Ограничиваем по количеству воды
                     if h2o_idx is not None:
                         xi = min(xi, n_final[h2o_idx] / 2.0)
-                    
                     if red_idx is not None:
-                        n_final[red_idx] += xi  # Добавляем H2
+                        n_final[red_idx] += xi
                     if oh_idx is not None:
-                        n_final[oh_idx] += 2 * xi  # Добавляем OH-
+                        n_final[oh_idx] += 2 * xi
                     if h2o_idx is not None:
-                        n_final[h2o_idx] -= 2 * xi  # Убираем воду
+                        n_final[h2o_idx] -= 2 * xi
                 elif ox_idx is not None:
-                    # Обычное восстановление (например, Cu+2 -> Cu)
                     max_xi = float(n_eq[ox_idx]) / 1.0
                     xi = min(xi, max_xi)
                     n_final[ox_idx] = max(0, n_final[ox_idx] - xi)

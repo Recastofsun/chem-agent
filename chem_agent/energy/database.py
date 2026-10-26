@@ -86,10 +86,15 @@ class ThermoDB:
         self.sit_params: dict[tuple[str, str], float] = {}
 
         try:
-            for row in con.execute("SELECT ox_formula, red_formula, n_electrons, e0_volts, ox_coeff, red_coeff, overpotential_V FROM redox_pairs"):
+            # Загружаем редокс-пары (с новыми колонками)
+            for row in con.execute("SELECT ox_formula, red_formula, n_electrons, e0_volts, ox_coeff, red_coeff, overpotential_V, exchange_current_A_m2 FROM redox_pairs"):
                 self.redox_pairs[(row[0], row[1])] = {
-                    "n": row[2], "e0": row[3], "ox_coeff": row[4], "red_coeff": row[5],
-                    "overpotential_V": row[6] or 0.0
+                    "n": row[2],
+                    "e0": row[3],
+                    "ox_coeff": row[4] or 1.0,
+                    "red_coeff": row[5] or 1.0,
+                    "overpotential_V": row[6] or 0.0,
+                    "exchange_current_A_m2": row[7] or 1e-3
                 }
                 
             # Загружаем кинетические барьеры

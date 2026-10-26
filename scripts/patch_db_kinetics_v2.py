@@ -6,17 +6,13 @@ def main():
     con = sqlite3.connect(str(db_path))
     cursor = con.cursor()
 
-    for col in ("overpotential_V", "exchange_current_A_m2"):
-        try:
-            cursor.execute(f"ALTER TABLE redox_pairs ADD COLUMN {col} REAL DEFAULT 0.0")
-        except sqlite3.OperationalError:
-            pass
-
+    # Жестко задаем j0 (ток обмена) и overpotential (перенапряжение)
     kinetics_data = [
         # (ox, red, e0, n, overpotential_V, exchange_current_A_m2)
-        ("O2", "H2O", 1.229, 4, 0.50, 1e-6),
-        ("Cl2", "Cl-", 1.360, 2, 0.10, 1e-2),
-        ("H+", "H2", 0.000, 2, 0.00, 1e-3),
+        ("O2", "H2O", 1.229, 4, 0.50, 1e-6),   # Кислород: очень низкий ток обмена
+        ("Cl2", "Cl-", 1.360, 2, 0.10, 1e-2),  # Хлор: высокий ток обмена
+        ("H+", "H2", 0.000, 2, 0.00, 1e-3),    # Водород: средний ток
+        ("Cu+2", "Cu", 0.340, 2, 0.00, 1e-1),  # Медь: очень высокий ток обмена
     ]
 
     for ox, red, e0, n, eta, j0 in kinetics_data:
@@ -28,7 +24,7 @@ def main():
 
     con.commit()
     con.close()
-    print("✅ База данных обновлена.")
+    print("✅ База данных обновлена: j0 и перенапряжение заданы.")
 
 if __name__ == "__main__":
     main()
