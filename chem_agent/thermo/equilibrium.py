@@ -13,13 +13,17 @@ Dual: maximize b . lambda subject to
   * gas:        ln P - logsumexp(a_j . lambda - g_j) >= 0
 Phase amounts are the Lagrange multipliers of these constraints. The problem is convex,
 so the minimum is unique; the barrier method is deterministic.
-Activity coefficients are updated in an outer fixed-point loop (g_i~ = g_i + ln gamma_i).
+
+Activity coefficients are updated in an outer loop. Fast path: Anderson acceleration.
+If Anderson stagnates (diff > 1e-4 after 12 iterations), switch to full Newton on
+(lambda, n_w, n_gas, n_cond, ln_gamma_aq) with numerical Jacobian (W-01).
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
 import numpy as np
+import os
 
 M_W = 0.018015268  # kg/mol
 
@@ -28,17 +32,17 @@ AQ, GAS, COND, SOLVENT = "aq", "g", "cond", "solvent"
 
 @dataclass
 class EqProblem:
-    A: np.ndarray            # (n_species, n_components)
-    g: np.ndarray            # (n_species,) dimensionless mu0/RT
-    kind: list[str]          # AQ, GAS, COND, SOLVENT for each species
-    b: np.ndarray            # (n_components,)
-    charges: np.ndarray      # (n_species,)
+    A: np.ndarray
+    g: np.ndarray
+    kind: list[str]
+    b: np.ndarray
+    charges: np.ndarray
     P_bar: float = 1.0
-    gamma_fn: object = None  # callable(I, charges_aq) -> ln_gamma array; None = ideal
+    gamma_fn: object = None
     fixed_I: float | None = None
     charge_col: int | None = None
     lam0: np.ndarray | None = None
-    warm: tuple | None = None  # (lam, n, n_w, n_gas) of a nearby solution
+    warm: tuple | None = None
     fixed_lambda: dict[int, float] | None = None
 
 
@@ -120,7 +124,6 @@ class _Barrier:
         return v
 
     def delta(self, lam, cand, t, s, sc) -> float:
-        """Barrier value difference computed without cancellation."""
         v = t * float(self.p.b @ (cand - lam))
         if len(s["c"]):
             v += float(np.sum(np.log1p((sc["c"] - s["c"]) / s["c"])))
@@ -165,7 +168,6 @@ class _Barrier:
                 H[:, idx] = 0.0
                 H[idx, idx] = 1.0
         return grad, H
-        
 
     def amounts(self, lam, t, s) -> tuple[np.ndarray, float, float]:
         n = np.zeros(len(self.p.g))
@@ -183,7 +185,6 @@ class _Barrier:
 
 
 def _initial_lambda(p: EqProblem, g: np.ndarray) -> np.ndarray:
-    """Strictly feasible start: all element potentials very negative, charge potential 0."""
     A = p.A
     atoms = np.abs(A).sum(axis=1)
     is_charge = np.zeros(A.shape[1], dtype=bool)
@@ -191,7 +192,6 @@ def _initial_lambda(p: EqProblem, g: np.ndarray) -> np.ndarray:
         is_charge[p.charge_col] = True
     atoms_nc = (np.abs(A[:, ~is_charge])).sum(axis=1)
     atoms_nc = np.where(atoms_nc > 0, atoms_nc, 1.0)
-    # need g_i + M*atoms_i > margin for all species
     M = float(np.max((-g + 30.0) / atoms_nc))
     M = max(M, 50.0)
     lam = np.where(is_charge, 0.0, -M)
@@ -199,13 +199,11 @@ def _initial_lambda(p: EqProblem, g: np.ndarray) -> np.ndarray:
 
 
 def _lp_lambda(p: EqProblem, g: np.ndarray) -> np.ndarray | None:
-    """Element potentials of the 'all species pure' LP (dual of min g.n, A n = b, n >= 0),
-    shifted into the strict interior of the barrier domain."""
     from scipy.optimize import linprog
     A = p.A
     try:
         res = linprog(-p.b, A_ub=A, b_ub=g, bounds=[(None, None)] * A.shape[1], method="highs")
-    except Exception:  # noqa: BLE001
+    except Exception:
         return None
     if res.status != 0:
         return None
@@ -226,7 +224,7 @@ def _center(bar: _Barrier, lam, t, max_iter=150, tol=1e-7):
         d = 1.0 / np.sqrt(np.where(d > 1e-300, d, 1e-300))
         Hs = H * d[:, None] * d[None, :]
         Hs = 0.5 * (Hs + Hs.T)
-        w, V = np.linalg.eigh(-Hs)  # -Hs is positive semidefinite
+        w, V = np.linalg.eigh(-Hs)
         keep = w > 1e-9 * max(1e-300, float(w.max()))
         gk = V.T @ (grad * d)
         y = V[:, keep] @ (gk[keep] / w[keep])
@@ -234,11 +232,11 @@ def _center(bar: _Barrier, lam, t, max_iter=150, tol=1e-7):
         if bar.p.fixed_lambda:
             for idx in bar.p.fixed_lambda:
                 step[idx] = 0.0
-        dec = float(grad @ step)  # Newton decrement^2 (>= 0: ascent direction)
+        dec = float(grad @ step)
         if dec / 2 < tol or float(np.max(np.abs(step))) < 1e-12:
             break
         smax = float(np.max(np.abs(step)))
-        if smax > 20.0:  # trust region in units of RT
+        if smax > 20.0:
             step = step * (20.0 / smax)
         slope = float(grad @ step)
         alpha = 1.0
@@ -258,7 +256,7 @@ def _center(bar: _Barrier, lam, t, max_iter=150, tol=1e-7):
 
 
 def _polish(bar: _Barrier, lam, n, n_w, n_gas, scale, max_iter=60):
-    """Active-set Newton on the KKT system for full precision."""
+    """Active-set Newton on the KKT system for full precision (gamma fixed)."""
     p, A, g = bar.p, bar.A, bar.g
     E = A.shape[1]
     thr = 1e-10 * scale
@@ -349,7 +347,6 @@ def _polish(bar: _Barrier, lam, n, n_w, n_gas, scale, max_iter=60):
         if not ok:
             return None
         lam_, nw, ng, ncv = unpack(x)
-        # active-set checks
         old_amounts = {i: float(v) for i, v in zip(active_c, ncv)}
         changed = False
         if nc and np.min(ncv) < -thr:
@@ -388,9 +385,177 @@ def _polish(bar: _Barrier, lam, n, n_w, n_gas, scale, max_iter=60):
     return None
 
 
-def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
+def _polish_with_gamma(p: EqProblem, lam, n, n_w, n_gas, gamma_aq, scale, max_iter=30, jac_eps=1e-6):
+    """
+    Полный Newton по (λ, n_w, n_g, n_c, γ_aq) с численным Якобианом для γ.
+
+    bar строится на g0 (без ln_gamma). gamma_aq - текущее приближение к ln(gamma)
+    для aq-ионов. Система: KKT + (γ_i - f_i(I, m)) = 0.
+    Возвращает (lam, n, n_w, n_gas, gamma_aq_new) или None.
+    """
     A, g0 = p.A, p.g
-    ncomp = A.shape[1]
+    bar = _Barrier(p, g0)
+    E = A.shape[1]
+    ia = bar.ia
+    n_aq = len(ia)
+    if n_aq == 0:
+        return None
+
+    thr = 1e-10 * scale
+    s0 = bar.slacks(lam)
+    slack_c = s0["c"] if s0 is not None else np.full(len(bar.ic), np.inf)
+    active_c = [int(i) for i, sl in zip(bar.ic, slack_c) if n[i] > thr and sl < 1e-2]
+    gas_on = bar.has_gas and n_gas > thr and (s0 is None or s0["gas"] < 1e-2)
+    aq_on = bar.has_aq and n_w > thr
+
+    nc = len(active_c)
+    size = E + 2 + nc + n_aq
+    x = np.concatenate([lam, [n_w if aq_on else 0.0], [n_gas if gas_on else 0.0],
+                        n[active_c], gamma_aq.copy()])
+
+    def unpack(x):
+        return x[:E], x[E], x[E + 1], x[E + 2:E + 2 + nc], x[E + 2 + nc:]
+
+    def compute_F(x, with_jac=False):
+        lam_, nw, ng, ncv, gamma_ = unpack(x)
+        F = np.zeros(size)
+        J = np.zeros((size, size)) if with_jac else None
+
+        g_eff = g0.copy()
+        g_eff[ia] += gamma_
+
+        mass = -p.b.astype(float).copy()
+        Jm = np.zeros((E, E + 2 + nc + n_aq)) if with_jac else None
+
+        Aa = A[ia] if aq_on else None
+        ea = None
+        if aq_on:
+            ea = np.exp(np.minimum(Aa @ lam_ - g_eff[ia], 700))
+            aw = A[bar.iw]
+            sol = M_W * ea
+            mass += aw * nw + nw * (Aa.T @ sol)
+            if with_jac:
+                Jm[:, :E] += nw * (Aa * sol[:, None]).T @ Aa
+                Jm[:, E] = aw + Aa.T @ sol
+                Jm[:, E + 2 + nc:] = -nw * (Aa * sol[:, None]).T
+            F[E] = g_eff[bar.iw] - aw @ lam_ - sol.sum()
+            if with_jac:
+                J[E, :E] = -aw - Aa.T @ sol
+        else:
+            F[E] = x[E]
+            if with_jac:
+                J[E, E] = 1.0
+
+        if gas_on:
+            Ag = A[bar.ig]
+            lse, pg = _lse(Ag @ lam_ - g0[bar.ig])
+            mass += ng * (Ag.T @ pg)
+            ap = Ag.T @ pg
+            if with_jac:
+                Jm[:, :E] += ng * ((Ag * pg[:, None]).T @ Ag - np.outer(ap, ap))
+                Jm[:, E + 1] = ap
+            F[E + 1] = bar.lnP - lse
+            if with_jac:
+                J[E + 1, :E] = -ap
+        else:
+            F[E + 1] = x[E + 1]
+            if with_jac:
+                J[E + 1, E + 1] = 1.0
+
+        if nc:
+            Ac = A[active_c]
+            mass += Ac.T @ ncv
+            if with_jac:
+                Jm[:, E + 2:E + 2 + nc] = Ac.T
+            F[E + 2:E + 2 + nc] = g_eff[active_c] - Ac @ lam_
+            if with_jac:
+                J[E + 2:E + 2 + nc, :E] = -Ac
+
+        F[:E] = mass / scale
+        if with_jac:
+            J[:E] = Jm / scale
+
+        if aq_on and Aa is not None and ea is not None:
+            m_aq_local = ea
+            I_local = 0.5 * float(np.sum(m_aq_local * p.charges[ia] ** 2))
+            f_val = p.gamma_fn(I_local, p.charges[ia], m=m_aq_local)
+            # Масштабируем γ-блок так, чтобы невязки по массе и по γ были соизмеримы
+            gamma_scale = 1.0
+            F[E + 2 + nc:] = (gamma_ - f_val) * gamma_scale
+
+            if with_jac:
+                J[E + 2 + nc:, E + 2 + nc:] = np.eye(n_aq) * gamma_scale
+                for j in range(n_aq):
+                    gamma_plus = gamma_.copy()
+                    gamma_plus[j] += jac_eps
+                    g_eff_plus = g0.copy()
+                    g_eff_plus[ia] += gamma_plus
+                    m_plus = np.exp(np.minimum(Aa @ lam_ - g_eff_plus[ia], 700))
+                    I_plus = 0.5 * float(np.sum(m_plus * p.charges[ia] ** 2))
+                    f_plus = p.gamma_fn(I_plus, p.charges[ia], m=m_plus)
+                    J[E + 2 + nc + j, E + 2 + nc:] = -(f_plus - f_val) / jac_eps * gamma_scale
+                for j in range(E):
+                    lam_plus = lam_.copy()
+                    lam_plus[j] += jac_eps
+                    m_plus = np.exp(np.minimum(Aa @ lam_plus - g_eff[ia], 700))
+                    I_plus = 0.5 * float(np.sum(m_plus * p.charges[ia] ** 2))
+                    f_plus = p.gamma_fn(I_plus, p.charges[ia], m=m_plus)
+                    J[E + 2 + nc:, j] = -(f_plus - f_val) / jac_eps * gamma_scale
+        else:
+            F[E + 2 + nc:] = gamma_
+            if with_jac:
+                J[E + 2 + nc:, E + 2 + nc:] = np.eye(n_aq)
+
+        return (F, J) if with_jac else F
+
+    for _ in range(max_iter):
+        F = compute_F(x, with_jac=False)
+        nrm = float(np.linalg.norm(F))
+        if nrm < 1e-10:
+            break
+        _, J = compute_F(x, with_jac=True)
+        try:
+            dx = np.linalg.lstsq(J, -F, rcond=None)[0]
+        except np.linalg.LinAlgError:
+            return None
+        a = 1.0
+        improved = False
+        for _ls in range(40):
+            xn = x + a * dx
+            with np.errstate(all="ignore"):
+                Fn = compute_F(xn, with_jac=False)
+                nn = float(np.linalg.norm(Fn))
+            if np.isfinite(nn) and nn < (1 - 1e-4 * a) * nrm:
+                x = xn
+                improved = True
+                break
+            a *= 0.5
+        if not improved:
+            break
+
+    F_final = compute_F(x, with_jac=False)
+    if float(np.linalg.norm(F_final)) > 1e-6:
+        return None
+
+    lam_, nw, ng, ncv, gamma_ = unpack(x)
+    n_new = np.zeros(len(g0))
+    if active_c:
+        n_new[active_c] = np.maximum(ncv, 0.0)
+    if aq_on:
+        n_new[bar.iw] = nw
+        g_eff = g0.copy()
+        g_eff[ia] += gamma_
+        n_new[ia] = nw * M_W * np.exp(np.minimum(A[ia] @ lam_ - g_eff[ia], 700))
+    if gas_on:
+        _, pg = _lse(A[bar.ig] @ lam_ - g0[bar.ig])
+        n_new[bar.ig] = ng * pg
+    return lam_, n_new, (nw if aq_on else 0.0), (ng if gas_on else 0.0), gamma_
+
+
+def solve(p: EqProblem, max_outer: int = 40, newton_threshold: int = 12) -> EqResult:
+    DEBUG_FORCE_NEWTON = os.environ.get("CHEM_AGENT_DEBUG_FORCE_NEWTON_AFTER")
+    DEBUG_DISABLE_ANDERSON = os.environ.get("CHEM_AGENT_DEBUG_DISABLE_ANDERSON") == "1"
+    A, g0 = p.A, p.g
     scale = float(np.sum(np.abs(p.b)))
     if scale <= 0:
         raise EquilibriumError("Пустая система: нет вещества")
@@ -405,6 +570,15 @@ def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
     polish_failed = False
     n = np.zeros(len(g0))
     n_w = n_gas = 0.0
+
+    # Anderson
+    anderson_m = 4
+    X_hist: list[np.ndarray] = []
+    F_hist: list[np.ndarray] = []
+    damping = 1.0
+    prev_diff = float("inf")
+    anderson_fail = False
+
     for outer in range(max_outer):
         g = g0 + ln_gamma
         bar = _Barrier(p, g)
@@ -412,7 +586,7 @@ def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
         if outer > 0 and lam is not None:
             pol = _polish(bar, lam, n, n_w, n_gas, scale)
         elif outer == 0 and p.warm is not None:
-            pol = _polish(bar, *p.warm, scale)  # fast path: Newton from previous solution
+            pol = _polish(bar, *p.warm, scale)
         if pol is None:
             if lam is not None:
                 lam0 = lam
@@ -437,7 +611,6 @@ def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
             n, n_w, n_gas = bar.amounts(lam, t, s)
             pol = _polish(bar, lam, n, n_w, n_gas, scale)
             if pol is None:
-                # tighten the barrier (smaller duality gap) and try the Newton polish again
                 while m_constr / t > 1e-11 * scale:
                     t *= 25.0
                     lam_c, s, it = _center(bar, lam_c, t)
@@ -448,23 +621,96 @@ def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
             if pol is None:
                 polish_failed = True
                 msgs.append("Уточнение Ньютоном не сошлось; использовано решение барьерного метода")
+
         if pol is not None:
             lam, n, n_w, n_gas = pol
+
         if p.gamma_fn is None or not len(ia) or n_w <= 0:
             converged = True
             break
+
         W = n_w * M_W
         m_aq = n[ia] / W
         z = p.charges[ia]
         I_new = p.fixed_I if p.fixed_I is not None else 0.5 * float(np.sum(m_aq * z ** 2))
-        lg_new = p.gamma_fn(I_new, z, m=m_aq) 
-        diff = float(np.max(np.abs(lg_new - ln_gamma[ia]))) if len(ia) else 0.0
-        ln_gamma[ia] = 0.5 * ln_gamma[ia] + 0.5 * lg_new if outer > 3 else lg_new
+        lg_new = p.gamma_fn(I_new, z, m=m_aq)
         I_val = I_new
-        if diff < 1e-7:
+
+        diff = float(np.max(np.abs(lg_new - ln_gamma[ia]))) if len(ia) else 0.0      
+        if DEBUG_DISABLE_ANDERSON:
+            anderson_fail = True
+        if DEBUG_FORCE_NEWTON is not None:
+            try:
+                force_after = int(DEBUG_FORCE_NEWTON)
+                if outer >= force_after:
+                    anderson_fail = True
+            except ValueError:
+                pass
+
+        # --- Production-фоллбэк: Anderson застрял ---
+        if outer > newton_threshold and diff > 1e-4:
+            anderson_fail = True
+            msgs.append(f"Anderson не сошёлся за {newton_threshold} итераций — переключаемся на Newton")
+
+        # --- Newton fallback (warm start) -
+        # --- Переключение на Newton (только если Anderson сделал 3+ итерации) ---
+        if anderson_fail:
+            res = _polish_with_gamma(p, lam, n, n_w, n_gas, ln_gamma[ia], scale)
+            if res is not None:
+                lam, n, n_w, n_gas, gamma_new = res
+                ln_gamma[ia] = gamma_new
+                W = n_w * M_W
+                m_aq = n[ia] / W if W > 0 else np.zeros(len(ia))
+                I_val = p.fixed_I if p.fixed_I is not None else 0.5 * float(np.sum(m_aq * z ** 2))
+                lg_check = p.gamma_fn(I_val, z, m=m_aq) if W > 0 else ln_gamma[ia]
+                diff = float(np.max(np.abs(lg_check - ln_gamma[ia])))
+                msgs.append(f"[Newton] итерация {outer}: |γ - f| = {diff:.2e}")
+                # После успешного Newton сбрасываем флаг, чтобы не запускать его снова
+                anderson_fail = False
+                if diff < 1e-8:
+                    converged = True
+                    break
+            else:
+                msgs.append(f"[Newton] итерация {outer}: не сошёлся, продолжаем Anderson")
+                anderson_fail = False  # отдаём управление Anderson
+
+        x_cur = ln_gamma[ia].copy()
+        f_cur = lg_new.copy()
+        X_hist.append(x_cur)
+        F_hist.append(f_cur)
+        if len(X_hist) > anderson_m:
+            X_hist.pop(0)
+            F_hist.pop(0)
+
+        if len(X_hist) == 1:
+            ln_gamma[ia] = f_cur
+        else:
+            k = len(X_hist)
+            R = np.array([F_hist[i] - X_hist[i] for i in range(k)])
+            K = np.zeros((k + 1, k + 1))
+            K[:k, :k] = R @ R.T
+            K[:k, k] = 1.0
+            K[k, :k] = 1.0
+            rhs = np.zeros(k + 1)
+            rhs[k] = 1.0
+            try:
+                sol = np.linalg.solve(K, rhs)
+                c = sol[:k]
+            except np.linalg.LinAlgError:
+                c = np.zeros(k)
+                c[-1] = 1.0
+            ln_gamma_anderson = sum(ci * F_hist[i] for i, ci in enumerate(c))
+            if diff >= prev_diff * 0.95:
+                damping = max(0.3, damping * 0.7)
+            else:
+                damping = min(1.0, damping * 1.2)
+            ln_gamma[ia] = (1.0 - damping) * f_cur + damping * ln_gamma_anderson
+
+        prev_diff = diff
+
+        if diff < 1e-8:
             converged = True
             break
-    # residual per component, relative to the amount of that component in the system
     bb = np.abs(p.b)
     denom = np.where(bb > 1e-6 * scale, bb, 1e-6 * scale)
     resid = float(np.max(np.abs(A.T @ n - p.b) / denom))
@@ -472,6 +718,10 @@ def solve(p: EqProblem, max_outer: int = 40) -> EqResult:
         msgs.append(f"Невязка баланса масс {resid:.2e}")
     if not converged:
         msgs.append("Коэффициенты активности не сошлись за отведенное число итераций")
-    return EqResult(n=n, lam=lam, ln_gamma=ln_gamma, ionic_strength=I_val,
-                    water_kg=n_w * M_W, converged=converged and resid < 1e-5 and not polish_failed,
-                    iterations=total_iter, residual=resid, gas_total=n_gas, messages=msgs)
+
+    return EqResult(
+        n=n, lam=lam, ln_gamma=ln_gamma, ionic_strength=I_val,
+        water_kg=n_w * M_W,
+        converged=converged and resid < 1e-5 and not polish_failed,
+        iterations=total_iter, residual=resid, gas_total=n_gas, messages=msgs,
+    )
