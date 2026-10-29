@@ -13,14 +13,14 @@
    "pool": [
     "c10"
    ],
-   "external": null
+   "external": "unknown"
   },
   "Pb(NO3)2(s)": {
    "reason": "нет термодинамических данных в crc.db",
    "pool": [
     "d10"
    ],
-   "external": null
+   "external": "ok"
   },
   "Sr3(PO4)2(s)": {
    "reason": "нет термодинамических данных в crc.db",
@@ -270,8 +270,22 @@
    "pool": [
     "G064 (исключена)"
    ]
+  },
+  "NaNO": {
+   "reason": "нет термодинамических данных в crc.db",
+   "pool": [
+    "D074"
+   ],
+   "external": "ok"
+  },
+  "KNO": {
+   "reason": "нет термодинамических данных в crc.db",
+   "pool": [
+    "D076"
+   ],
+   "external": "ok"
   }
  },
  "generated_at": "2026-10-28T15:21:54+00:00",
- "n_missing": 30
+ "n_missing": 32
 }

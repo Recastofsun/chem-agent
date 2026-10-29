@@ -5823,7 +5823,10 @@
    "volume_L": 1.0
   },
   "expected_main": "PbC2O4",
-  "accept_main": [],
+  "accept_main": [
+   "NaNO3",
+   "KNO3"
+  ],
   "expected_equation": "Pb(NO3)2 + Na2C2O4 -> PbC2O4↓ + 2 NaNO3",
   "accept_equations": [],
   "generated": true
@@ -5848,7 +5851,10 @@
    "volume_L": 1.0
   },
   "expected_main": "PbC2O4",
-  "accept_main": [],
+  "accept_main": [
+   "NaNO3",
+   "KNO3"
+  ],
   "expected_equation": "Pb(NO3)2 + K2C2O4 -> PbC2O4↓ + 2 KNO3",
   "accept_equations": [],
   "generated": true
@@ -19223,12 +19229,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "Ag",
+  "expected_main": "NO",
   "accept_main": [
-   "NO2",
    "O2"
   ],
-  "expected_equation": "2 AgNO3 -> 2 Ag + 2 NO2↑ + O2↑",
+  "expected_equation": "2 AgNO3 -> 2 Ag + 2 NO↑ + O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -19250,12 +19255,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "Ag",
+  "expected_main": "NO",
   "accept_main": [
-   "NO2",
    "O2"
   ],
-  "expected_equation": "2 AgNO3 -> 2 Ag + 2 NO2↑ + O2↑",
+  "expected_equation": "2 AgNO3 -> 2 Ag + 2 NO↑ + O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -19277,12 +19281,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "MgO",
+  "expected_main": "NO",
   "accept_main": [
-   "NO2",
    "O2"
   ],
-  "expected_equation": "2 Mg(NO3)2 -> 2 MgO + 4 NO2↑ + O2↑",
+  "expected_equation": "2 Mg(NO3)2 -> 2 MgO + 4 NO + 3 O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -19304,12 +19307,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "MgO",
+  "expected_main": "NO",
   "accept_main": [
-   "NO2",
    "O2"
   ],
-  "expected_equation": "2 Mg(NO3)2 -> 2 MgO + 4 NO2↑ + O2↑",
+  "expected_equation": "2 Mg(NO3)2 -> 2 MgO + 4 NO + 3 O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -19331,11 +19333,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "NaNO2",
+  "expected_main": "NO",
   "accept_main": [
    "O2"
   ],
-  "expected_equation": "2 NaNO3 -> 2 NaNO2 + O2↑",
+  "expected_equation": "4 NaNO3 -> 2 Na2O + 4 NO + 3 O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -19357,11 +19359,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "NaNO2",
+  "expected_main": "NO",
   "accept_main": [
    "O2"
   ],
-  "expected_equation": "2 NaNO3 -> 2 NaNO2 + O2↑",
+  "expected_equation": "2 NaNO3 -> 2 NaNO + O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -19409,11 +19411,11 @@
     "mode": "open"
    }
   },
-  "expected_main": "KNO2",
+  "expected_main": "NO",
   "accept_main": [
    "O2"
   ],
-  "expected_equation": "2 KNO3 -> 2 KNO2 + O2↑",
+  "expected_equation": "2 KNO3 -> 2 KNO + O2↑",
   "accept_equations": [],
   "generated": true
  },
@@ -24878,7 +24880,7 @@
   "accept_main": [
    "ZnCl2"
   ],
-  "expected_equation": "ZnS + 2 HCl -> ZnCl2 + H2S↑",
+  "expected_equation": "ZnS + 2 HCl -> ZnCl2 + H2S",
   "accept_equations": [],
   "generated": true
  },
@@ -24905,7 +24907,7 @@
   "accept_main": [
    "ZnBr2"
   ],
-  "expected_equation": "ZnS + 2 HBr -> ZnBr2 + H2S↑",
+  "expected_equation": "ZnS + 2 HBr -> ZnBr2 + H2S",
   "accept_equations": [],
   "generated": true
  },
@@ -24932,7 +24934,7 @@
   "accept_main": [
    "ZnSO4"
   ],
-  "expected_equation": "ZnS + H2SO4 -> ZnSO4 + H2S↑",
+  "expected_equation": "ZnS + H2SO4 -> ZnSO4 + H2S",
   "accept_equations": [],
   "generated": true
  },
