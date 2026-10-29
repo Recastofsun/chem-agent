@@ -627,7 +627,7 @@ class Agent:
             "rules_fired": rules.fired,
             "synthesis": synth,
         })
-        base["summary"] = {
+        summary_data = {
             "main_product": products[0]["formula"] if products else None,
             "main_product_kind": products[0]["kind"] if products else None,
             "delta_G_kJ_mol": main_eq["delta_G_kJ_mol"] if main_eq else None,
@@ -637,6 +637,15 @@ class Agent:
             "pH": self._pH(solver, eq),
             "ionic_strength_M": eq.ionic_strength if aqueous else None,
         }
+        if unc:
+            if unc.get("delta_G") and unc["delta_G"].get("p05") is not None:
+                summary_data["delta_G_95_CI"] = [unc["delta_G"]["p05"], unc["delta_G"]["p95"]]
+            if unc.get("pH") and unc["pH"].get("p05") is not None:
+                summary_data["pH_95_CI"] = [unc["pH"]["p05"], unc["pH"]["p95"]]
+            if unc.get("products") and len(unc["products"]) > 0 and unc["products"][0].get("p05") is not None:
+                summary_data["main_product_moles_95_CI"] = [unc["products"][0]["p05"], unc["products"][0]["p95"]]
+
+        base["summary"] = summary_data
         if opts.get("separation"):  # W-13: разделение равновесного состава
             from .separation import separate
             base["separation"] = separate(base, opts["separation"], self.db)
@@ -1248,6 +1257,7 @@ class Agent:
         top0 = an.products[0].key if an.products else None
         amounts: dict[tuple, list[float]] = {p.key: [] for p in an.products[:10]}
         dGs: list[float] = []
+        phs: list[float] = []
         same_top = 0
         same_occ = 0
         failed = 0
@@ -1258,6 +1268,9 @@ class Agent:
             except Exception:
                 failed += 1
                 continue
+            ph_val = self._pH(solver, eqk)
+            if ph_val is not None:
+                phs.append(ph_val)
             ank = analyze(system, eqk.n)
             if ank.reaction_occurred == an.reaction_occurred:
                 same_occ += 1
@@ -1291,6 +1304,7 @@ class Agent:
             "products": [{"formula": next(p.formula for p in an.products if p.key == key), **summarize(v)}
                          for key, v in amounts.items()],
             "delta_G": summarize(dGs) if dGs else None,
+            "pH": summarize(phs) if phs else None,
             "contributions": contributions,
         }
 

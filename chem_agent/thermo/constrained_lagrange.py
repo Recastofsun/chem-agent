@@ -16,7 +16,7 @@ def solve_kkt(A, b, g0, charges, phi, T, kinds, charge_col=None, gamma_fn=None, 
     g_eff = g0.copy()
     
     # 1. Системный учет перенапряжения (штрафуем ПРОДУКТЫ реакции)
-    if species_list is not None and abs(phi) > 1e-6:
+    if False:  # W-25: отключено. Используем electrolysis.py и kinetics.py
         for i, s in enumerate(species_list):
             for (ox_f, red_f), pair in db.redox_pairs.items():
                 eta = pair.get("overpotential_V", 0.0)
