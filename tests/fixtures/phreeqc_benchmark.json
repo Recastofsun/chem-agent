@@ -1,0 +1,66 @@
+[
+  {
+    "id": "phreeqc_01_gypsum",
+    "description": "Растворимость гипса в чистой воде, 25C",
+    "type": "solubility",
+    "reagents": [{"formula": "CaSO4", "moles": 1.0, "phase": "s"}],
+    "conditions": {"temperature_K": 298.15, "volume_L": 1.0, "solvent": {"name": "water"}},
+    "expected": {
+      "Ca+2": 0.0152,
+      "SO4-2": 0.0152,
+      "pH": 7.0,
+      "ionic_strength": 0.06
+    }
+  },
+  {
+    "id": "phreeqc_02_calcite",
+    "description": "Растворимость кальцита при PCO2=10^-3.5 атм, 25C",
+    "type": "solubility_gas",
+    "reagents": [{"formula": "CaCO3", "moles": 1.0, "phase": "s"}],
+    "conditions": {
+      "temperature_K": 298.15, 
+      "volume_L": 1.0, 
+      "solvent": {"name": "water"},
+      "atmosphere": {"mode": "fixed", "composition": {"CO2": 3.16e-4}}
+    },
+    "expected": {
+      "Ca+2": 0.00146,
+      "pH": 8.3
+    }
+  },
+  {
+    "id": "phreeqc_03_barite",
+    "description": "Осаждение барита при смешивании BaCl2 и Na2SO4",
+    "type": "precipitation",
+    "reagents": [
+      {"formula": "BaCl2", "moles": 0.01, "phase": "aq"},
+      {"formula": "Na2SO4", "moles": 0.01, "phase": "aq"}
+    ],
+    "conditions": {"temperature_K": 298.15, "volume_L": 2.0, "solvent": {"name": "water"}},
+    "expected": {
+      "BaSO4(s)": 0.01,
+      "Ba+2": 1e-6
+    }
+  },
+  {
+    "id": "phreeqc_04_cucl2_electrolysis",
+    "description": "Электролиз CuCl2 при 2.0 В, инертные электроды",
+    "type": "electrolysis",
+    "cell": {
+      "anode": {
+        "electrode": {"material": "Pt"},
+        "solution": {"species": [{"formula": "CuCl2", "moles": 0.1}], "volume_L": 0.5}
+      },
+      "cathode": {
+        "electrode": {"material": "Pt"},
+        "solution": {"species": [{"formula": "CuCl2", "moles": 0.1}], "volume_L": 0.5}
+      },
+      "membrane": {"type": "cation_exchange"},
+      "external_circuit": {"mode": "potentiostatic", "voltage_V": 2.0, "duration_s": 3600}
+    },
+    "expected": {
+      "anode": {"Cl2": 0.0187},
+      "cathode": {"Cu": 0.0187}
+    }
+  }
+]

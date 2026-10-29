@@ -103,8 +103,8 @@ def analyze(system: ChemSystem, n: np.ndarray, reagent_keys: set | None = None) 
             if s.key in reagent_keys and net[s.key] <= sig:
                 continue
             k = kinds[i]
-            if k == SOLVENT or (s.key == WATER_KEY and not system.aqueous):
-                kind = "water" if k == SOLVENT or s.phase == "l" else "gas"
+            if k == SOLVENT or s.key == WATER_KEY:
+                kind = "water"
             elif k == COND:
                 kind = ("precipitate" if system.aqueous else "solid") if s.phase == "s" else "liquid"
             elif k == GAS:

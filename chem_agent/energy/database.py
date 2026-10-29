@@ -81,19 +81,20 @@ class ThermoDB:
         for sp in self.species:
             self.by_key.setdefault(sp.key, []).append(sp)
 
-        # --- НОВОЕ: Загрузка данных Core v2.2 ---
         self.redox_pairs: dict[tuple[str, str], dict] = {}
         self.kinetic_barriers: dict[str, float] = {}
         self.sit_params: dict[tuple[str, str], float] = {}
 
         try:
-            # Загружаем редокс-пары (теперь сохраняем и e0, и n)
-            for row in con.execute("SELECT ox_formula, red_formula, n_electrons, e0_volts, ox_coeff, red_coeff FROM redox_pairs"):
+            # Загружаем редокс-пары (с новыми колонками)
+            for row in con.execute("SELECT ox_formula, red_formula, n_electrons, e0_volts, ox_coeff, red_coeff, overpotential_V, exchange_current_A_m2 FROM redox_pairs"):
                 self.redox_pairs[(row[0], row[1])] = {
-                    "n": row[2], 
+                    "n": row[2],
                     "e0": row[3],
                     "ox_coeff": row[4] or 1.0,
-                    "red_coeff": row[5] or 1.0
+                    "red_coeff": row[5] or 1.0,
+                    "overpotential_V": row[6] or 0.0,
+                    "exchange_current_A_m2": row[7] or 1e-3
                 }
                 
             # Загружаем кинетические барьеры
@@ -131,7 +132,6 @@ class ThermoDB:
                 out.append(s)
         return out
 
-    # --- НОВЫЕ МЕТОДЫ ДЛЯ CORE v2.2 ---
     def get_e0(self, ox_formula: str, red_formula: str) -> dict | None:
         "Возвращает стандартный электродный потенциал и число электронов для пары."
         return self.redox_pairs.get((ox_formula, red_formula))
