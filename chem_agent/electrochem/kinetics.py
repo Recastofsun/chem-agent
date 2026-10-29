@@ -19,9 +19,7 @@ def nernst_potential(e0: float, n: int, c_ox: float, c_red: float, T: float) -> 
 def select_dominant_reaction(db, U: float, concentrations: dict[str, float], T: float, side: str) -> dict | None:
     best_candidate = None
     max_current = -1.0
-    
-    print(f"\n--- Поиск реакции для {side} (U={U:.2f} В) ---")
-    
+       
     for (ox_f, red_f), pair in db.redox_pairs.items():
         c_ox = concentrations.get(ox_f, 0.0)
         if ox_f == "H+":
@@ -58,9 +56,7 @@ def select_dominant_reaction(db, U: float, concentrations: dict[str, float], T: 
         
         exponent = (alpha * n * F * eta_capped) / (R_GAS * T)
         j = j0 * math.exp(exponent)
-        
-        print(f"  {ox_f}/{red_f}: eta={eta:.2f}, j0={j0:.1e} -> Ток j = {j:.2e}")
-        
+               
         if j > max_current:
             max_current = j
             best_candidate = {
@@ -68,8 +64,6 @@ def select_dominant_reaction(db, U: float, concentrations: dict[str, float], T: 
                 "E_eq": E_eq, "eta": eta, "j": j
             }
             
-    if best_candidate:
-        print(f"  ПОБЕДИТЕЛЬ: {best_candidate['ox']}/{best_candidate['red']} (j={best_candidate['j']:.2e})")
     return best_candidate
             
     
