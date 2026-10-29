@@ -38,6 +38,7 @@ from .thermo.gibbs import R, T0, dGf_T
 from .uncertainty.ensemble import SIZES, draws, summarize
 from .uncertainty.propagation import sigma_logK, sigma_sum
 from .utils.hashing import deterministic_uuid, sha256_of
+from .uncertainty.propagation import sigma_sum_corr
 
 STAGE_RU = {"dissociation": "диссоциация", "ionic": "ионная стадия", "complexation": "комплексообразование",
             "association": "ассоциация"}
@@ -127,7 +128,8 @@ class _Solver:
 def _species_G(solver: _Solver, idx_coefs: list[tuple[int, float]], G: np.ndarray | None = None):
     G = solver.G if G is None else G
     g = sum(G[i] * c for i, c in idx_coefs)
-    s = sigma_sum([(c, solver.sigma[i]) for i, c in idx_coefs])
+    sources = [solver.system.species[i].source for i, _ in idx_coefs]
+    s = sigma_sum_corr(idx_coefs, solver.sigma, sources)
     h_ok = all(solver.system.species[i].dHf is not None for i, _ in idx_coefs)
     h = sum(solver.system.species[i].dHf * c for i, c in idx_coefs) if h_ok else None
     return g, s, h
@@ -1241,7 +1243,8 @@ class Agent:
         size = opts.get("ensemble_size") or SIZES[opts["accuracy"]]
         sig_rt = solver.sigma
         dist = "uniform" if opts["uncertainty_method"] == "bootstrap" else "normal"
-        D = draws(sig_rt, size, opts["random_seed"], dist)
+        sources = [s.source for s in system.species]
+        D = draws(sig_rt, size, opts["random_seed"], dist, sources=sources)
         top0 = an.products[0].key if an.products else None
         amounts: dict[tuple, list[float]] = {p.key: [] for p in an.products[:10]}
         dGs: list[float] = []
