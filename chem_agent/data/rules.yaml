@@ -1,0 +1,54 @@
+# Фундаментальные кинетические правила (v2.5, W-03).
+# Остальные правила v2.4 - в crc.db, таблица kinetic_barriers (Ea по Эйрингу вместо порогов T),
+# миграция scripts/patch_db_w03_rules.py. Свойства веществ - parser/classifier.py.
+# order - место правила в общем порядке с kinetic_barriers.priority: decouple по одному
+# элементу перезаписывается более поздним правилом.
+rules:
+  - id: n2_inert
+    order: 0
+    title: "N2 кинетически инертен"
+    why: "Тройная связь N≡N: при обычных условиях азот не образуется из соединений азота и не реагирует."
+    if: {reagent_absent: N2}
+    then: {decouple: {element: N, groups: [[0], [others]]}}
+
+  - id: no_perchlorate
+    order: 9
+    title: "Перхлорат не образуется"
+    why: "Окисление хлора до Cl(VII) идет только электрохимически или при диспропорционировании хлората (Ea > 200 кДж/моль)."
+    if: {}
+    then: {forbid_new_class: "perchlorate"}
+
+  - id: hydroxides_not_oxides
+    order: 13
+    title: "Из раствора осаждаются гидроксиды, а не оксиды"
+    why: "Оксиды металлов термодинамически устойчивее гидроксидов, но из водного раствора (до 100 °C) выпадают гидроксиды."
+    if: {aqueous: true, T_below: 400}
+    then: {forbid_new_class: oxide_if_hydroxide}
+
+  - id: no_radicals
+    order: 15
+    title: "Радикалы и атомарные газы не образуются"
+    why: "Частицы с неспаренным электроном (H, OH, HO2, Cl и т. п.) живут доли секунды."
+    if: {T_below: 2000}
+    then: {forbid_new_class: radicals}
+
+  - id: water_not_reduced
+    order: 17
+    title: "Вода не восстанавливается малоактивными металлами"
+    why: "Без кислоты H2 выделяют только щелочные/щелочноземельные металлы, Mg (при нагревании) и амфотерные металлы в щелочи (Ea > 100 кДж/моль)."
+    if: {aqueous: true, no_acid: true, no_water_reducer: true}
+    then: {forbid_new: ["H2"]}
+
+  - id: organic_no_new
+    order: 18
+    title: "Органические вещества не образуются из неорганических"
+    why: "Синтез органики (например, CO2 + H2 -> CH4) без катализатора не идет."
+    if: {organic_reagent: false}
+    then: {forbid_new_class: organic}
+
+  - id: gas_mix_no_igniter
+    order: 100
+    title: "Смесь газов без поджига не реагирует"
+    why: "H2 + O2, H2 + Cl2 и подобные смеси при T < 700 K без искры, пламени, света или катализатора не реагируют (Ea > 150 кДж/моль). Исключения - NH3 + HX, NO + O2."
+    if: {aqueous: false, T_below: 700, gas_mix_no_igniter: true}
+    then: {no_reaction: true}

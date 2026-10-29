@@ -1,0 +1,10 @@
+{
+  "formula": "NH3", "name": "Аммиак",
+  "atoms": [
+    {"element": "N", "x": 0.0, "y": 0.1, "z": 0.0, "color": "#3050f8", "radius": 0.6},
+    {"element": "H", "x": 0.94, "y": -0.38, "z": 0.0, "color": "#ffffff", "radius": 0.3},
+    {"element": "H", "x": -0.47, "y": -0.38, "z": 0.81, "color": "#ffffff", "radius": 0.3},
+    {"element": "H", "x": -0.47, "y": -0.38, "z": -0.81, "color": "#ffffff", "radius": 0.3}
+  ],
+  "bonds": [[0, 1], [0, 2], [0, 3]]
+}

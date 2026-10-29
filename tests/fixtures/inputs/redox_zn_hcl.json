@@ -1,0 +1,17 @@
+{
+  "reagents": [
+    {
+      "formula": "Zn",
+      "moles": 0.02,
+      "phase": "s"
+    },
+    {
+      "formula": "HCl",
+      "moles": 0.05,
+      "phase": "aq"
+    }
+  ],
+  "options": {
+    "accuracy": "fast"
+  }
+}

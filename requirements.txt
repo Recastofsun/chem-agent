@@ -1,0 +1,28 @@
+# ============================================================
+# Chem-Agent v2.0 — production requirements (desktop, offline)
+# ------------------------------------------------------------
+# Набор для сборки .exe и офлайн-поставки.
+# HTTP-стек (FastAPI/uvicorn/pydantic) переехал в requirements-dev.txt
+# и используется только в режиме разработки через chem_agent/api/server.py.
+# ============================================================
+
+# --- Ядро v1.0 (без изменений) ---
+# Точные версии; колёса для Windows x64 / CPython 3.11 лежат в offline_cache\wheels
+numpy==2.4.4
+scipy==1.17.1
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+PyYAML==6.0.3
+typing_extensions==4.16.0
+colorama==0.4.6
+
+# --- v2.0 desktop (PyWebView + WebView2) ---
+# pywebview: нативное окно, js_api bridge, WebView2 backend на Windows
+# proxy_tools, bottle: транзитивные зависимости pywebview (оставлены явно для офлайн-кэша)
+pywebview==5.4
+proxy_tools==0.1.0
+bottle==0.13.2
+
+# pythonnet + clr-loader: биндинг pywebview к WebView2 через .NET (только Windows)
+pythonnet==3.0.5 ; sys_platform == "win32"
+clr-loader==0.2.7.post0 ; sys_platform == "win32"

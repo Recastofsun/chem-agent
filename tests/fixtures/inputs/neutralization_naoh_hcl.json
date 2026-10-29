@@ -1,0 +1,17 @@
+{
+  "reagents": [
+    {
+      "formula": "NaOH",
+      "moles": 0.05,
+      "phase": "aq"
+    },
+    {
+      "formula": "HCl",
+      "moles": 0.05,
+      "phase": "aq"
+    }
+  ],
+  "options": {
+    "accuracy": "fast"
+  }
+}

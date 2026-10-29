@@ -1,0 +1,8 @@
+{
+  "formula": "O2", "name": "Кислород",
+  "atoms": [
+    {"element": "O", "x": -0.6, "y": 0.0, "z": 0.0, "color": "#ff0000", "radius": 0.6},
+    {"element": "O", "x": 0.6, "y": 0.0, "z": 0.0, "color": "#ff0000", "radius": 0.6}
+  ],
+  "bonds": [[0, 1]]
+}

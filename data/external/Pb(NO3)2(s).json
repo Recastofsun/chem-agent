@@ -1,0 +1,10 @@
+{
+  "formula": "Pb(NO3)2(s)",
+  "source": "pubchem",
+  "cid": 24924,
+  "molecular_weight": 331.0,
+  "name": "lead(2+) dinitrate",
+  "n_candidates": 5,
+  "query": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastformula/N2O6Pb/property/MolecularWeight,IUPACName/JSON",
+  "fetched_at": "2026-10-28T15:22:16+00:00"
+}

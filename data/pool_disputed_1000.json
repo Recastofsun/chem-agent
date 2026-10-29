@@ -1,0 +1,182 @@
+[
+ {
+  "id": "r11",
+  "category": "ОВР",
+  "main": "FeCl2",
+  "expected_main": "FeCl2",
+  "equation": null,
+  "expected_equation": "2 FeCl3 + SnCl2 -> 2 FeCl2 + SnCl4",
+  "status": "ok",
+  "reason": "Нет SnCl6-2 в базе: Sn(IV) в 0,1 М HCl выпадает как SnO2. Учебное уравнение предполагает концентрированную HCl и хлорокомплекс олова. Пробел данных."
+ },
+ {
+  "id": "c10",
+  "category": "комплексы",
+  "main": "KCl",
+  "expected_main": "FeSCNCl2",
+  "equation": null,
+  "expected_equation": "FeCl3 + KSCN -> FeSCNCl2 + KCl",
+  "status": "ok",
+  "reason": "FeCl3 + KSCN: в базе один комплекс FeSCN+2 (lg β из complex_constants в расчете не участвует), равновесие уводит в Fe(SCN)3 и гидролиз; известная проблема h049."
+ },
+ {
+  "id": "d10",
+  "category": "разложение",
+  "main": null,
+  "expected_main": "PbO",
+  "equation": null,
+  "expected_equation": "2 Pb(NO3)2 -> 2 PbO + 4 NO2↑ + O2↑",
+  "status": "unknown",
+  "reason": "Нет Pb(NO3)2(тв) в базе: известна только ΔfH = -451,9 кДж/моль, ΔfG и S° в открытых источниках не найдены. Пробел данных, status unknown."
+ },
+ {
+  "id": "g03",
+  "category": "газовые",
+  "main": "N2O4",
+  "expected_main": "NO2",
+  "equation": "2 NO + O2 -> N2O4",
+  "expected_equation": "2 NO + O2 -> 2 NO2↑",
+  "status": "ok",
+  "reason": "По данным CRC N2O4(ж) при 298 K стабильнее газа на 0,4 кДж/моль (Tкип 294 K): ядро дает жидкий N2O4. Погрешность данных больше разницы; ожидание (NO2/N2O4 газ) верно."
+ },
+ {
+  "id": "R135",
+  "category": "ОВР",
+  "main": "Cu",
+  "expected_main": "Cu",
+  "equation": "Sn + 2 CuSO4 + 2 H2O -> 2 Cu↓ + SnO2↓ + 2 H+ + 2 HSO4-",
+  "expected_equation": "Sn + CuSO4 -> Cu↓ + SnSO4",
+  "status": "ok",
+  "reason": "Sn + CuSO4: ядро дает Sn(IV) (SnO2), учебник - SnSO4. Cu2+ термодинамически окисляет Sn2+ (E Sn4+/Sn2+ = 0,15 В < 0,34 В), гидролиз Sn(IV) до SnO2 выгоден; кинетику окисления Sn(II) ядро не знает."
+ },
+ {
+  "id": "R136",
+  "category": "ОВР",
+  "main": "Cu",
+  "expected_main": "Cu",
+  "equation": "Sn + 2 CuSO4 + 2 H2O -> 2 Cu↓ + SnO2↓ + 2 H+ + 2 HSO4-",
+  "expected_equation": "Sn + CuSO4 -> Cu↓ + SnSO4",
+  "status": "ok",
+  "reason": "То же, что R135 (другая концентрация)."
+ },
+ {
+  "id": "D056",
+  "category": "разложение",
+  "main": "O2",
+  "expected_main": "KCl",
+  "equation": "KClO4 -> 2 O2↑ + KCl↑",
+  "expected_equation": "KClO4 -> KCl + 2 O2↑",
+  "status": "ok",
+  "reason": "KClO4 при 1100 K в открытой системе: давление пара KCl 4e-3 бар выше порога 1e-3 бар, KCl уходит в газ. Граница модели испарения в открытой системе."
+ },
+ {
+  "id": "D067",
+  "category": "разложение",
+  "main": "O2",
+  "expected_main": "Ag",
+  "equation": "AgNO3 -> O2↑ + Ag + NO↑",
+  "expected_equation": "2 AgNO3 -> 2 Ag + 2 NO2↑ + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "D068",
+  "category": "разложение",
+  "main": "O2",
+  "expected_main": "Ag",
+  "equation": "AgNO3 -> O2↑ + Ag + NO↑",
+  "expected_equation": "2 AgNO3 -> 2 Ag + 2 NO2↑ + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "D071",
+  "category": "разложение",
+  "main": "NO",
+  "expected_main": "MgO",
+  "equation": "2 Mg(NO3)2 -> 4 NO↑ + 3 O2↑ + 2 MgO",
+  "expected_equation": "2 Mg(NO3)2 -> 2 MgO + 4 NO2↑ + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "D072",
+  "category": "разложение",
+  "main": "NO",
+  "expected_main": "MgO",
+  "equation": "2 Mg(NO3)2 -> 4 NO↑ + 3 O2↑ + 2 MgO",
+  "expected_equation": "2 Mg(NO3)2 -> 2 MgO + 4 NO2↑ + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "D073",
+  "category": "разложение",
+  "main": "NO",
+  "expected_main": "NaNO2",
+  "equation": "4 NaNO3 -> 4 NO↑ + 3 O2↑ + 2 Na2O",
+  "expected_equation": "2 NaNO3 -> 2 NaNO2 + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "D074",
+  "category": "разложение",
+  "main": "O2",
+  "expected_main": "NaNO2",
+  "equation": "NaNO3 -> O2↑ + Na↑ + NO↑",
+  "expected_equation": "2 NaNO3 -> 2 NaNO2 + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "D076",
+  "category": "разложение",
+  "main": "O2",
+  "expected_main": "KNO2",
+  "equation": "KNO3 -> O2↑ + K↑ + NO↑",
+  "expected_equation": "2 KNO3 -> 2 KNO2 + O2↑",
+  "status": "ok",
+  "reason": "Ожидание генератора спорно: при T + 200 K в открытой системе (P -> 0) равновесие дает вторичное разложение - NO2 -> NO + O2, разложение нитрита, пары щелочного металла. Учебное уравнение описывает первичную стадию. Ограничение модели открытой системы (LIMITATIONS)."
+ },
+ {
+  "id": "G031",
+  "category": "газовые",
+  "main": "Mn2O3",
+  "expected_main": "MnO2",
+  "equation": "4 Mn + 3 O2 -> 2 Mn2O3",
+  "expected_equation": "Mn + O2 -> MnO2",
+  "status": "ok",
+  "reason": "Mn + O2 при 700 K: ядро дает Mn2O3, ожидалось MnO2. Граница MnO2/Mn2O3 (Kp = 1 бар около 760-800 K) в пределах погрешности данных при остаточном давлении O2 в закрытом объеме."
+ },
+ {
+  "id": "G115",
+  "category": "газовые",
+  "main": "H2S",
+  "expected_main": "H2S",
+  "equation": "ZnS + 2 HCl -> H2S + ZnCl2",
+  "expected_equation": "ZnS + 2 HCl -> ZnCl2 + H2S↑",
+  "status": "ok",
+  "reason": "ZnS + HCl в закрытом сосуде 1 л: ZnS растворяется частично (K ~ 1e-4), H2S меньше растворимости и остается в растворе. Учебное уравнение со стрелкой предполагает открытый сосуд."
+ },
+ {
+  "id": "G116",
+  "category": "газовые",
+  "main": "H2S",
+  "expected_main": "H2S",
+  "equation": "ZnS + 2 HBr -> H2S + ZnBr2",
+  "expected_equation": "ZnS + 2 HBr -> ZnBr2 + H2S↑",
+  "status": "ok",
+  "reason": "То же, что G115 (HBr)."
+ },
+ {
+  "id": "G117",
+  "category": "газовые",
+  "main": null,
+  "expected_main": "H2S",
+  "equation": null,
+  "expected_equation": "ZnS + H2SO4 -> ZnSO4 + H2S↑",
+  "status": "no_reaction",
+  "reason": "ZnS + H2SO4 в закрытом сосуде: растворение ZnS ниже порога реакции (см. G115)."
+ }
+]

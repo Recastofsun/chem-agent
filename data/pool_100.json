@@ -1,0 +1,2424 @@
+[
+ {
+  "id": "n01",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "NaCl",
+  "accept_main": [],
+  "expected_equation": "HCl + NaOH -> NaCl + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n02",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "H2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Na2SO4",
+  "accept_main": [],
+  "expected_equation": "H2SO4 + 2 NaOH -> Na2SO4 + 2 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n03",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "KNO3",
+  "accept_main": [],
+  "expected_equation": "HNO3 + KOH -> KNO3 + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n04",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "Ca(OH)2",
+    "moles": 0.01,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CaCl2",
+  "accept_main": [],
+  "expected_equation": "2 HCl + Ca(OH)2 -> CaCl2 + 2 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n05",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "H3PO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.15,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Na3PO4",
+  "accept_main": [],
+  "expected_equation": "H3PO4 + 3 NaOH -> Na3PO4 + 3 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n06",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "H3PO4",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "NaH2PO4",
+  "accept_main": [],
+  "expected_equation": "H3PO4 + NaOH -> NaH2PO4 + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n07",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HBr",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "KOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "KBr",
+  "accept_main": [],
+  "expected_equation": "HBr + KOH -> KBr + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n08",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "NH4Cl",
+  "accept_main": [],
+  "expected_equation": "HCl + NH3 -> NH4Cl",
+  "accept_equations": []
+ },
+ {
+  "id": "n09",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "H2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "(NH4)2SO4",
+  "accept_main": [],
+  "expected_equation": "H2SO4 + 2 NH3 -> (NH4)2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "n10",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "Ba(OH)2",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ba(NO3)2",
+  "accept_main": [],
+  "expected_equation": "2 HNO3 + Ba(OH)2 -> Ba(NO3)2 + 2 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n11",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "H2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Mg(OH)2",
+    "moles": 0.05,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "MgSO4",
+  "accept_main": [],
+  "expected_equation": "H2SO4 + Mg(OH)2 -> MgSO4 + 2 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n12",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "Cu(OH)2",
+    "moles": 0.05,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CuCl2",
+  "accept_main": [],
+  "expected_equation": "2 HCl + Cu(OH)2 -> CuCl2 + 2 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n13",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "ZnO",
+    "moles": 0.05,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "ZnCl2",
+  "accept_main": [],
+  "expected_equation": "2 HCl + ZnO -> ZnCl2 + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n14",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HNO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "CaO",
+    "moles": 0.05,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ca(NO3)2",
+  "accept_main": [],
+  "expected_equation": "2 HNO3 + CaO -> Ca(NO3)2 + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "n15",
+  "category": "нейтрализация",
+  "reagents": [
+   {
+    "formula": "HClO4",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "LiOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "LiClO4",
+  "accept_main": [],
+  "expected_equation": "HClO4 + LiOH -> LiClO4 + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "p01",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "BaCl2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "BaSO4",
+  "accept_main": [],
+  "expected_equation": "BaCl2 + Na2SO4 -> BaSO4↓ + 2 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p02",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaCl",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "AgCl",
+  "accept_main": [],
+  "expected_equation": "AgNO3 + NaCl -> AgCl↓ + NaNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p03",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "KBr",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "AgBr",
+  "accept_main": [],
+  "expected_equation": "AgNO3 + KBr -> AgBr↓ + KNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p04",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "AgI",
+  "accept_main": [],
+  "expected_equation": "AgNO3 + KI -> AgI↓ + KNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p05",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "PbI2",
+  "accept_main": [],
+  "expected_equation": "Pb(NO3)2 + 2 KI -> PbI2↓ + 2 KNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p06",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "CaCl2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2CO3",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CaCO3",
+  "accept_main": [],
+  "expected_equation": "CaCl2 + Na2CO3 -> CaCO3↓ + 2 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p07",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "CuSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Cu(OH)2",
+  "accept_main": [],
+  "expected_equation": "CuSO4 + 2 NaOH -> Cu(OH)2↓ + Na2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "p08",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "FeCl3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.15,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Fe(OH)3",
+  "accept_main": [],
+  "expected_equation": "FeCl3 + 3 NaOH -> Fe(OH)3↓ + 3 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p09",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "FeSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Fe(OH)2",
+  "accept_main": [],
+  "expected_equation": "FeSO4 + 2 NaOH -> Fe(OH)2↓ + Na2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "p10",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "MgCl2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Mg(OH)2",
+  "accept_main": [],
+  "expected_equation": "MgCl2 + 2 NaOH -> Mg(OH)2↓ + 2 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p11",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "CaCl2",
+    "moles": 0.03,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na3PO4",
+    "moles": 0.02,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ca3(PO4)2",
+  "accept_main": [],
+  "expected_equation": "3 CaCl2 + 2 Na3PO4 -> Ca3(PO4)2↓ + 6 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p12",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2SO4",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "PbSO4",
+  "accept_main": [],
+  "expected_equation": "Pb(NO3)2 + Na2SO4 -> PbSO4↓ + 2 NaNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p13",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "BaCl2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2CO3",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "BaCO3",
+  "accept_main": [],
+  "expected_equation": "BaCl2 + Na2CO3 -> BaCO3↓ + 2 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p14",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "CuSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2S",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CuS",
+  "accept_main": [],
+  "expected_equation": "CuSO4 + Na2S -> CuS↓ + Na2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "p15",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "ZnSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2S",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "ZnS",
+  "accept_main": [],
+  "expected_equation": "ZnSO4 + Na2S -> ZnS↓ + Na2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "p16",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "Na2S",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "PbS",
+  "accept_main": [],
+  "expected_equation": "Pb(NO3)2 + Na2S -> PbS↓ + 2 NaNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p17",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "K2CrO4",
+    "moles": 0.025,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ag2CrO4",
+  "accept_main": [],
+  "expected_equation": "2 AgNO3 + K2CrO4 -> Ag2CrO4↓ + 2 KNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p18",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "Ba(NO3)2",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "K2CrO4",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "BaCrO4",
+  "accept_main": [],
+  "expected_equation": "Ba(NO3)2 + K2CrO4 -> BaCrO4↓ + 2 KNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "p19",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "AlCl3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.15,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Al(OH)3",
+  "accept_main": [],
+  "expected_equation": "AlCl3 + 3 NaOH -> Al(OH)3↓ + 3 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "p20",
+  "category": "осаждение",
+  "reagents": [
+   {
+    "formula": "NiSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ni(OH)2",
+  "accept_main": [],
+  "expected_equation": "NiSO4 + 2 NaOH -> Ni(OH)2↓ + Na2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "r01",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Zn",
+    "moles": 0.05,
+    "phase": "s"
+   },
+   {
+    "formula": "CuSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Cu",
+  "accept_main": [],
+  "expected_equation": "Zn + CuSO4 -> Cu↓ + ZnSO4",
+  "accept_equations": []
+ },
+ {
+  "id": "r02",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Fe",
+    "moles": 0.05,
+    "phase": "s"
+   },
+   {
+    "formula": "CuSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Cu",
+  "accept_main": [],
+  "expected_equation": "Fe + CuSO4 -> Cu↓ + FeSO4",
+  "accept_equations": []
+ },
+ {
+  "id": "r03",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Cu",
+    "moles": 0.025,
+    "phase": "s"
+   },
+   {
+    "formula": "AgNO3",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ag",
+  "accept_main": [],
+  "expected_equation": "Cu + 2 AgNO3 -> 2 Ag↓ + Cu(NO3)2",
+  "accept_equations": []
+ },
+ {
+  "id": "r04",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Zn",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "ZnCl2",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "Zn + 2 HCl -> ZnCl2 + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r05",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Fe",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "FeCl2",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "Fe + 2 HCl -> FeCl2 + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r06",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Mg",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "MgSO4",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "Mg + H2SO4 -> MgSO4 + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r07",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Al",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.3,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "AlCl3",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "2 Al + 6 HCl -> 2 AlCl3 + 3 H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r08",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Cl2",
+    "moles": 0.05,
+    "phase": "g"
+   },
+   {
+    "formula": "KBr",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Br2",
+  "accept_main": [
+   "KCl"
+  ],
+  "expected_equation": "Cl2 + 2 KBr -> 2 KCl + Br2",
+  "accept_equations": []
+ },
+ {
+  "id": "r09",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Br2",
+    "moles": 0.005,
+    "phase": "l"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.01,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "I2",
+  "accept_main": [
+   "KBr"
+  ],
+  "expected_equation": "Br2 + 2 KI -> 2 KBr + I2↓",
+  "accept_equations": []
+ },
+ {
+  "id": "r10",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Mg",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "MgCl2",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "Mg + 2 HCl -> MgCl2 + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r11",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "FeCl3",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "SnCl2",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "FeCl2",
+  "accept_main": [],
+  "expected_equation": "2 FeCl3 + SnCl2 -> 2 FeCl2 + SnCl4",
+  "accept_equations": []
+ },
+ {
+  "id": "r12",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "KMnO4",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "FeSO4",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.08,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Fe2(SO4)3",
+  "accept_main": [],
+  "expected_equation": "2 KMnO4 + 10 FeSO4 + 8 H2SO4 -> 5 Fe2(SO4)3 + 2 MnSO4 + K2SO4 + 8 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "r13",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "K2Cr2O7",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "FeSO4",
+    "moles": 0.06,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.07,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Fe2(SO4)3",
+  "accept_main": [],
+  "expected_equation": "K2Cr2O7 + 6 FeSO4 + 7 H2SO4 -> 3 Fe2(SO4)3 + Cr2(SO4)3 + K2SO4 + 7 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "r14",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Cu",
+    "moles": 0.03,
+    "phase": "s"
+   },
+   {
+    "formula": "HNO3",
+    "moles": 0.08,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Cu(NO3)2",
+  "accept_main": [
+   "NO"
+  ],
+  "expected_equation": "3 Cu + 8 HNO3 -> 3 Cu(NO3)2 + 2 NO↑ + 4 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "r15",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "H2O2",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "KI",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.01,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "I2",
+  "accept_main": [],
+  "expected_equation": "H2O2 + 2 KI + H2SO4 -> I2↓ + K2SO4 + 2 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "r16",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Na",
+    "moles": 0.1,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "NaOH",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "2 Na + 2 H2O -> 2 NaOH + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r17",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Ca",
+    "moles": 0.01,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ca(OH)2",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "Ca + 2 H2O -> Ca(OH)2 + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r18",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "K",
+    "moles": 0.1,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "KOH",
+  "accept_main": [
+   "H2"
+  ],
+  "expected_equation": "2 K + 2 H2O -> 2 KOH + H2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "r19",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Zn",
+    "moles": 0.05,
+    "phase": "s"
+   },
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Pb",
+  "accept_main": [],
+  "expected_equation": "Zn + Pb(NO3)2 -> Pb↓ + Zn(NO3)2",
+  "accept_equations": []
+ },
+ {
+  "id": "r20",
+  "category": "ОВР",
+  "reagents": [
+   {
+    "formula": "Na2SO3",
+    "moles": 0.05,
+    "phase": "aq"
+   },
+   {
+    "formula": "KMnO4",
+    "moles": 0.02,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.03,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Na2SO4",
+  "accept_main": [],
+  "expected_equation": "5 Na2SO3 + 2 KMnO4 + 3 H2SO4 -> 5 Na2SO4 + 2 MnSO4 + K2SO4 + 3 H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "c01",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "CuSO4",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.04,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Cu(NH3)4SO4",
+  "accept_main": [],
+  "expected_equation": "CuSO4 + 4 NH3 -> Cu(NH3)4SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "c02",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "AgCl",
+    "moles": 0.01,
+    "phase": "s"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ag(NH3)2Cl",
+  "accept_main": [],
+  "expected_equation": "AgCl + 2 NH3 -> Ag(NH3)2Cl",
+  "accept_equations": []
+ },
+ {
+  "id": "c03",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "Zn(OH)2",
+    "moles": 0.01,
+    "phase": "s"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Na2Zn(OH)4",
+  "accept_main": [],
+  "expected_equation": "Zn(OH)2 + 2 NaOH -> Na2Zn(OH)4",
+  "accept_equations": []
+ },
+ {
+  "id": "c04",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "Al(OH)3",
+    "moles": 0.01,
+    "phase": "s"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "NaAl(OH)4",
+  "accept_main": [],
+  "expected_equation": "Al(OH)3 + NaOH -> NaAl(OH)4",
+  "accept_equations": []
+ },
+ {
+  "id": "c05",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "NiSO4",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ni(NH3)6SO4",
+  "accept_main": [],
+  "expected_equation": "NiSO4 + 6 NH3 -> Ni(NH3)6SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "c06",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Ag(NH3)2NO3",
+  "accept_main": [],
+  "expected_equation": "AgNO3 + 2 NH3 -> Ag(NH3)2NO3",
+  "accept_equations": []
+ },
+ {
+  "id": "c07",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "CuCl2",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "NH3",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Cu(NH3)4Cl2",
+  "accept_main": [],
+  "expected_equation": "CuCl2 + 4 NH3 -> Cu(NH3)4Cl2",
+  "accept_equations": []
+ },
+ {
+  "id": "c08",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "FeSO4",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "KCN",
+    "moles": 0.06,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "K4Fe(CN)6",
+  "accept_main": [],
+  "expected_equation": "FeSO4 + 6 KCN -> K4Fe(CN)6 + K2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "c09",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "Zn(NO3)2",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "Na2Zn(OH)4",
+  "accept_main": [],
+  "expected_equation": "Zn(NO3)2 + 4 NaOH -> Na2Zn(OH)4 + 2 NaNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "c10",
+  "category": "комплексы",
+  "reagents": [
+   {
+    "formula": "FeCl3",
+    "moles": 0.01,
+    "phase": "aq"
+   },
+   {
+    "formula": "KSCN",
+    "moles": 0.01,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "FeSCNCl2",
+  "accept_main": [],
+  "expected_equation": "FeCl3 + KSCN -> FeSCNCl2 + KCl",
+  "accept_equations": []
+ },
+ {
+  "id": "d01",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "CaCO3",
+    "moles": 0.01,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 1200
+  },
+  "expected_main": "CaO",
+  "accept_main": [],
+  "expected_equation": "CaCO3 -> CaO + CO2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d02",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "KClO3",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 700
+  },
+  "expected_main": "KCl",
+  "accept_main": [
+   "O2"
+  ],
+  "expected_equation": "2 KClO3 -> 2 KCl + 3 O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d03",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "KNO3",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 750,
+   "atmosphere": {
+    "mode": "open"
+   }
+  },
+  "expected_main": "KNO2",
+  "accept_main": [],
+  "expected_equation": "2 KNO3 -> 2 KNO2 + O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d04",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "HgO",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 800
+  },
+  "expected_main": "Hg",
+  "accept_main": [],
+  "expected_equation": "2 HgO -> 2 Hg↑ + O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d05",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "Cu(OH)2",
+    "moles": 0.01,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 500
+  },
+  "expected_main": "CuO",
+  "accept_main": [],
+  "expected_equation": "Cu(OH)2 -> CuO + H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d06",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "NaHCO3",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 450
+  },
+  "expected_main": "Na2CO3",
+  "accept_main": [
+   "CO2"
+  ],
+  "expected_equation": "2 NaHCO3 -> Na2CO3 + CO2↑ + H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d07",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "MgCO3",
+    "moles": 0.01,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 900
+  },
+  "expected_main": "MgO",
+  "accept_main": [],
+  "expected_equation": "MgCO3 -> MgO + CO2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d08",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "Fe(OH)3",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 600
+  },
+  "expected_main": "Fe2O3",
+  "accept_main": [],
+  "expected_equation": "2 Fe(OH)3 -> Fe2O3 + 3 H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d09",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "Ag2O",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 700
+  },
+  "expected_main": "Ag",
+  "accept_main": [
+   "O2"
+  ],
+  "expected_equation": "2 Ag2O -> 4 Ag + O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d10",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "Pb(NO3)2",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 800,
+   "atmosphere": {
+    "mode": "open"
+   }
+  },
+  "expected_main": "PbO",
+  "accept_main": [],
+  "expected_equation": "2 Pb(NO3)2 -> 2 PbO + 4 NO2↑ + O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d11",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "Al(OH)3",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 800
+  },
+  "expected_main": "Al2O3",
+  "accept_main": [],
+  "expected_equation": "2 Al(OH)3 -> Al2O3 + 3 H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "d12",
+  "category": "разложение",
+  "reagents": [
+   {
+    "formula": "CaSO4·2H2O",
+    "moles": 0.01,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 500
+  },
+  "expected_main": "CaSO4",
+  "accept_main": [],
+  "expected_equation": "CaSO4·2H2O -> CaSO4 + 2 H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "e01",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "CuCl2",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 2.0
+   }
+  },
+  "expected_main": "Cu",
+  "accept_main": [],
+  "expected_equation": "CuCl2 -> Cu↓ + Cl2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "e02",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "NaCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 4.0
+   }
+  },
+  "expected_main": "NaOH",
+  "accept_main": [
+   "H2",
+   "Cl2"
+  ],
+  "expected_equation": "2 NaCl + 2 H2O -> 2 NaOH + H2↑ + Cl2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "e03",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "CuSO4",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 2.0
+   }
+  },
+  "expected_main": "Cu",
+  "accept_main": [],
+  "expected_equation": "2 CuSO4 + 2 H2O -> 2 Cu↓ + O2↑ + 2 H2SO4",
+  "accept_equations": []
+ },
+ {
+  "id": "e04",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "Na2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 3.0
+   }
+  },
+  "expected_main": "H2",
+  "accept_main": [],
+  "expected_equation": "2 H2O -> 2 H2↑ + O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "e05",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "KI",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 2.0
+   }
+  },
+  "expected_main": "KOH",
+  "accept_main": [
+   "H2",
+   "I2"
+  ],
+  "expected_equation": "2 KI + 2 H2O -> 2 KOH + H2↑ + I2↓",
+  "accept_equations": []
+ },
+ {
+  "id": "e06",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "AgNO3",
+    "moles": 0.05,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 2.0
+   }
+  },
+  "expected_main": "Ag",
+  "accept_main": [],
+  "expected_equation": "4 AgNO3 + 2 H2O -> 4 Ag↓ + O2↑ + 4 HNO3",
+  "accept_equations": []
+ },
+ {
+  "id": "e07",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 3.0
+   }
+  },
+  "expected_main": "H2",
+  "accept_main": [],
+  "expected_equation": "2 H2O -> 2 H2↑ + O2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "e08",
+  "category": "электрохимия",
+  "reagents": [
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0,
+   "electrolysis": {
+    "enabled": true,
+    "voltage_V": 2.0
+   }
+  },
+  "expected_main": "H2",
+  "accept_main": [],
+  "expected_equation": "2 HCl -> H2↑ + Cl2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g01",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "H2",
+    "moles": 0.02,
+    "phase": "g"
+   },
+   {
+    "formula": "O2",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 900
+  },
+  "expected_main": "H2O",
+  "accept_main": [],
+  "expected_equation": "2 H2 + O2 -> 2 H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g02",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "NH3",
+    "moles": 0.01,
+    "phase": "g"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0
+  },
+  "expected_main": "NH4Cl",
+  "accept_main": [],
+  "expected_equation": "NH3 + HCl -> NH4Cl",
+  "accept_equations": []
+ },
+ {
+  "id": "g03",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "NO",
+    "moles": 0.02,
+    "phase": "g"
+   },
+   {
+    "formula": "O2",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0
+  },
+  "expected_main": "NO2",
+  "accept_main": [
+   "N2O4"
+  ],
+  "expected_equation": "2 NO + O2 -> 2 NO2↑",
+  "accept_equations": [
+   "2 NO + O2 -> N2O4↑"
+  ]
+ },
+ {
+  "id": "g04",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "CH4",
+    "moles": 0.01,
+    "phase": "g"
+   },
+   {
+    "formula": "O2",
+    "moles": 0.02,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 900
+  },
+  "expected_main": "CO2",
+  "accept_main": [],
+  "expected_equation": "CH4 + 2 O2 -> CO2↑ + 2 H2O↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g05",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "CO",
+    "moles": 0.02,
+    "phase": "g"
+   },
+   {
+    "formula": "O2",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 900
+  },
+  "expected_main": "CO2",
+  "accept_main": [],
+  "expected_equation": "2 CO + O2 -> 2 CO2↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g06",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "H2",
+    "moles": 0.01,
+    "phase": "g"
+   },
+   {
+    "formula": "Cl2",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "method": {
+    "type": "photochemical",
+    "wavelength_nm": 450
+   }
+  },
+  "expected_main": "HCl",
+  "accept_main": [],
+  "expected_equation": "H2 + Cl2 -> 2 HCl↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g07",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "H2",
+    "moles": 0.01,
+    "phase": "g"
+   },
+   {
+    "formula": "Br2",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "method": {
+    "type": "photochemical",
+    "wavelength_nm": 500
+   }
+  },
+  "expected_main": "HBr",
+  "accept_main": [],
+  "expected_equation": "H2 + Br2 -> 2 HBr↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g08",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "Na2CO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CO2",
+  "accept_main": [
+   "NaCl"
+  ],
+  "expected_equation": "Na2CO3 + 2 HCl -> 2 NaCl + CO2↑ + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "g09",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "CaCO3",
+    "moles": 0.1,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.2,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CO2",
+  "accept_main": [
+   "CaCl2"
+  ],
+  "expected_equation": "CaCO3 + 2 HCl -> CaCl2 + CO2↑ + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "g10",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "NH4Cl",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "NaOH",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "NH3",
+  "accept_main": [
+   "NaCl"
+  ],
+  "expected_equation": "NH4Cl + NaOH -> NH3 + NaCl + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "g11",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "FeS",
+    "moles": 0.3,
+    "phase": "s"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.6,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "H2S",
+  "accept_main": [
+   "FeCl2"
+  ],
+  "expected_equation": "FeS + 2 HCl -> FeCl2 + H2S↑",
+  "accept_equations": []
+ },
+ {
+  "id": "g12",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "Na",
+    "moles": 0.02,
+    "phase": "s"
+   },
+   {
+    "formula": "Cl2",
+    "moles": 0.01,
+    "phase": "g"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0
+  },
+  "expected_main": "NaCl",
+  "accept_main": [],
+  "expected_equation": "2 Na + Cl2 -> 2 NaCl",
+  "accept_equations": []
+ },
+ {
+  "id": "g13",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "NaHCO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "HCl",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CO2",
+  "accept_main": [
+   "NaCl"
+  ],
+  "expected_equation": "NaHCO3 + HCl -> NaCl + CO2↑ + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "g14",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "K2CO3",
+    "moles": 0.1,
+    "phase": "aq"
+   },
+   {
+    "formula": "H2SO4",
+    "moles": 0.1,
+    "phase": "aq"
+   }
+  ],
+  "conditions": {
+   "solvent": "water",
+   "volume_L": 1.0
+  },
+  "expected_main": "CO2",
+  "accept_main": [
+   "K2SO4"
+  ],
+  "expected_equation": "K2CO3 + H2SO4 -> K2SO4 + CO2↑ + H2O",
+  "accept_equations": []
+ },
+ {
+  "id": "g15",
+  "category": "газовые",
+  "reagents": [
+   {
+    "formula": "Fe",
+    "moles": 0.02,
+    "phase": "s"
+   },
+   {
+    "formula": "S",
+    "moles": 0.02,
+    "phase": "s"
+   }
+  ],
+  "conditions": {
+   "solvent": "none",
+   "volume_L": 1.0,
+   "temperature_K": 800
+  },
+  "expected_main": "FeS",
+  "accept_main": [],
+  "expected_equation": "Fe + S -> FeS",
+  "accept_equations": []
+ }
+]

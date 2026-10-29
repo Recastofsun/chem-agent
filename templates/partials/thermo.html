@@ -1,0 +1,15 @@
+<section id="thermo" class="card">
+  <details open><summary><h2>5. Термодинамика</h2></summary>
+  {% if charts.dG_T %}
+  <div class="charts2">
+    <figure><figcaption>ΔG основной реакции от температуры (полоса - ±1σ)</figcaption>{{ charts.dG_T | safe }}</figure>
+    <figure><figcaption>Константа равновесия, lg K(T)</figcaption>{{ charts.K_T | safe }}</figure>
+  </div>
+  {% else %}<p class="muted">Зависимость от температуры не строится: нет уравнения с известными энергиями.</p>{% endif %}
+  {% if charts.profile %}
+  <figure><figcaption>Равновесный состав вдоль температурного профиля</figcaption>{{ charts.profile | safe }}</figure>
+  <p class="small muted">{{ d.thermo.profile_note }}</p>
+  {% endif %}
+  <p class="small muted">Модель: ΔGf(T) = ΔGf(298) − (T − 298,15)·ΔSf при постоянных ΔHf и ΔSf. Для частиц без ΔHf зависимость от T неизвестна - погрешность растет на 0,1 кДж/моль на каждый кельвин.</p>
+  </details>
+</section>

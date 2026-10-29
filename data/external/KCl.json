@@ -1,0 +1,10 @@
+{
+  "formula": "KCl",
+  "source": "pubchem",
+  "cid": 4873,
+  "molecular_weight": 74.55,
+  "name": "potassium chloride",
+  "n_candidates": 1,
+  "query": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/KCl/property/MolecularWeight,IUPACName/JSON",
+  "fetched_at": "2026-10-28T11:04:43+00:00"
+}

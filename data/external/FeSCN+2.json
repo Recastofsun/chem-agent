@@ -1,0 +1,10 @@
+{
+  "formula": "FeSCN+2",
+  "error": "no_data",
+  "reason": "not_found",
+  "sources_tried": [
+    "pubchem",
+    "nist"
+  ],
+  "fetched_at": "2026-10-28T11:01:59+00:00"
+}

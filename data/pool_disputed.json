@@ -1,0 +1,42 @@
+[
+ {
+  "id": "r11",
+  "category": "ОВР",
+  "main": "FeCl2",
+  "expected_main": "FeCl2",
+  "equation": null,
+  "expected_equation": "2 FeCl3 + SnCl2 -> 2 FeCl2 + SnCl4",
+  "status": "ok",
+  "reason": "Нет SnCl6-2 в базе: Sn(IV) в 0,1 М HCl выпадает как SnO2. Учебное уравнение предполагает концентрированную HCl и хлорокомплекс олова. Пробел данных."
+ },
+ {
+  "id": "c10",
+  "category": "комплексы",
+  "main": "KCl",
+  "expected_main": "FeSCNCl2",
+  "equation": null,
+  "expected_equation": "FeCl3 + KSCN -> FeSCNCl2 + KCl",
+  "status": "ok",
+  "reason": "FeCl3 + KSCN: в базе один комплекс FeSCN+2 (lg β из complex_constants в расчете не участвует), равновесие уводит в Fe(SCN)3 и гидролиз; известная проблема h049."
+ },
+ {
+  "id": "d10",
+  "category": "разложение",
+  "main": null,
+  "expected_main": "PbO",
+  "equation": null,
+  "expected_equation": "2 Pb(NO3)2 -> 2 PbO + 4 NO2↑ + O2↑",
+  "status": "unknown",
+  "reason": "Нет Pb(NO3)2(тв) в базе: известна только ΔfH = -451,9 кДж/моль, ΔfG и S° в открытых источниках не найдены. Пробел данных, status unknown."
+ },
+ {
+  "id": "g03",
+  "category": "газовые",
+  "main": "N2O4",
+  "expected_main": "NO2",
+  "equation": "2 NO + O2 -> N2O4",
+  "expected_equation": "2 NO + O2 -> 2 NO2↑",
+  "status": "ok",
+  "reason": "По данным CRC N2O4(ж) при 298 K стабильнее газа на 0,4 кДж/моль (Tкип 294 K): ядро дает жидкий N2O4. Погрешность данных больше разницы; ожидание (NO2/N2O4 газ) верно."
+ }
+]

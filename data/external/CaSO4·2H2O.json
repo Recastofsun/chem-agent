@@ -1,0 +1,10 @@
+{
+  "formula": "CaSO4·2H2O",
+  "source": "pubchem",
+  "cid": 24928,
+  "molecular_weight": 172.17,
+  "name": "calcium;sulfate;dihydrate",
+  "n_candidates": 3,
+  "query": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastformula/CaH4O6S/property/MolecularWeight,IUPACName/JSON",
+  "fetched_at": "2026-10-28T11:01:56+00:00"
+}

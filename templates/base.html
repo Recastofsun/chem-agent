@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="{{ theme }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="chem-agent {{ d.metadata.version }}">
+<title>{{ title }}</title>
+{% if logo_uri %}<link rel="icon" href="{{ logo_uri }}">{% endif %}
+<style>
+{{ css | safe }}
+</style>
+</head>
+<body>
+<header class="top">
+  {% if logo_uri %}<img src="{{ logo_uri }}" alt="" width="28" height="28">{% endif %}
+  <div>
+    <h1>{{ title }}</h1>
+    <div class="muted small">ID {{ d.reaction_id }} · sha256 {{ d.input_hash[:16] }}… · офлайн · версия {{ d.metadata.version }}</div>
+  </div>
+  <div class="tools no-print">
+    <button type="button" id="theme-btn" title="Светлая/темная тема">Тема</button>
+    <button type="button" id="expand-btn" title="Раскрыть все разделы">Раскрыть все</button>
+    <button type="button" onclick="window.print()" title="Печать или сохранение в PDF">PDF</button>
+    <button type="button" id="json-btn" title="Скачать JSON">JSON</button>
+  </div>
+</header>
+<nav class="toc no-print">
+  <a href="#summary">1. Резюме</a><a href="#input">2. Вход</a><a href="#reactions">3. Реакции</a>
+  <a href="#products">4. Продукты</a><a href="#thermo">5. Термодинамика</a><a href="#kinetics">6. Кинетика</a>
+  <a href="#uncertainty">7. Неопределенность</a><a href="#explanation">8. Объяснение</a><a href="#metadata">9. Метаданные</a>
+</nav>
+<main>
+{% block content %}{% endblock %}
+</main>
+<div id="zoom" class="zoom no-print" hidden><div class="zoom-inner"></div></div>
+<script type="application/json" id="result-json">{{ json_blob | safe }}</script>
+<script>
+{{ js | safe }}
+</script>
+</body>
+</html>

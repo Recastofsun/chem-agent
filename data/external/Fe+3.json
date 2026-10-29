@@ -1,0 +1,10 @@
+{
+  "formula": "Fe+3",
+  "source": "pubchem",
+  "cid": 29936,
+  "molecular_weight": 55.84,
+  "name": "iron(3+)",
+  "n_candidates": 1,
+  "query": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/Fe%2B3/property/MolecularWeight,IUPACName/JSON",
+  "fetched_at": "2026-10-28T11:01:57+00:00"
+}

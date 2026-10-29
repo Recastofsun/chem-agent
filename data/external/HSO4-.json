@@ -1,0 +1,10 @@
+{
+  "formula": "HSO4-",
+  "source": "pubchem",
+  "cid": 61778,
+  "molecular_weight": 97.07,
+  "name": "hydrogen sulfate",
+  "n_candidates": 1,
+  "query": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/HSO4-/property/MolecularWeight,IUPACName/JSON",
+  "fetched_at": "2026-10-28T11:02:25+00:00"
+}

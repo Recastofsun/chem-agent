@@ -1,0 +1,16 @@
+{
+  "reagents": [
+    {
+      "formula": "CaCO3",
+      "moles": 0.1,
+      "phase": "s"
+    }
+  ],
+  "conditions": {
+    "temperature_K": 1200,
+    "solvent": "none"
+  },
+  "options": {
+    "accuracy": "fast"
+  }
+}

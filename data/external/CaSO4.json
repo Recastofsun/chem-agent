@@ -1,0 +1,10 @@
+{
+  "formula": "CaSO4",
+  "source": "pubchem",
+  "cid": 24497,
+  "molecular_weight": 136.14,
+  "name": "calcium sulfate",
+  "n_candidates": 1,
+  "query": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/CaSO4/property/MolecularWeight,IUPACName/JSON",
+  "fetched_at": "2026-10-28T11:01:53+00:00"
+}
