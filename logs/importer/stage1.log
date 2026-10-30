@@ -1,0 +1,178 @@
+2026-10-30 15:58:45,369 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 15:58:45,370 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 15:58:45,370 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 15:58:45,370 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 15:58:45,372 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 15:58:45,372 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 15:58:45,373 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 15:58:45,406 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 15:58:45,406 - universal_importer.stage1 - INFO -    Новых веществ: 120
+2026-10-30 15:58:45,406 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 15:58:45,406 - universal_importer.stage1 - INFO - 
+ Итог Stage 1:
+2026-10-30 15:58:45,407 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 120, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 11, Пропущено (мастер): 1, Прочее: 61
+2026-10-30 15:58:45,407 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 15:58:45,407 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 16:35:23,028 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:35:23,029 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 16:35:23,029 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:35:23,029 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 16:35:23,044 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 16:35:23,044 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 16:35:23,044 - universal_importer.stage1 - INFO - 🗑️  Удален старый staging.db
+2026-10-30 16:35:23,047 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 16:35:23,080 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 16:35:23,080 - universal_importer.stage1 - INFO -    Новых веществ: 120
+2026-10-30 16:35:23,081 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 16:35:23,081 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 16:35:23,081 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 120, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 11, Пропущено (мастер): 1, Прочее: 61
+2026-10-30 16:35:23,082 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 16:35:23,082 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 16:42:22,328 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:42:22,328 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 16:42:22,328 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:42:22,329 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 16:42:22,331 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 16:42:22,331 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 16:42:22,333 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO -    Новых веществ: 120
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO - 
+ Итог Stage 1:
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 120, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 11, Пропущено (мастер): 1, Прочее: 61
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 16:42:22,375 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 16:46:48,242 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:46:48,242 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 16:46:48,242 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:46:48,242 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 16:46:48,245 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 16:46:48,246 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 16:46:48,248 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 16:46:48,280 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 16:46:48,281 - universal_importer.stage1 - INFO -    Новых веществ: 120
+2026-10-30 16:46:48,281 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 16:46:48,281 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 16:46:48,281 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 120, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 11, Пропущено (мастер): 1, Прочее: 61
+2026-10-30 16:46:48,281 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 16:46:48,281 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 16:48:58,741 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:48:58,741 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 16:48:58,741 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 16:48:58,741 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 16:48:58,744 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 16:48:58,744 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 16:48:58,744 - universal_importer.stage1 - INFO - 🗑️  Удален старый staging.db
+2026-10-30 16:48:58,745 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 16:48:58,776 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 16:48:58,777 - universal_importer.stage1 - INFO -    Новых веществ: 120
+2026-10-30 16:48:58,777 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 16:48:58,777 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 16:48:58,777 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 120, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 11, Пропущено (мастер): 1, Прочее: 61
+2026-10-30 16:48:58,777 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 16:48:58,778 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 17:00:54,277 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:00:54,277 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 17:00:54,277 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:00:54,277 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 17:00:54,279 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 17:00:54,279 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 17:00:54,281 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 17:00:54,309 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 17:00:54,309 - universal_importer.stage1 - INFO -    Новых веществ: 131
+2026-10-30 17:00:54,310 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 17:00:54,310 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 17:00:54,310 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 131, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 0, Пропущено (мастер): 1, Прочее: 61
+2026-10-30 17:00:54,310 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 17:00:54,310 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 17:24:23,859 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:24:23,859 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 17:24:23,859 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:24:23,859 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 17:24:23,861 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 17:24:23,861 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 17:24:23,862 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 17:24:23,864 - universal_importer.stage1 - INFO - ⚠️  Пропущен HCl: в blacklist (сильный электролит)
+2026-10-30 17:24:23,871 - universal_importer.stage1 - INFO - ⚠️  Пропущен Na2SO4: в blacklist (сильный электролит)
+2026-10-30 17:24:23,871 - universal_importer.stage1 - INFO - ⚠️  Пропущен NaF: в blacklist (сильный электролит)
+2026-10-30 17:24:23,872 - universal_importer.stage1 - INFO - ⚠️  Пропущен KF: в blacklist (сильный электролит)
+2026-10-30 17:24:23,892 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 17:24:23,892 - universal_importer.stage1 - INFO -    Новых веществ: 127
+2026-10-30 17:24:23,892 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 17:24:23,893 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 17:24:23,895 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 127, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 0, Пропущено (мастер): 1, Пропущено (blacklist): 4, Прочее: 61
+2026-10-30 17:24:23,897 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 17:24:23,899 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 17:26:18,433 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:26:18,434 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 17:26:18,434 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:26:18,434 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 17:26:18,437 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 17:26:18,437 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 17:26:18,438 - universal_importer.stage1 - INFO - 🗑️  Удален старый staging.db
+2026-10-30 17:26:18,439 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 17:26:18,441 - universal_importer.stage1 - INFO - ⚠️  Пропущен HCl: в blacklist (сильный электролит)
+2026-10-30 17:26:18,447 - universal_importer.stage1 - INFO - ⚠️  Пропущен Na2SO4: в blacklist (сильный электролит)
+2026-10-30 17:26:18,449 - universal_importer.stage1 - INFO - ⚠️  Пропущен NaF: в blacklist (сильный электролит)
+2026-10-30 17:26:18,449 - universal_importer.stage1 - INFO - ⚠️  Пропущен KF: в blacklist (сильный электролит)
+2026-10-30 17:26:18,473 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 17:26:18,473 - universal_importer.stage1 - INFO -    Новых веществ: 127
+2026-10-30 17:26:18,474 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 17:26:18,474 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 17:26:18,474 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 127, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 0, Пропущено (мастер): 1, Пропущено (blacklist): 4, Прочее: 61
+2026-10-30 17:26:18,474 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 17:26:18,474 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 17:26:31,108 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:26:31,109 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 17:26:31,109 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:26:31,109 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 17:26:31,113 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 17:26:31,113 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 17:26:31,115 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 17:26:31,117 - universal_importer.stage1 - INFO - ⚠️  Пропущен HCl: в blacklist (сильный электролит)
+2026-10-30 17:26:31,123 - universal_importer.stage1 - INFO - ⚠️  Пропущен Na2SO4: в blacklist (сильный электролит)
+2026-10-30 17:26:31,124 - universal_importer.stage1 - INFO - ⚠️  Пропущен NaF: в blacklist (сильный электролит)
+2026-10-30 17:26:31,124 - universal_importer.stage1 - INFO - ⚠️  Пропущен KF: в blacklist (сильный электролит)
+2026-10-30 17:26:31,146 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 17:26:31,146 - universal_importer.stage1 - INFO -    Новых веществ: 127
+2026-10-30 17:26:31,147 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 17:26:31,147 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 17:26:31,147 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 127, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 0, Пропущено (мастер): 1, Пропущено (blacklist): 4, Прочее: 61
+2026-10-30 17:26:31,147 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 17:26:31,147 - universal_importer.stage1 - INFO -    Manifest: manifest.json
+2026-10-30 17:34:41,292 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:34:41,292 - universal_importer.stage1 - INFO - STAGE 1: Parsing + Staging + Manifest
+2026-10-30 17:34:41,292 - universal_importer.stage1 - INFO - ============================================================
+2026-10-30 17:34:41,292 - universal_importer.stage1 - INFO - 📖 Парсинг phreeqc...
+2026-10-30 17:34:41,294 - universal_importer.stage1 - INFO -    Мастер-ионов: 50
+2026-10-30 17:34:41,294 - universal_importer.stage1 - INFO -    Реакций: 266
+2026-10-30 17:34:41,296 - universal_importer.stage1 - INFO - 📂 Staging DB создан как копия crc.db
+2026-10-30 17:34:41,298 - universal_importer.stage1 - INFO - ⚠️  Пропущен HCl: в blacklist (log_k=-0.46)
+2026-10-30 17:34:41,298 - universal_importer.stage1 - INFO - ⚠️  Пропущен (CO2)2: в blacklist (log_k=-1.78)
+2026-10-30 17:34:41,301 - universal_importer.stage1 - INFO - ⚠️  Пропущен BF(OH)3-: в blacklist (log_k=-0.4)
+2026-10-30 17:34:41,304 - universal_importer.stage1 - INFO - ⚠️  Пропущен NaHCO3: в blacklist (log_k=-0.433)
+2026-10-30 17:34:41,304 - universal_importer.stage1 - INFO - ⚠️  Пропущен Na2SO4: в blacklist (log_k=-2.37)
+2026-10-30 17:34:41,305 - universal_importer.stage1 - INFO - ⚠️  Пропущен NaF: в blacklist (log_k=-2.38)
+2026-10-30 17:34:41,305 - universal_importer.stage1 - INFO - ⚠️  Пропущен KF: в blacklist (log_k=-0.82)
+2026-10-30 17:34:41,305 - universal_importer.stage1 - INFO - ⚠️  Пропущен KHCO3: в blacklist (log_k=-0.266)
+2026-10-30 17:34:41,308 - universal_importer.stage1 - INFO - ⚠️  Пропущен MnCl3-: в blacklist (log_k=-0.31)
+2026-10-30 17:34:41,311 - universal_importer.stage1 - INFO - ⚠️  Пропущен CuCl3-: в blacklist (log_k=-2.29)
+2026-10-30 17:34:41,311 - universal_importer.stage1 - INFO - ⚠️  Пропущен CuCl4-2: в blacklist (log_k=-4.59)
+2026-10-30 17:34:41,313 - universal_importer.stage1 - INFO - ⚠️  Пропущен ZnBr+: в blacklist (log_k=-0.58)
+2026-10-30 17:34:41,313 - universal_importer.stage1 - INFO - ⚠️  Пропущен ZnBr2: в blacklist (log_k=-0.98)
+2026-10-30 17:34:41,327 - universal_importer.stage1 - INFO - 📝 Manifest сохранен: manifest.json
+2026-10-30 17:34:41,327 - universal_importer.stage1 - INFO -    Новых веществ: 118
+2026-10-30 17:34:41,328 - universal_importer.stage1 - INFO -    Конфликтов: 7
+2026-10-30 17:34:41,328 - universal_importer.stage1 - INFO - 
+📊 Итог Stage 1:
+2026-10-30 17:34:41,328 - universal_importer.stage1 - INFO -    Всего распарсено: 266, Добавлено: 118, Пропущено (CRC существует): 7, Пропущено (баланс): 66, Пропущено (нет реагентов): 0, Пропущено (мастер): 1, Пропущено (blacklist): 13, Прочее: 61
+2026-10-30 17:34:41,328 - universal_importer.stage1 - INFO -    Staging DB: staging.db
+2026-10-30 17:34:41,328 - universal_importer.stage1 - INFO -    Manifest: manifest.json

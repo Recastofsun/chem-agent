@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from chem_agent.agent import Agent
 
 def main():
-    agent = Agent(offline=True)
+    agent = Agent(offline=True, db_path='chem_agent/data/phreeqc.db')
     bench_file = Path(__file__).parent.parent / "tests" / "fixtures" / "phreeqc_benchmark.json"
     cases = json.loads(bench_file.read_text(encoding="utf-8"))
 

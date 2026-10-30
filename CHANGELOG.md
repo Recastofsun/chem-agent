@@ -1,5 +1,37 @@
 # CHANGELOG
 
+## [2.5.1] - 2026-10-30 — W-26: Универсальный импортер PHREEQC
+
+### Added
+- **W-26: Универсальный импортер термодинамических баз** (`tools/universal_importer/`):
+  - 4-Stage Pipeline: Parsing → Staging → Test Generation → Merge.
+  - Модульная архитектура: добавление нового формата = один файл в `formats/`.
+  - Парсер PHREEQC: `phreeqc.dat` → унифицированная структура → БД.
+  - Автоматическая ротация логов (максимум 10 файлов в `logs/importer/`).
+- **127 новых веществ** из PHREEQC:
+  - Ионные пары и комплексы: Ca/Mg/Fe/Mn/Al/Ba/Sr/Li/Cu/Zn/Cd/Pb с SO4²⁻, CO3²⁻, HCO3⁻, HPO4²⁻, H2PO4⁻, F⁻, Cl⁻, Br⁻, NO3⁻.
+  - Сульфидные комплексы: Fe(HS)2, Fe(HS)3⁻, Cu(HS)3⁻, Zn(HS)2, Cd(HS)n, Pb(HS)n.
+  - Добавлен HS⁻(aq) в CRC (dGf = -17.7 кДж/моль, `scripts/add_hs_ion.py`).
+- **CRC Priority**: существующие вещества из CRC никогда не перезаписываются.
+- **Blacklist сильных электролитов**: HCl, HBr, HI, HNO3, H2SO4, HClO4, NaOH, KOH, LiOH, Na2SO4, NaF, KF.
+- **Blacklist по log_k**: вещества с log_k < -0.1 (полностью диссоциирующие) исключаются.
+- **Версионирование БД**: таблица `metadata` (version, last_import, source_hash) + таблица `import_log` + автоматические бэкапы в `chem_agent/data/backups/`.
+- **Manifest.json**: паспорт каждого импорта (новые вещества, конфликты, статистика, sha256 источника).
+- **Автогенерация тестов** (`tools/universal_importer/stage2_test_generator.py`): unit-тесты на наличие + химические тесты на осаждение.
+
+### Changed
+- **Формулы комплексов**: сохранение скобок для читаемости (`Cu(CO3)2-2`, `Fe(SO4)2-`).
+- **Точность pool_1000**: 0.982 → 0.974 (небольшое падение, требует анализа — см. DEVLOG).
+- **Точность pool_100**: 0.96 → 0.92 при первом merge (исправлено blacklist'ом сильных электролитов).
+
+### Fixed
+- Критическая регрессия `test_neutralization_pH_and_dG`: delta_G = 2.63 вместо -79.9 кДж/моль. Причина: первый вариант merge делал UPDATE существующих веществ. Исправлено: merge только INSERT.
+- Раскрытие скобок в формулах комплексов (`MgO8S2-2` → `Mg(SO4)2-2`): разделены `clean_formula_complex` и `clean_formula_mineral`.
+
+### Notes
+- Архитектура готова к расширению: MINTEQ, wateq4f.dat, llnl.dat = один файл в `formats/`.
+- Старые скрипты `tools/phreeqc_importer/0*.py` помечены как deprecated.
+
 ## [2.5.0] - 2026-10-28 - Core v2.5 (Multiagent, Pipeline, Pitzer)
 
 ### Added

@@ -1,0 +1,894 @@
+{
+  "timestamp": "2026-10-30T17:34:41.326110",
+  "source": "phreeqc.dat",
+  "source_hash": "sha256:5b2caeaa37fc35478549f15584fa797f079ee6c9b40410373b24b7a3cb8e0487",
+  "format": "phreeqc",
+  "new_species": [
+    {
+      "formula": "NH4SO4-",
+      "phase": "aq",
+      "dGf": -816.08,
+      "source_reaction": "NH4+ + SO4-2 = NH4SO4-",
+      "log_k": 1.353
+    },
+    {
+      "formula": "CaCO3",
+      "phase": "aq",
+      "dGf": -1063.0,
+      "source_reaction": "Ca+2 + CO3-2 = CaCO3",
+      "log_k": 3.224
+    },
+    {
+      "formula": "CaHCO3+",
+      "phase": "aq",
+      "dGf": -1045.61,
+      "source_reaction": "Ca+2 + CO3-2 + H+ = CaHCO3+",
+      "log_k": 6.27
+    },
+    {
+      "formula": "CaSO4",
+      "phase": "aq",
+      "dGf": -1285.88,
+      "source_reaction": "Ca+2 + SO4-2 = CaSO4",
+      "log_k": 2.14
+    },
+    {
+      "formula": "CaHSO4+",
+      "phase": "aq",
+      "dGf": -1303.34,
+      "source_reaction": "Ca+2 + HSO4- = CaHSO4+",
+      "log_k": 1.08
+    },
+    {
+      "formula": "CaPO4-",
+      "phase": "aq",
+      "dGf": -1535.43,
+      "source_reaction": "Ca+2 + PO4-3 = CaPO4-",
+      "log_k": 6.459
+    },
+    {
+      "formula": "CaHPO4",
+      "phase": "aq",
+      "dGf": -1627.17,
+      "source_reaction": "Ca+2 + HPO4-2 = CaHPO4",
+      "log_k": 2.739
+    },
+    {
+      "formula": "CaH2PO4+",
+      "phase": "aq",
+      "dGf": -1675.76,
+      "source_reaction": "Ca+2 + H2PO4- = CaH2PO4+",
+      "log_k": 1.408
+    },
+    {
+      "formula": "MgCO3",
+      "phase": "aq",
+      "dGf": -965.59,
+      "source_reaction": "Mg+2 + CO3-2 = MgCO3",
+      "log_k": 2.98
+    },
+    {
+      "formula": "MgHCO3+",
+      "phase": "aq",
+      "dGf": -917.53,
+      "source_reaction": "Mg+2 + H+ + CO3-2 = MgHCO3+",
+      "log_k": 11.399
+    },
+    {
+      "formula": "MgSO4",
+      "phase": "aq",
+      "dGf": -1185.49,
+      "source_reaction": "Mg+2 + SO4-2 = MgSO4",
+      "log_k": 2.42
+    },
+    {
+      "formula": "Mg(SO4)2-2",
+      "phase": "aq",
+      "dGf": -1927.02,
+      "source_reaction": "SO4-2 + MgSO4 = Mg(SO4)2-2",
+      "log_k": 0.52
+    },
+    {
+      "formula": "MgPO4-",
+      "phase": "aq",
+      "dGf": -1435.89,
+      "source_reaction": "Mg+2 + PO4-3 = MgPO4-",
+      "log_k": 6.589
+    },
+    {
+      "formula": "MgHPO4",
+      "phase": "aq",
+      "dGf": -1527.62,
+      "source_reaction": "Mg+2 + HPO4-2 = MgHPO4",
+      "log_k": 2.87
+    },
+    {
+      "formula": "MgH2PO4+",
+      "phase": "aq",
+      "dGf": -1576.36,
+      "source_reaction": "Mg+2 + H2PO4- = MgH2PO4+",
+      "log_k": 1.513
+    },
+    {
+      "formula": "MgF+",
+      "phase": "aq",
+      "dGf": -723.21,
+      "source_reaction": "Mg+2 + F- = MgF+",
+      "log_k": 1.82
+    },
+    {
+      "formula": "NaSO4-",
+      "phase": "aq",
+      "dGf": -1001.03,
+      "source_reaction": "Na+ + SO4-2 = NaSO4-",
+      "log_k": 0.94
+    },
+    {
+      "formula": "NaHPO4-",
+      "phase": "aq",
+      "dGf": -1349.44,
+      "source_reaction": "Na+ + HPO4-2 = NaHPO4-",
+      "log_k": 0.29
+    },
+    {
+      "formula": "KSO4-",
+      "phase": "aq",
+      "dGf": -1021.06,
+      "source_reaction": "K+ + SO4-2 = KSO4-",
+      "log_k": 1.18
+    },
+    {
+      "formula": "KHPO4-",
+      "phase": "aq",
+      "dGf": -1370.84,
+      "source_reaction": "K+ + HPO4-2 = KHPO4-",
+      "log_k": 0.29
+    },
+    {
+      "formula": "FeCl+",
+      "phase": "aq",
+      "dGf": -209.3,
+      "source_reaction": "Fe+2 + Cl- = FeCl+",
+      "log_k": 0.14
+    },
+    {
+      "formula": "FeCO3",
+      "phase": "aq",
+      "dGf": -581.7,
+      "source_reaction": "Fe+2 + CO3-2 = FeCO3",
+      "log_k": 4.38
+    },
+    {
+      "formula": "FeHCO3+",
+      "phase": "aq",
+      "dGf": -654.28,
+      "source_reaction": "Fe+2 + HCO3- = FeHCO3+",
+      "log_k": 2.0
+    },
+    {
+      "formula": "FeSO4",
+      "phase": "aq",
+      "dGf": -810.56,
+      "source_reaction": "Fe+2 + SO4-2 = FeSO4",
+      "log_k": 2.25
+    },
+    {
+      "formula": "FeHSO4+",
+      "phase": "aq",
+      "dGf": -828.64,
+      "source_reaction": "Fe+2 + HSO4- = FeHSO4+",
+      "log_k": 1.08
+    },
+    {
+      "formula": "Fe(HS)2",
+      "phase": "aq",
+      "dGf": -63.21,
+      "source_reaction": "Fe+2 + 2 HS- = Fe(HS)2",
+      "log_k": 8.95
+    },
+    {
+      "formula": "Fe(HS)3-",
+      "phase": "aq",
+      "dGf": -69.29,
+      "source_reaction": "Fe+2 + 3 HS- = Fe(HS)3-",
+      "log_k": 10.987
+    },
+    {
+      "formula": "FeHPO4",
+      "phase": "aq",
+      "dGf": -1147.55,
+      "source_reaction": "Fe+2 + HPO4-2 = FeHPO4",
+      "log_k": 3.6
+    },
+    {
+      "formula": "FeH2PO4+",
+      "phase": "aq",
+      "dGf": -1193.69,
+      "source_reaction": "Fe+2 + H2PO4- = FeH2PO4+",
+      "log_k": 2.7
+    },
+    {
+      "formula": "FeF+",
+      "phase": "aq",
+      "dGf": -351.99,
+      "source_reaction": "Fe+2 + F- = FeF+",
+      "log_k": 1.0
+    },
+    {
+      "formula": "FeCl+2",
+      "phase": "aq",
+      "dGf": -127.45,
+      "source_reaction": "Fe+3 + Cl- = FeCl+2",
+      "log_k": 1.48
+    },
+    {
+      "formula": "FeCl2+",
+      "phase": "aq",
+      "dGf": -254.94,
+      "source_reaction": "Fe+3 + 2 Cl- = FeCl2+",
+      "log_k": 2.13
+    },
+    {
+      "formula": "FeCl3",
+      "phase": "aq",
+      "dGf": -391.85,
+      "source_reaction": "Fe+3 + 3 Cl- = FeCl3",
+      "log_k": 1.13
+    },
+    {
+      "formula": "FeSO4+",
+      "phase": "aq",
+      "dGf": -726.14,
+      "source_reaction": "Fe+3 + SO4-2 = FeSO4+",
+      "log_k": 4.04
+    },
+    {
+      "formula": "FeHSO4+2",
+      "phase": "aq",
+      "dGf": -746.44,
+      "source_reaction": "Fe+3 + HSO4- = FeHSO4+2",
+      "log_k": 2.48
+    },
+    {
+      "formula": "Fe(SO4)2-",
+      "phase": "aq",
+      "dGf": -1462.99,
+      "source_reaction": "Fe+3 + 2 SO4-2 = Fe(SO4)2-",
+      "log_k": 5.38
+    },
+    {
+      "formula": "FeHPO4+",
+      "phase": "aq",
+      "dGf": -1062.91,
+      "source_reaction": "Fe+3 + HPO4-2 = FeHPO4+",
+      "log_k": 5.43
+    },
+    {
+      "formula": "FeH2PO4+2",
+      "phase": "aq",
+      "dGf": -1103.91,
+      "source_reaction": "Fe+3 + H2PO4- = FeH2PO4+2",
+      "log_k": 5.43
+    },
+    {
+      "formula": "FeF+2",
+      "phase": "aq",
+      "dGf": -248.11,
+      "source_reaction": "Fe+3 + F- = FeF+2",
+      "log_k": 6.2
+    },
+    {
+      "formula": "FeF2+",
+      "phase": "aq",
+      "dGf": -500.65,
+      "source_reaction": "Fe+3 + 2 F- = FeF2+",
+      "log_k": 10.8
+    },
+    {
+      "formula": "FeF3",
+      "phase": "aq",
+      "dGf": -761.19,
+      "source_reaction": "Fe+3 + 3 F- = FeF3",
+      "log_k": 14.0
+    },
+    {
+      "formula": "MnCl+",
+      "phase": "aq",
+      "dGf": -355.82,
+      "source_reaction": "Mn+2 + Cl- = MnCl+",
+      "log_k": 0.61
+    },
+    {
+      "formula": "MnCl2",
+      "phase": "aq",
+      "dGf": -489.07,
+      "source_reaction": "Mn+2 + 2 Cl- = MnCl2",
+      "log_k": 0.25
+    },
+    {
+      "formula": "MnCO3",
+      "phase": "aq",
+      "dGf": -727.93,
+      "source_reaction": "Mn+2 + CO3-2 = MnCO3",
+      "log_k": 4.9
+    },
+    {
+      "formula": "MnHCO3+",
+      "phase": "aq",
+      "dGf": -803.77,
+      "source_reaction": "Mn+2 + HCO3- = MnHCO3+",
+      "log_k": 1.95
+    },
+    {
+      "formula": "MnSO4",
+      "phase": "aq",
+      "dGf": -964.56,
+      "source_reaction": "Mn+2 + SO4-2 = MnSO4",
+      "log_k": 1.408
+    },
+    {
+      "formula": "Mn(NO3)2",
+      "phase": "aq",
+      "dGf": -447.28,
+      "source_reaction": "Mn+2 + 2 NO3- = Mn(NO3)2",
+      "log_k": 0.6
+    },
+    {
+      "formula": "MnF+",
+      "phase": "aq",
+      "dGf": -502.11,
+      "source_reaction": "Mn+2 + F- = MnF+",
+      "log_k": 0.84
+    },
+    {
+      "formula": "AlSO4+",
+      "phase": "aq",
+      "dGf": -1209.52,
+      "source_reaction": "Al+3 + SO4-2 = AlSO4+",
+      "log_k": 3.5
+    },
+    {
+      "formula": "Al(SO4)2-",
+      "phase": "aq",
+      "dGf": -1945.46,
+      "source_reaction": "Al+3 + 2 SO4-2 = Al(SO4)2-",
+      "log_k": 5.0
+    },
+    {
+      "formula": "AlHSO4+2",
+      "phase": "aq",
+      "dGf": -1238.27,
+      "source_reaction": "Al+3 + HSO4- = AlHSO4+2",
+      "log_k": 0.46
+    },
+    {
+      "formula": "AlF+2",
+      "phase": "aq",
+      "dGf": -723.84,
+      "source_reaction": "Al+3 + F- = AlF+2",
+      "log_k": 7.0
+    },
+    {
+      "formula": "AlF2+",
+      "phase": "aq",
+      "dGf": -970.11,
+      "source_reaction": "Al+3 + 2 F- = AlF2+",
+      "log_k": 12.7
+    },
+    {
+      "formula": "AlF3",
+      "phase": "aq",
+      "dGf": -1225.51,
+      "source_reaction": "Al+3 + 3 F- = AlF3",
+      "log_k": 16.8
+    },
+    {
+      "formula": "AlF4-",
+      "phase": "aq",
+      "dGf": -1489.46,
+      "source_reaction": "Al+3 + 4 F- = AlF4-",
+      "log_k": 19.4
+    },
+    {
+      "formula": "BaCO3",
+      "phase": "aq",
+      "dGf": -1073.13,
+      "source_reaction": "Ba+2 + CO3-2 = BaCO3",
+      "log_k": 2.71
+    },
+    {
+      "formula": "BaHCO3+",
+      "phase": "aq",
+      "dGf": -1141.99,
+      "source_reaction": "Ba+2 + HCO3- = BaHCO3+",
+      "log_k": 0.982
+    },
+    {
+      "formula": "SrHCO3+",
+      "phase": "aq",
+      "dGf": -1021.61,
+      "source_reaction": "Sr+2 + CO3-2 + H+ = SrHCO3+",
+      "log_k": 11.509
+    },
+    {
+      "formula": "SrCO3",
+      "phase": "aq",
+      "dGf": -1071.26,
+      "source_reaction": "Sr+2 + CO3-2 = SrCO3",
+      "log_k": 2.81
+    },
+    {
+      "formula": "SrSO4",
+      "phase": "aq",
+      "dGf": -1290.93,
+      "source_reaction": "Sr+2 + SO4-2 = SrSO4",
+      "log_k": 2.29
+    },
+    {
+      "formula": "LiSO4-",
+      "phase": "aq",
+      "dGf": -1034.15,
+      "source_reaction": "Li+ + SO4-2 = LiSO4-",
+      "log_k": 0.64
+    },
+    {
+      "formula": "CuCl2-",
+      "phase": "aq",
+      "dGf": -181.01,
+      "source_reaction": "Cu+ + 2 Cl- = CuCl2-",
+      "log_k": 5.5
+    },
+    {
+      "formula": "CuCl3-2",
+      "phase": "aq",
+      "dGf": -311.06,
+      "source_reaction": "Cu+ + 3 Cl- = CuCl3-2",
+      "log_k": 5.7
+    },
+    {
+      "formula": "CuCO3",
+      "phase": "aq",
+      "dGf": -423.89,
+      "source_reaction": "Cu+2 + CO3-2 = CuCO3",
+      "log_k": 6.73
+    },
+    {
+      "formula": "Cu(CO3)2-2",
+      "phase": "aq",
+      "dGf": -933.99,
+      "source_reaction": "Cu+2 + 2 CO3-2 = Cu(CO3)2-2",
+      "log_k": 9.83
+    },
+    {
+      "formula": "CuHCO3+",
+      "phase": "aq",
+      "dGf": -505.89,
+      "source_reaction": "Cu+2 + HCO3- = CuHCO3+",
+      "log_k": 2.7
+    },
+    {
+      "formula": "CuCl+",
+      "phase": "aq",
+      "dGf": -63.25,
+      "source_reaction": "Cu+2 + Cl- = CuCl+",
+      "log_k": 0.43
+    },
+    {
+      "formula": "CuCl2",
+      "phase": "aq",
+      "dGf": -195.99,
+      "source_reaction": "Cu+2 + 2 Cl- = CuCl2",
+      "log_k": 0.16
+    },
+    {
+      "formula": "CuF+",
+      "phase": "aq",
+      "dGf": -206.11,
+      "source_reaction": "Cu+2 + F- = CuF+",
+      "log_k": 1.26
+    },
+    {
+      "formula": "CuSO4",
+      "phase": "aq",
+      "dGf": -665.81,
+      "source_reaction": "Cu+2 + SO4-2 = CuSO4",
+      "log_k": 2.31
+    },
+    {
+      "formula": "Cu(HS)3-",
+      "phase": "aq",
+      "dGf": 160.24,
+      "source_reaction": "Cu+2 + 3 HS- = Cu(HS)3-",
+      "log_k": 25.9
+    },
+    {
+      "formula": "ZnCl+",
+      "phase": "aq",
+      "dGf": -275.85,
+      "source_reaction": "Zn+2 + Cl- = ZnCl+",
+      "log_k": 0.43
+    },
+    {
+      "formula": "ZnCl2",
+      "phase": "aq",
+      "dGf": -406.93,
+      "source_reaction": "Zn+2 + 2 Cl- = ZnCl2",
+      "log_k": 0.45
+    },
+    {
+      "formula": "ZnCl3-",
+      "phase": "aq",
+      "dGf": -537.85,
+      "source_reaction": "Zn+2 + 3 Cl- = ZnCl3-",
+      "log_k": 0.5
+    },
+    {
+      "formula": "ZnCl4-2",
+      "phase": "aq",
+      "dGf": -670.76,
+      "source_reaction": "Zn+2 + 4 Cl- = ZnCl4-2",
+      "log_k": 0.2
+    },
+    {
+      "formula": "Zn(HS)2",
+      "phase": "aq",
+      "dGf": -97.22,
+      "source_reaction": "Zn+2 + 2 HS- = Zn(HS)2",
+      "log_k": 14.94
+    },
+    {
+      "formula": "Zn(HS)3-",
+      "phase": "aq",
+      "dGf": -108.3,
+      "source_reaction": "Zn+2 + 3 HS- = Zn(HS)3-",
+      "log_k": 16.1
+    },
+    {
+      "formula": "ZnCO3",
+      "phase": "aq",
+      "dGf": -644.65,
+      "source_reaction": "Zn+2 + CO3-2 = ZnCO3",
+      "log_k": 5.3
+    },
+    {
+      "formula": "Zn(CO3)2-2",
+      "phase": "aq",
+      "dGf": -1147.73,
+      "source_reaction": "Zn+2 + 2 CO3-2 = Zn(CO3)2-2",
+      "log_k": 9.63
+    },
+    {
+      "formula": "ZnHCO3+",
+      "phase": "aq",
+      "dGf": -721.91,
+      "source_reaction": "Zn+2 + HCO3- = ZnHCO3+",
+      "log_k": 2.1
+    },
+    {
+      "formula": "ZnSO4",
+      "phase": "aq",
+      "dGf": -878.7,
+      "source_reaction": "Zn+2 + SO4-2 = ZnSO4",
+      "log_k": 2.26
+    },
+    {
+      "formula": "Zn(SO4)2-2",
+      "phase": "aq",
+      "dGf": -1629.54,
+      "source_reaction": "Zn+2 + 2 SO4-2 = Zn(SO4)2-2",
+      "log_k": 1.15
+    },
+    {
+      "formula": "ZnF+",
+      "phase": "aq",
+      "dGf": -419.34,
+      "source_reaction": "Zn+2 + F- = ZnF+",
+      "log_k": 1.15
+    },
+    {
+      "formula": "CdNO3+",
+      "phase": "aq",
+      "dGf": -186.62,
+      "source_reaction": "Cd+2 + NO3- = CdNO3+",
+      "log_k": 0.4
+    },
+    {
+      "formula": "CdCl+",
+      "phase": "aq",
+      "dGf": -197.5,
+      "source_reaction": "Cd+2 + Cl- = CdCl+",
+      "log_k": 1.98
+    },
+    {
+      "formula": "CdCl2",
+      "phase": "aq",
+      "dGf": -325.16,
+      "source_reaction": "Cd+2 + 2 Cl- = CdCl2",
+      "log_k": 2.6
+    },
+    {
+      "formula": "CdCl3-",
+      "phase": "aq",
+      "dGf": -457.5,
+      "source_reaction": "Cd+2 + 3 Cl- = CdCl3-",
+      "log_k": 2.4
+    },
+    {
+      "formula": "CdCO3",
+      "phase": "aq",
+      "dGf": -588.85,
+      "source_reaction": "Cd+2 + CO3-2 = CdCO3",
+      "log_k": 2.9
+    },
+    {
+      "formula": "Cd(CO3)2-2",
+      "phase": "aq",
+      "dGf": -1096.67,
+      "source_reaction": "Cd+2 + 2 CO3-2 = Cd(CO3)2-2",
+      "log_k": 6.4
+    },
+    {
+      "formula": "CdHCO3+",
+      "phase": "aq",
+      "dGf": -655.84,
+      "source_reaction": "Cd+2 + HCO3- = CdHCO3+",
+      "log_k": 1.5
+    },
+    {
+      "formula": "CdSO4",
+      "phase": "aq",
+      "dGf": -816.3,
+      "source_reaction": "Cd+2 + SO4-2 = CdSO4",
+      "log_k": 1.016
+    },
+    {
+      "formula": "Cd(SO4)2-2",
+      "phase": "aq",
+      "dGf": -1551.26,
+      "source_reaction": "Cd+2 + 2 SO4-2 = Cd(SO4)2-2",
+      "log_k": 2.688
+    },
+    {
+      "formula": "CdBr+",
+      "phase": "aq",
+      "dGf": -169.21,
+      "source_reaction": "Cd+2 + Br- = CdBr+",
+      "log_k": 2.17
+    },
+    {
+      "formula": "CdBr2",
+      "phase": "aq",
+      "dGf": -269.05,
+      "source_reaction": "Cd+2 + 2 Br- = CdBr2",
+      "log_k": 2.9
+    },
+    {
+      "formula": "CdF+",
+      "phase": "aq",
+      "dGf": -350.12,
+      "source_reaction": "Cd+2 + F- = CdF+",
+      "log_k": 1.1
+    },
+    {
+      "formula": "CdF2",
+      "phase": "aq",
+      "dGf": -626.64,
+      "source_reaction": "Cd+2 + 2 F- = CdF2",
+      "log_k": 1.5
+    },
+    {
+      "formula": "CdHS+",
+      "phase": "aq",
+      "dGf": -37.25,
+      "source_reaction": "Cd+2 + HS- = CdHS+",
+      "log_k": 10.17
+    },
+    {
+      "formula": "Cd(HS)2",
+      "phase": "aq",
+      "dGf": -18.65,
+      "source_reaction": "Cd+2 + 2 HS- = Cd(HS)2",
+      "log_k": 16.53
+    },
+    {
+      "formula": "Cd(HS)3-",
+      "phase": "aq",
+      "dGf": -23.9,
+      "source_reaction": "Cd+2 + 3 HS- = Cd(HS)3-",
+      "log_k": 18.71
+    },
+    {
+      "formula": "Cd(HS)4-2",
+      "phase": "aq",
+      "dGf": -29.1,
+      "source_reaction": "Cd+2 + 4 HS- = Cd(HS)4-2",
+      "log_k": 20.9
+    },
+    {
+      "formula": "PbCl+",
+      "phase": "aq",
+      "dGf": -146.47,
+      "source_reaction": "Pb+2 + Cl- = PbCl+",
+      "log_k": 1.6
+    },
+    {
+      "formula": "PbCl2",
+      "phase": "aq",
+      "dGf": -276.53,
+      "source_reaction": "Pb+2 + 2 Cl- = PbCl2",
+      "log_k": 1.8
+    },
+    {
+      "formula": "PbCl3-",
+      "phase": "aq",
+      "dGf": -408.3,
+      "source_reaction": "Pb+2 + 3 Cl- = PbCl3-",
+      "log_k": 1.7
+    },
+    {
+      "formula": "PbCl4-2",
+      "phase": "aq",
+      "dGf": -541.32,
+      "source_reaction": "Pb+2 + 4 Cl- = PbCl4-2",
+      "log_k": 1.38
+    },
+    {
+      "formula": "PbCO3",
+      "phase": "aq",
+      "dGf": -510.87,
+      "source_reaction": "Pb+2 + CO3-2 = PbCO3",
+      "log_k": 7.24
+    },
+    {
+      "formula": "Pb(CO3)2-2",
+      "phase": "aq",
+      "dGf": -1019.27,
+      "source_reaction": "Pb+2 + 2 CO3-2 = Pb(CO3)2-2",
+      "log_k": 10.64
+    },
+    {
+      "formula": "PbHCO3+",
+      "phase": "aq",
+      "dGf": -594.65,
+      "source_reaction": "Pb+2 + HCO3- = PbHCO3+",
+      "log_k": 2.9
+    },
+    {
+      "formula": "PbSO4",
+      "phase": "aq",
+      "dGf": -753.2,
+      "source_reaction": "Pb+2 + SO4-2 = PbSO4",
+      "log_k": 2.75
+    },
+    {
+      "formula": "Pb(SO4)2-2",
+      "phase": "aq",
+      "dGf": -1493.59,
+      "source_reaction": "Pb+2 + 2 SO4-2 = Pb(SO4)2-2",
+      "log_k": 3.47
+    },
+    {
+      "formula": "Pb(HS)2",
+      "phase": "aq",
+      "dGf": 27.36,
+      "source_reaction": "Pb+2 + 2 HS- = Pb(HS)2",
+      "log_k": 15.27
+    },
+    {
+      "formula": "Pb(HS)3-",
+      "phase": "aq",
+      "dGf": 17.08,
+      "source_reaction": "Pb+2 + 3 HS- = Pb(HS)3-",
+      "log_k": 16.57
+    },
+    {
+      "formula": "PbNO3+",
+      "phase": "aq",
+      "dGf": -129.02,
+      "source_reaction": "Pb+2 + NO3- = PbNO3+",
+      "log_k": 1.17
+    },
+    {
+      "formula": "PbBr+",
+      "phase": "aq",
+      "dGf": -118.3,
+      "source_reaction": "Pb+2 + Br- = PbBr+",
+      "log_k": 1.77
+    },
+    {
+      "formula": "PbBr2",
+      "phase": "aq",
+      "dGf": -224.18,
+      "source_reaction": "Pb+2 + 2 Br- = PbBr2",
+      "log_k": 1.44
+    },
+    {
+      "formula": "PbF+",
+      "phase": "aq",
+      "dGf": -296.06,
+      "source_reaction": "Pb+2 + F- = PbF+",
+      "log_k": 1.25
+    },
+    {
+      "formula": "PbF2",
+      "phase": "aq",
+      "dGf": -567.39,
+      "source_reaction": "Pb+2 + 2 F- = PbF2",
+      "log_k": 2.56
+    },
+    {
+      "formula": "PbF3-",
+      "phase": "aq",
+      "dGf": -841.28,
+      "source_reaction": "Pb+2 + 3 F- = PbF3-",
+      "log_k": 3.42
+    },
+    {
+      "formula": "PbF4-2",
+      "phase": "aq",
+      "dGf": -1121.91,
+      "source_reaction": "Pb+2 + 4 F- = PbF4-2",
+      "log_k": 3.1
+    }
+  ],
+  "conflicts": [
+    {
+      "formula": "HSO4-",
+      "phase": "aq",
+      "crc_dGf": -755.9,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    },
+    {
+      "formula": "H2S",
+      "phase": "aq",
+      "crc_dGf": -27.83,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    },
+    {
+      "formula": "HPO4-2",
+      "phase": "aq",
+      "crc_dGf": -1089.2,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    },
+    {
+      "formula": "H2PO4-",
+      "phase": "aq",
+      "crc_dGf": -1130.2,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    },
+    {
+      "formula": "HF",
+      "phase": "aq",
+      "crc_dGf": -296.82,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    },
+    {
+      "formula": "HF2-",
+      "phase": "aq",
+      "crc_dGf": -578.1,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    },
+    {
+      "formula": "Cu+",
+      "phase": "aq",
+      "crc_dGf": 50.0,
+      "phreeqc_dGf": null,
+      "action": "SKIPPED (CRC priority)"
+    }
+  ],
+  "stats": {
+    "total_parsed": 266,
+    "added": 118,
+    "skipped_crc_exists": 7,
+    "skipped_balance_fail": 66,
+    "skipped_missing_reactants": 0,
+    "skipped_master": 1,
+    "skipped_other": 61
+  }
+}
