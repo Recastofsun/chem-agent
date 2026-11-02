@@ -1,9 +1,7 @@
 """Activity coefficient models for aqueous solutes (molal scale)."""
 from __future__ import annotations
-
 import math
 from typing import Callable
-
 import numpy as np
 
 LN10 = math.log(10.0)
@@ -35,10 +33,8 @@ def make_sit_matrix(species_list, db) -> np.ndarray:
     """Строит матрицу параметров SIT (epsilon) для списка частиц."""
     n = len(species_list)
     matrix = np.zeros((n, n))
-    
     # Получаем список имен (формул) ионов
     formulas = [s.formula for s in species_list]
-    
     for i, f1 in enumerate(formulas):
         for j, f2 in enumerate(formulas):
             if i == j:
@@ -47,7 +43,6 @@ def make_sit_matrix(species_list, db) -> np.ndarray:
             # В базе SIT хранится для пар ионов.
             eps = db.get_sit(f1, f2)
             matrix[i, j] = eps
-            
     return matrix
 
 
@@ -68,7 +63,7 @@ def _pitzer_gp(x: np.ndarray) -> np.ndarray:
 
 def make_pitzer_fn(species_list, db, A_log10: float) -> Callable:
     """Модель Pitzer (Harvie, Moller, Weare 1984) для смеси ионов, ln(gamma) на моляльной шкале.
-
+    
     ln g_M = z_M^2 F + SUM_a m_a (2 B_Ma + Z C_Ma) + SUM_c m_c 2 theta_Mc + |z_M| SUM_c SUM_a m_c m_a C_ca
     F = f_gamma + SUM_c SUM_a m_c m_a B'_ca
     f_gamma = -A_phi [sqrt(I) / (1 + b sqrt(I)) + (2/b) ln(1 + b sqrt(I))],  b = 1.2
@@ -85,6 +80,7 @@ def make_pitzer_fn(species_list, db, A_log10: float) -> Callable:
     b0, b1, b2 = np.zeros((n, n)), np.zeros((n, n)), np.zeros((n, n))
     a1, a2 = np.full((n, n), 2.0), np.full((n, n), 12.0)
     C, theta = np.zeros((n, n)), np.zeros((n, n))
+    
     for i in range(n):
         for j in range(n):
             if i == j or zs[i] == 0 or zs[j] == 0:
@@ -99,9 +95,10 @@ def make_pitzer_fn(species_list, db, A_log10: float) -> Callable:
                 C[i, j] = (p["C_phi"] or 0.0) / (2.0 * math.sqrt(abs(zs[i] * zs[j])))
             else:
                 theta[i, j] = p["theta"] or 0.0
+    
     A_phi = A_log10 * LN10 / 3.0
     absz = np.abs(zs)
-
+    
     def f(I, z, m=None):
         if m is None:
             raise ValueError("Для модели Pitzer необходим массив моляльностей m")
@@ -119,6 +116,7 @@ def make_pitzer_fn(species_list, db, A_log10: float) -> Callable:
         out = zs ** 2 * F + (2.0 * Bm + Z * C) @ m + 2.0 * theta @ m + absz * CC
         out[zs == 0] = 0.0
         return out
+    
     return f
 
 
@@ -126,7 +124,7 @@ def make_gamma_fn(model: str, T: float, eps: float | None = None, ion_size_A: fl
                   species_list=None, db=None) -> Callable:
     """
     Возвращает функцию f(I, z, m) -> ln(gamma).
-    m - массив моляльностей (нужен только для SIT).
+    m - массив моляльностей (нужен только для SIT и Pitzer).
     """
     if model == "ideal":
         return None
@@ -138,39 +136,34 @@ def make_gamma_fn(model: str, T: float, eps: float | None = None, ion_size_A: fl
             sI = math.sqrt(max(I, 0.0))
             return -LN10 * A * np.asarray(z) ** 2 * sI / (1.0 + B * ion_size_A * sI)
         return f
-        
+    
     if model == "pitzer":
         if species_list is None or db is None:
             raise ValueError("Для модели Pitzer необходимо передать species_list и db")
         return make_pitzer_fn(species_list, db, A)
-
+    
     if model == "davies":
         def f(I, z, m=None):
             sI = math.sqrt(max(I, 0.0))
             return -LN10 * A * np.asarray(z) ** 2 * (sI / (1.0 + sI) - 0.3 * I)
         return f
-        
+    
     if model == "sit":
         if species_list is None or db is None:
             raise ValueError("Для модели SIT необходимо передать species_list и db")
-            
         sit_matrix = make_sit_matrix(species_list, db)
-        
         def f(I, z, m=None):
             if m is None:
                 raise ValueError("Для модели SIT необходим массив моляльностей m")
-            
             sI = math.sqrt(max(I, 0.0))
             # Первое слагаемое (Дебай-Хюккель)
             dh_term = -LN10 * A * np.asarray(z) ** 2 * sI / (1.0 + 1.5 * sI)
-            
             # Второе слагаемое (SIT: сумма по j epsilon(i,j)*m_j)
             # m - вектор моляльностей всех частиц
             sit_term = LN10 * (sit_matrix @ m)
-            
             return dh_term + sit_term
         return f
-
+    
     raise ValueError(f"Неизвестная модель активности: {model}")
 
 
