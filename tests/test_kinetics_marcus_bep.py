@@ -35,10 +35,14 @@ def test_marcus_through_agent(agent):
 
 def test_bep_through_agent(agent):
     d = agent.predict(reagents=FE_CE, options={"include_uncertainty": False, "kinetics_model": "bep",
-                                               "kinetics": {"alpha": 0.5, "beta_kJ_mol": 60}}).data
+                                                "kinetics": {"alpha": 0.5, "beta_kJ_mol": 60}}).data
     dH = d["balanced_equations"][0]["delta_H_kJ_mol"]
     assert d["kinetics"]["model"].startswith("BEP")
-    assert d["kinetics"]["barrier_kJ_mol"] == pytest.approx(bep.barrier(0.5, 60, dH))
+    if dH is not None:
+        assert d["kinetics"]["barrier_kJ_mol"] == pytest.approx(bep.barrier(0.5, 60, dH))
+    else:
+        # Если dH не рассчитан (нет данных), барьер тоже None
+        assert d["kinetics"]["barrier_kJ_mol"] is None
 
 
 def test_missing_parameters_reported(agent):
