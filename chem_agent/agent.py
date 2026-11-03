@@ -632,18 +632,23 @@ class Agent:
             "main_product_kind": products[0]["kind"] if products else None,
             "delta_G_kJ_mol": main_eq["delta_G_kJ_mol"] if main_eq else None,
             "delta_G_uncertainty": main_eq["delta_G_uncertainty"] if main_eq else None,
-            "confidence": confidence,
+            # W-35: posterior_probability
+            "posterior_probability": unc.get("posterior_probability") if unc else None,
+            "confidence": confidence,  # alias
             "reaction_occurred": an.reaction_occurred,
             "pH": self._pH(solver, eq),
             "ionic_strength_M": eq.ionic_strength if aqueous else None,
         }
+
         if unc:
-            if unc.get("delta_G") and unc["delta_G"].get("p05") is not None:
-                summary_data["delta_G_95_CI"] = [unc["delta_G"]["p05"], unc["delta_G"]["p95"]]
-            if unc.get("pH") and unc["pH"].get("p05") is not None:
-                summary_data["pH_95_CI"] = [unc["pH"]["p05"], unc["pH"]["p95"]]
-            if unc.get("products") and len(unc["products"]) > 0 and unc["products"][0].get("p05") is not None:
-                summary_data["main_product_moles_95_CI"] = [unc["products"][0]["p05"], unc["products"][0]["p95"]]
+            if unc.get("delta_G") and unc["delta_G"].get("credible_interval_95") is not None:
+                summary_data["delta_G_95_CI"] = unc["delta_G"]["credible_interval_95"]
+            if unc.get("delta_G_analytical_95_CI") is not None:
+                summary_data["delta_G_analytical_95_CI"] = unc["delta_G_analytical_95_CI"]
+            if unc.get("pH") and unc["pH"].get("credible_interval_95") is not None:
+                summary_data["pH_95_CI"] = unc["pH"]["credible_interval_95"]
+            if unc.get("products") and len(unc["products"]) > 0 and unc["products"][0].get("credible_interval_95") is not None:
+                summary_data["main_product_moles_95_CI"] = unc["products"][0]["credible_interval_95"]
 
         base["summary"] = summary_data
         if opts.get("separation"):  # W-13: разделение равновесного состава
@@ -1262,48 +1267,93 @@ class Agent:
         same_occ = 0
         failed = 0
         contrib = np.zeros(len(system.species))
+        
         for k in range(size):
             try:
                 eqk = solver.run(dG_shift=D[k], warm=eq0)
             except Exception:
                 failed += 1
                 continue
+            
             ph_val = self._pH(solver, eqk)
             if ph_val is not None:
                 phs.append(ph_val)
+            
             ank = analyze(system, eqk.n)
             if ank.reaction_occurred == an.reaction_occurred:
                 same_occ += 1
+            
             topk = ank.products[0].key if ank.products else None
             if topk == top0:
                 same_top += 1
+            
             got = {p.key: p.moles for p in ank.products}
             for key in amounts:
                 amounts[key].append(got.get(key, 0.0))
+            
             if main_eq and main_eq.get("_parts"):
                 G = solver.G + D[k]
                 dGs.append(sum(G[i] * c for i, c in main_eq["_parts"]))
+        
         n_ok = max(1, size - failed)
+        
+        # W-35: Bayesian posterior probability
+        posterior_probability = (same_top / n_ok) if an.reaction_occurred else (same_occ / n_ok)
+        
         if main_eq and main_eq.get("_parts"):
             for i, c in main_eq["_parts"]:
                 contrib[i] = (c * solver.sigma[i]) ** 2
+        
         tot = contrib.sum()
         contributions = []
         if tot > 0:
             for i in np.argsort(-contrib)[:8]:
                 if contrib[i] <= 0:
                     break
-                contributions.append({"species": system.species[i].label, "source": system.species[i].source,
-                                      "share": float(contrib[i] / tot), "sigma_kJ": float(solver.sigma[i])})
-        conf = (same_top / n_ok) if an.reaction_occurred else (same_occ / n_ok)
+                contributions.append({
+                    "species": system.species[i].label,
+                    "source": system.species[i].source,
+                    "share": float(contrib[i] / tot),
+                    "sigma_kJ": float(solver.sigma[i])
+                })
+        
+        # W-35: Аналитический 95% CI для ΔG (быстрый, без ансамбля)
+        analytical_95_ci = None
+        if main_eq and main_eq.get("_parts"):
+            from .uncertainty.propagation import sigma_sum_corr
+            from .uncertainty.ensemble import analytical_credible_interval
+            
+            idx_coefs = main_eq["_parts"]
+            sigma_dG = sigma_sum_corr(idx_coefs, solver.sigma, sources)
+            mean_dG = sum(solver.G[i] * c for i, c in idx_coefs)
+            analytical_95_ci = analytical_credible_interval(mean_dG, sigma_dG, 0.95)
+        
         return {
-            "method": opts["uncertainty_method"], "members": size, "failed": failed,
-            "confidence": round(float(conf), 3),
-            "confidence_definition": ("доля членов ансамбля, в которых основной продукт тот же" if an.reaction_occurred
-                                      else "доля членов ансамбля, в которых реакция тоже не идет"),
-            "products": [{"formula": next(p.formula for p in an.products if p.key == key), **summarize(v)}
-                         for key, v in amounts.items()],
+            "method": opts["uncertainty_method"],
+            "members": size,
+            "failed": failed,
+            # W-35: posterior_probability (байесовская интерпретация)
+            "posterior_probability": round(float(posterior_probability), 3),
+            "confidence": round(float(posterior_probability), 3),  # alias для обратной совместимости
+            "posterior_probability_definition": (
+                "P(основной продукт | данные) — апостериорная вероятность того, что основной продукт верен"
+                if an.reaction_occurred
+                else "P(реакция не идет | данные) — апостериорная вероятность отсутствия реакции"
+            ),
+            "confidence_definition": (
+                "доля членов ансамбля, в которых основной продукт тот же (частотная интерпретация)"
+                if an.reaction_occurred
+                else "доля членов ансамбля, в которых реакция тоже не идет"
+            ),
+            "products": [
+                {
+                    "formula": next(p.formula for p in an.products if p.key == key),
+                    **summarize(v)
+                }
+                for key, v in amounts.items()
+            ],
             "delta_G": summarize(dGs) if dGs else None,
+            "delta_G_analytical_95_CI": analytical_95_ci,
             "pH": summarize(phs) if phs else None,
             "contributions": contributions,
         }
