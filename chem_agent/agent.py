@@ -214,28 +214,36 @@ class Agent:
                     out = synthesis.merge_zone(out, hot, zone)
         return Result(out)
 
-    # --- НОВЫЙ МЕТОД ДЛЯ ДВУХКАМЕРНОЙ ЯЧЕЙКИ -----------------------------------
     def _run_cell(self, req: dict, warnings: list[str]) -> dict:
         from .thermo.constrained_lagrange import solve_kkt
         from .electrochem.kinetics import select_dominant_reaction
-
+        from .electrochem.membrane import Membrane, update_chambers
+        
         cell = req["cell"]
         T = 298.15
         if req.get("conditions") and req["conditions"].get("temperature_K"):
             T = float(req["conditions"]["temperature_K"])
-
+        
         circuit = cell.get("external_circuit", {})
         U = circuit.get("voltage_V", 2.0)
         duration_s = circuit.get("duration_s", 3600)
-        
         F = 96485.332
         area = cell.get("membrane", {}).get("area_m2", 0.01)
+        
+        # Параметры мембраны
+        membrane = Membrane(
+            type=cell.get("membrane", {}).get("type", "CEM"),
+            area_m2=area,
+            thickness_m=cell.get("membrane", {}).get("thickness_m", 1e-4),
+            permselectivity=cell.get("membrane", {}).get("permselectivity", 0.95),
+            water_transport=cell.get("membrane", {}).get("water_transport", 0.0),
+        )
         
         if circuit.get("mode") == "galvanostatic":
             current = circuit.get("current_density_A_m2", 100) * area
         else:
             current = 100 * area
-            
+        
         max_electrons = (current * duration_s) / F
 
         def solve_chamber(side_name: str, side_potential: float):
@@ -340,9 +348,64 @@ class Agent:
             sys_chamber.initial = n_eq
             return n_final, True, sys_chamber
 
-        # Анод (-U), Катод (+U)
+            # Анод (-U), Катод (+U)
         n_anode, ok_anode, sys_anode = solve_chamber("anode", -U)
         n_cathode, ok_cathode, sys_cathode = solve_chamber("cathode", U)
+
+        # === Мембранный транспорт ===
+        if ok_anode and ok_cathode and n_anode is not None and n_cathode is not None:
+            from .electrochem.membrane import Membrane, update_chambers
+            
+            # Получаем концентрации (моль/м³)
+            volume_anode = cell["anode"]["solution"].get("volume_L", 1.0) * 1e-3  # м³
+            volume_cathode = cell["cathode"]["solution"].get("volume_L", 1.0) * 1e-3  # м³
+            
+            anode_conc = {}
+            cathode_conc = {}
+            charges = {}
+            
+            for i, s in enumerate(sys_anode.species):
+                if s.phase == "aq" and n_anode[i] > 1e-6:
+                    anode_conc[s.formula] = n_anode[i] / volume_anode * 1000  # моль/м³
+                    charges[s.formula] = s.charge
+            
+            for i, s in enumerate(sys_cathode.species):
+                if s.phase == "aq" and n_cathode[i] > 1e-6:
+                    cathode_conc[s.formula] = n_cathode[i] / volume_cathode * 1000  # моль/м³
+                    charges[s.formula] = s.charge
+            
+            # Параметры мембраны
+            membrane = Membrane(
+                type=cell.get("membrane", {}).get("type", "cation_exchange"),
+                area_m2=cell.get("membrane", {}).get("area_m2", 0.01),
+                thickness_m=cell.get("membrane", {}).get("thickness_m", 1e-4),
+                permselectivity=cell.get("membrane", {}).get("permselectivity", 0.95),
+            )
+            
+            # Разность потенциалов (анод - катод)
+            delta_phi = -U - U  # анод при -U, катод при +U
+            
+            # Обновляем концентрации
+            new_anode_conc, new_cathode_conc, ion_transfers = update_chambers(
+                anode_conc, cathode_conc, charges, delta_phi, T, membrane, duration_s,
+                volume_anode, volume_cathode
+            )
+            
+            # Пересчитываем моли
+            for i, s in enumerate(sys_anode.species):
+                if s.formula in new_anode_conc:
+                    n_anode[i] = new_anode_conc[s.formula] * volume_anode / 1000
+            
+            for i, s in enumerate(sys_cathode.species):
+                if s.formula in new_cathode_conc:
+                    n_cathode[i] = new_cathode_conc[s.formula] * volume_cathode / 1000
+            
+            # Добавляем информацию о переносе ионов
+            if ion_transfers:
+                warnings.append(
+                    f"Мембранный транспорт: перенесено ионов: " +
+                    ", ".join(f"{ion}: {n:.4g} моль" for ion, n in ion_transfers.items() if abs(n) > 1e-6)
+                )
 
         def summarize(n_arr, sys_obj, ok):
             if not ok or n_arr is None:
@@ -472,10 +535,7 @@ class Agent:
             is_open = True
         if atm.get("headspace_L", 0) > 100.0:
             is_open = True
-        # Открытая сухая система (прокаливание в тигле) или открытая без состава воздуха:
-        # продукты-газы уходят (P -> 0), KNO3 -> KNO2 + O2 (h054).
-        # Раствор под заданной атмосферой: открытость задана большим газовым пространством
-        # (atmosphere.gas_amounts), давление реальное, иначе CO2/O2 воздуха не растворяются.
+
         P_bar_solver = self.P_OPEN_DRY if is_open and (not gases or not aqueous) else P_bar
 
         solver = _Solver(system, T, P_bar_solver, opts["activity_model"], eps, fixed_I, voltage_V=voltage_V)
@@ -497,8 +557,6 @@ class Agent:
         if synth and synth.get("initiated"):
             methods.append("Photochemical initiation (photolysis threshold hc/λ)")
 
-        # Pipeline (W-04): этапы диссоциация -> комплексы -> осаждение -> газ -> финал.
-        # Финал - полный расчет, как без Pipeline; этапы нужны для отчета (detailed) и для тупика.
         pipe = pipeline.run(solver, lambda warm: self._equilibrium(solver, titration, warm), opts["pipeline_mode"])
         base["pipeline"] = pipe.report
         if pipe.status == "unknown":
@@ -686,11 +744,6 @@ class Agent:
 
     @staticmethod
     def _no_sublimation(solver: _Solver, warnings: list) -> None:
-        """W-16: открытая сухая система считается при P -> 0, чтобы газообразные продукты уходили (h054).
-        Но при P -> 0 испаряется и все нелетучее: KCl при 900 K, Ag при 1000 K. Газовая форма вещества,
-        у которого есть твердая или жидкая запись, исключается, если давление его пара при T ниже 1e-3 бар
-        (0,02 моль в газовом пространстве 1000 л при 900 K - это 1,5e-3 бар): за время опыта такое вещество
-        не улетучивается. Летучие (H2O, Hg, S, I2, NH3) остаются."""
         species = solver.system.species
         cond = {}
         for j, s in enumerate(species):
@@ -1036,9 +1089,6 @@ class Agent:
                 parallel = any(prods[j].moles >= 0.1 * prods[0].moles for j in st.dropped_products)
         wi = next((i for i, k in enumerate(system.kinds) if k == SOLVENT), None)
         if res is None and wi is not None and wkey not in pkeys:
-            # вода как продукт относительно реагентов в исходной форме: 2 Al(OH)3 + 2 SiO2 -> каолинит + H2O.
-            # net по воде считается от самоуравновешенного начального состава (Al(OH)3 -> Al2O3 + H2O при 473 K)
-            # и может показать ее расход, хотя относительно заданных реагентов вода выделяется
             w = ProductEntry("H2O", "l", "molecule", 0.0, wkey, species_idx=[wi])
             st = staged_balance(rc, rq, pc + [dict(wkey[0])], pq + [0], [p.moles for p in prods] + [0.0],
                                 reac_names=[r.formula for r in reag], prod_names=[p.formula for p in prods] + ["H2O"],
@@ -1297,7 +1347,7 @@ class Agent:
         
         n_ok = max(1, size - failed)
         
-        # W-35: Bayesian posterior probability
+        # Bayesian posterior probability
         posterior_probability = (same_top / n_ok) if an.reaction_occurred else (same_occ / n_ok)
         
         if main_eq and main_eq.get("_parts"):
@@ -1317,7 +1367,6 @@ class Agent:
                     "sigma_kJ": float(solver.sigma[i])
                 })
         
-        # W-35: Аналитический 95% CI для ΔG (быстрый, без ансамбля)
         analytical_95_ci = None
         if main_eq and main_eq.get("_parts"):
             from .uncertainty.propagation import sigma_sum_corr
@@ -1332,7 +1381,8 @@ class Agent:
             "method": opts["uncertainty_method"],
             "members": size,
             "failed": failed,
-            # W-35: posterior_probability (байесовская интерпретация)
+
+        #posterior_probability (байесовская интерпретация)
             "posterior_probability": round(float(posterior_probability), 3),
             "confidence": round(float(posterior_probability), 3),  # alias для обратной совместимости
             "posterior_probability_definition": (
