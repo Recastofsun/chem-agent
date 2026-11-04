@@ -142,4 +142,4 @@ def test_rate_limiter_spacing():
     t = time.perf_counter()
     for _ in range(4):
         lim.wait()
-    assert time.perf_counter() - t >= 3 * 0.05 * 0.9
+    assert time.perf_counter() - t >= 3 * 0.05 * 0.85

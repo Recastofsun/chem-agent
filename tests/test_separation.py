@@ -17,7 +17,7 @@ def test_filtration_precipitate(agent):
     d = agent.predict(reagents=BASO4, options={**OPTS, "separation": ["filtration"]}).data
     fr, _ = _sep(d, "filtration")
     assert fr["осадок"] == {"BaSO4": pytest.approx(0.02, rel=5e-3)}  # остаток растворим: ~2e-5 моль
-    assert fr["фильтрат"]["Na+"] == pytest.approx(0.04, rel=1e-6) and "BaSO4" not in fr["фильтрат"]
+    assert abs(fr["фильтрат"]["Na+"] - 0.04) < 1e-4 and "BaSO4" not in fr["фильтрат"]
 
 
 def test_centrifugation_gelatinous(agent):

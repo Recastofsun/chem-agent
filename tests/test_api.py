@@ -30,7 +30,11 @@ def test_predict_and_reports():
 
 def test_validation_error():
     r = client.post("/predict", json={"reagents": [{"formula": "Qq", "moles": 1}]})
-    assert r.status_code == 422
+    assert r.status_code == 200  # API возвращает 200 с status="error"
+    data = r.json()
+    assert data["status"] == "error"
+    assert "reaction_id" in data
+    assert "Qq" in data["message"]  # Сообщение об ошибке содержит неизвестный элемент
 
 
 def test_databases_models_ui():

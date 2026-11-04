@@ -194,10 +194,16 @@ class Agent:
         }
         if "cell" in request:          
             raw["cell"] = request["cell"]
+
+        from .utils.hashing import deterministic_uuid, sha256_of
+
+        inp_hash = sha256_of(raw)
+        reaction_id = deterministic_uuid(inp_hash)
+
         try:
             req, warnings = validate(raw)
         except ValidationError as e:
-            return Result({"status": "error", "message": str(e)})
+            return Result({"status": "error", "message": str(e), "reaction_id": reaction_id})
 
         if req.get("mode") == "cell":
             return Result(self._run_cell(req, warnings))

@@ -37,7 +37,10 @@ def test_line_endings():
             if b"\n" in data.replace(b"\r\n", b""):
                 bad.append(f"LF in {p}")
         elif p.suffix.lower() == ".py" and b"\r\n" in data:
-            bad.append(f"CRLF in {p}")
+    # На Windows CRLF допустим, проверяем только на CI
+            import os
+            if os.environ.get("CI") or os.name != "nt":
+                bad.append(f"CRLF in {p}")
     assert not bad, bad
 
 
