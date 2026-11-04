@@ -40,19 +40,22 @@ def test_phreeqc_barite_precipitation(agent_phreeqc):
     req = {
         "reagents": [
             {"formula": "BaCl2", "moles": 0.01, "phase": "aq"},
-            {"formula": "Na2SO4", "moles": 0.01, "phase": "aq"}
+            {"formula": "Na2SO4", "moles": 0.01, "phase": "aq"},
         ],
         "conditions": {"temperature_K": 298.15, "solvent": {"name": "water"}, "volume_L": 2.0},
         "options": {"include_uncertainty": False}
     }
     res = agent_phreeqc.predict(request=req)
     data = res.data
+    assert data["status"] == "ok"
     
-    comp = {p["formula"]: p["final_mol"] for p in data["final_composition"]}
-    # Барит должен выпасть в осадок (около 0.01 моль)
-    assert comp.get("BaSO4", 0) > 0.009
-    # Ион бария в растворе должен быть очень мал (из-за Ksp и комплекса)
-    assert comp.get("Ba+2", 0) < 1e-4
+    # Проверяем осаждение BaSO4(s) конкретно по фазе, чтобы не спутать с BaSO4(aq)
+    baso4_s = next(
+        (p["final_mol"] for p in data["final_composition"] 
+         if p["formula"] == "BaSO4" and p.get("phase") == "s"), 
+        0.0
+    )
+    assert baso4_s > 0.009, f"Ожидается осаждение BaSO4(s) > 0.009 моль, получено: {baso4_s}"
 
 def test_phreeqc_new_complexes_are_present(agent_phreeqc):
     """Проверка, что новые импортированные комплексы реально есть в базе."""

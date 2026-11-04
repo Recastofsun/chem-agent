@@ -223,111 +223,166 @@ class Agent:
         T = 298.15
         if req.get("conditions") and req["conditions"].get("temperature_K"):
             T = float(req["conditions"]["temperature_K"])
-        
+
         circuit = cell.get("external_circuit", {})
         U = circuit.get("voltage_V", 2.0)
         duration_s = circuit.get("duration_s", 3600)
-        F = 96485.332
+        mode = circuit.get("mode", "potentiostatic")
+        current_density = circuit.get("current_density_A_m2", 100.0)
+        F_CONST = 96485.332
         area = cell.get("membrane", {}).get("area_m2", 0.01)
-        
-        # Параметры мембраны
+
+        # Маппинг типов мембран
+        type_map = {
+            "CEM": "cation_exchange",
+            "AEM": "anion_exchange",
+            "BPM": "bipolar",
+            "non_selective": "porous",
+        }
         membrane = Membrane(
-            type=cell.get("membrane", {}).get("type", "CEM"),
+            type=type_map.get(cell.get("membrane", {}).get("type", "CEM"), "cation_exchange"),
             area_m2=area,
             thickness_m=cell.get("membrane", {}).get("thickness_m", 1e-4),
             permselectivity=cell.get("membrane", {}).get("permselectivity", 0.95),
-            water_transport=cell.get("membrane", {}).get("water_transport", 0.0),
         )
-        
-        if circuit.get("mode") == "galvanostatic":
-            current = circuit.get("current_density_A_m2", 100) * area
-        else:
-            current = 100 * area
-        
-        max_electrons = (current * duration_s) / F
 
-        def solve_chamber(side_name: str, side_potential: float):
-            side = cell[side_name]
-            sol = side["solution"]
-            species_list = sol["species"]
-            volume_L = sol.get("volume_L", 1.0)
-            water_kg = volume_L
+        # Адаптивный временной шаг
+        dt = min(120.0, max(10.0, duration_s / 50.0))
+        history = []
+        history_stride = max(1, int(10.0 / dt))
 
-            # А) Строим начальную систему
-            reagents_list = [
-                Reagent(r["formula"], parse_formula(r["formula"]), r["moles"], r.get("phase", "aq"))
-                for r in species_list
-            ]
-            ctx = RuleContext(T=T, aqueous=True, reagents=reagents_list, volume_L=volume_L, voltage_V=abs(side_potential))
-            rules = evaluate(ctx, set())
-            resolver = EnergyResolver.from_request(self.db, {}, species_list, "auto")
-            all_species = resolver.apply(self.db.species, True)
+        # Кэш систем
+        system_cache = {}
+
+        # Начальные моли
+        moles_anode = {r["formula"]: r["moles"] for r in cell["anode"]["solution"]["species"]}
+        moles_cathode = {r["formula"]: r["moles"] for r in cell["cathode"]["solution"]["species"]}
+        vol_anode = cell["anode"]["solution"].get("volume_L", 1.0)
+        vol_cathode = cell["cathode"]["solution"].get("volume_L", 1.0)
+
+        def solve_chamber(side_name: str, side_potential: float, current_moles: dict, volume_L: float):
+            """Рассчитывает равновесие, выбирает реакцию и применяет Фарадей на один шаг."""
+            from .parser.formula import parse_formula
+            from .search.rules import Reagent
+            from .search.rules import RuleContext, evaluate
+            from .energy.resolver import EnergyResolver
+            from .search.hypotheses import build_system
+            from .thermo.gibbs import dGf_T
+            from .thermo.activity import make_gamma_fn
             
-            sys_chamber = build_system(all_species, reagents_list, T=T, P_bar=1.0, aqueous=True, water_kg=water_kg, rules=rules)
-            if not sys_chamber.species:
-                return None, False, sys_chamber
 
-            # Б) СНАЧАЛА СЧИТАЕМ РАВНОВЕСИЕ (чтобы получить реальные ионы)
+            reagents_list = [
+                Reagent(f, parse_formula(f), m, "aq")
+                for f, m in current_moles.items() if m > 1e-9
+            ]
+
+            ctx = RuleContext(T=T, aqueous=True, reagents=reagents_list, volume_L=volume_L,
+                            voltage_V=abs(side_potential))
+            rules = evaluate(ctx, set())
+            resolver = EnergyResolver.from_request(self.db, {}, [
+                {"formula": f, "moles": m, "phase": "aq"} for f, m in current_moles.items()
+            ], "auto")
+            all_species = resolver.apply(self.db.species, True)
+
+            formulas_key = frozenset(current_moles.keys())
+            if formulas_key not in system_cache:
+                system_cache[formulas_key] = build_system(
+                    all_species, reagents_list, T=T, P_bar=1.0, aqueous=True,
+                    water_kg=volume_L, rules=rules
+                )
+            sys_chamber = system_cache[formulas_key]
+
+            if not sys_chamber.species:
+                return None, False, None, None, {}
+
             g0_init = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
             charges_init = np.array([s.charge for s in sys_chamber.species])
+
             n_eq_init, _, ok_init = solve_kkt(
-                sys_chamber.A, sys_chamber.b, g0_init, charges_init, 
-                phi=0.0, T=T, kinds=sys_chamber.kinds, 
-                charge_col=sys_chamber.charge_col, gamma_fn=None, max_iter=200
+                sys_chamber.A, sys_chamber.b, g0_init, charges_init,
+                phi=0.0, T=T, kinds=sys_chamber.kinds,
+                charge_col=sys_chamber.charge_col, gamma_fn=None, max_iter=50
             )
-            
             if n_eq_init is None:
-                return None, False, sys_chamber
+                return None, False, None, None, {}
 
-            # Теперь concentrations - это реальные ионы (Cu+2, Cl-, H+ и т.д.)
-            concentrations = {s.formula: float(n_eq_init[i]) / volume_L for i, s in enumerate(sys_chamber.species)}
-            
-            # В) ВЫБИРАЕМ РЕАКЦИЮ (Нернст + Батлер-Фольмер)
-            dominant = select_dominant_reaction(self.db, U=abs(side_potential), concentrations=concentrations, T=T, side=side_name)
-            
+            concentrations = {s.formula: float(n_eq_init[i]) / volume_L
+                            for i, s in enumerate(sys_chamber.species) if float(n_eq_init[i]) > 1e-9}
+
+            dominant = select_dominant_reaction(
+                self.db, U=abs(side_potential), concentrations=concentrations, T=T, side=side_name
+            )
             if dominant is None:
-                warnings.append(f"{side_name}: доминирующая реакция не найдена (напряжения недостаточно).")
-                return n_eq_init, ok_init, sys_chamber
+                return n_eq_init, ok_init, sys_chamber, None, concentrations
 
-            # Г) ФИКС: Принудительно добавляем продукты, даже если правила их запрещали
+            # Добавляем продукты, если их нет в системе
             for p_formula in [dominant["ox"], dominant["red"]]:
                 p_key = parse_formula(p_formula).key
                 rules.forbid_new.discard(p_key)
-                
                 if p_formula not in [s.formula for s in sys_chamber.species]:
                     sp_db = self.db.find_formula(p_formula)
                     phase = sp_db[0].phase if sp_db else ("g" if p_formula in ("H2", "O2", "Cl2") else "aq")
                     reagents_list.append(Reagent(p_formula, parse_formula(p_formula), 0.0, phase))
 
-            # Пересобираем систему с продуктами
-            sys_chamber = build_system(all_species, reagents_list, T=T, P_bar=1.0, aqueous=True, water_kg=water_kg, rules=rules)
+            # Добавляем OH⁻/H⁺/H2O для реакций разложения воды
+            if side_name == "cathode" and dominant["red"] == "H2":
+                for extra in ["OH-", "H2O"]:
+                    if extra not in [s.formula for s in sys_chamber.species]:
+                        sp_db = self.db.find_formula(extra)
+                        phase = sp_db[0].phase if sp_db else ("l" if extra == "H2O" else "aq")
+                        reagents_list.append(Reagent(extra, parse_formula(extra), 0.0, phase))
+            if side_name == "anode" and dominant["ox"] == "O2":
+                for extra in ["H+", "H2O"]:
+                    if extra not in [s.formula for s in sys_chamber.species]:
+                        sp_db = self.db.find_formula(extra)
+                        phase = sp_db[0].phase if sp_db else ("l" if extra == "H2O" else "aq")
+                        reagents_list.append(Reagent(extra, parse_formula(extra), 0.0, phase))
 
-            # Д) Считаем равновесие с новыми продуктами
+            # Пересобираем систему, если добавили новые виды
+            new_formulas_key = frozenset(r.formula for r in reagents_list)
+            if new_formulas_key not in system_cache:
+                system_cache[new_formulas_key] = build_system(
+                    all_species, reagents_list, T=T, P_bar=1.0, aqueous=True,
+                    water_kg=volume_L, rules=rules
+                )
+            sys_chamber = system_cache[new_formulas_key]
+
             g0 = np.array([dGf_T(s, T)[0] / (R * T) for s in sys_chamber.species])
             charges = np.array([s.charge for s in sys_chamber.species])
-            n_eq, lam, ok = solve_kkt(sys_chamber.A, sys_chamber.b, g0, charges, phi=0.0, T=T, kinds=sys_chamber.kinds, charge_col=sys_chamber.charge_col, gamma_fn=None, max_iter=200)
-            
+            n_eq, lam, ok = solve_kkt(
+                sys_chamber.A, sys_chamber.b, g0, charges,
+                phi=0.0, T=T, kinds=sys_chamber.kinds,
+                charge_col=sys_chamber.charge_col, gamma_fn=None, max_iter=50
+            )
             if n_eq is None:
-                return None, False, sys_chamber
+                return None, False, sys_chamber, dominant, concentrations
 
-            # Е) ПРИМЕНЯЕМ ЗАКОН ФАРАДЕЯ
+            # Применяем закон Фарадея на шаг dt
             n_final = n_eq.copy()
-            
             ox_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == dominant["ox"]), None)
             red_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == dominant["red"]), None)
-            h2o_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == "H2O" and s.phase == "l"), None)
-            oh_idx = next((i for i, s in enumerate(sys_chamber.species) if s.formula == "OH-" and s.phase == "aq"), None)
-            
+            h2o_idx = next((i for i, s in enumerate(sys_chamber.species)
+                            if s.formula == "H2O" and s.phase == "l"), None)
+            oh_idx = next((i for i, s in enumerate(sys_chamber.species)
+                        if s.formula == "OH-" and s.phase == "aq"), None)
+            h_idx = next((i for i, s in enumerate(sys_chamber.species)
+                        if s.formula == "H+" and s.phase == "aq"), None)
+
             n_e = dominant["n"]
-            xi = max_electrons / n_e
+            xi = max_electrons_per_step / n_e
 
             if side_name == "anode" and red_idx is not None:
-                max_xi = float(n_eq[red_idx]) / 1.0
+                max_xi = float(n_eq[red_idx])
                 xi = min(xi, max_xi)
                 n_final[red_idx] = max(0, n_final[red_idx] - xi)
                 if ox_idx is not None:
                     n_final[ox_idx] += xi
-                    
+                if dominant["ox"] == "O2":
+                    if h_idx is not None:
+                        n_final[h_idx] += 4 * xi
+                    if h2o_idx is not None:
+                        n_final[h2o_idx] -= 2 * xi
+
             elif side_name == "cathode":
                 if dominant["red"] == "H2":
                     if h2o_idx is not None:
@@ -339,94 +394,146 @@ class Agent:
                     if h2o_idx is not None:
                         n_final[h2o_idx] -= 2 * xi
                 elif ox_idx is not None:
-                    max_xi = float(n_eq[ox_idx]) / 1.0
+                    max_xi = float(n_eq[ox_idx])
                     xi = min(xi, max_xi)
                     n_final[ox_idx] = max(0, n_final[ox_idx] - xi)
                     if red_idx is not None:
                         n_final[red_idx] += xi
 
             sys_chamber.initial = n_eq
-            return n_final, True, sys_chamber
+            return n_final, True, sys_chamber, dominant, concentrations
 
-            # Анод (-U), Катод (+U)
-        n_anode, ok_anode, sys_anode = solve_chamber("anode", -U)
-        n_cathode, ok_cathode, sys_cathode = solve_chamber("cathode", U)
+        t = 0.0
+        step = 0
+        total_electrons = 0.0
+        last_dominant_an = None
+        last_dominant_cat = None
+        dt_adaptive = dt
 
-        # === Мембранный транспорт ===
-        if ok_anode and ok_cathode and n_anode is not None and n_cathode is not None:
-            from .electrochem.membrane import Membrane, update_chambers
-            
-            # Получаем концентрации (моль/м³)
-            volume_anode = cell["anode"]["solution"].get("volume_L", 1.0) * 1e-3  # м³
-            volume_cathode = cell["cathode"]["solution"].get("volume_L", 1.0) * 1e-3  # м³
-            
-            anode_conc = {}
-            cathode_conc = {}
-            charges = {}
-            
-            for i, s in enumerate(sys_anode.species):
-                if s.phase == "aq" and n_anode[i] > 1e-6:
-                    anode_conc[s.formula] = n_anode[i] / volume_anode * 1000  # моль/м³
-                    charges[s.formula] = s.charge
-            
-            for i, s in enumerate(sys_cathode.species):
-                if s.phase == "aq" and n_cathode[i] > 1e-6:
-                    cathode_conc[s.formula] = n_cathode[i] / volume_cathode * 1000  # моль/м³
-                    charges[s.formula] = s.charge
-            
-            # Параметры мембраны
-            membrane = Membrane(
-                type=cell.get("membrane", {}).get("type", "cation_exchange"),
-                area_m2=cell.get("membrane", {}).get("area_m2", 0.01),
-                thickness_m=cell.get("membrane", {}).get("thickness_m", 1e-4),
-                permselectivity=cell.get("membrane", {}).get("permselectivity", 0.95),
+        while t < duration_s:
+            current_dt = min(dt_adaptive, duration_s - t)
+
+            if mode == "galvanostatic":
+                I = current_density * area
+                max_electrons_per_step = (I * current_dt) / F_CONST
+            else:
+                I = 100 * area
+                max_electrons_per_step = (I * current_dt) / F_CONST
+
+            n_anode, ok_anode, sys_anode, dom_an, conc_an = solve_chamber(
+                "anode", -U, moles_anode, vol_anode)
+            n_cathode, ok_cathode, sys_cathode, dom_cat, conc_cat = solve_chamber(
+                "cathode", U, moles_cathode, vol_cathode)
+
+            if not ok_anode or not ok_cathode:
+                warnings.append(f"Равновесие не достигнуто на шаге t={t:.1f} с. Остановка.")
+                break
+
+            if dom_an is not None:
+                last_dominant_an = dom_an
+            if dom_cat is not None:
+                last_dominant_cat = dom_cat
+
+            if n_anode is not None and sys_anode is not None:
+                for i, s in enumerate(sys_anode.species):
+                    if s.formula in moles_anode or float(n_anode[i]) > 1e-9:
+                        moles_anode[s.formula] = max(0.0, float(n_anode[i]))
+
+            if n_cathode is not None and sys_cathode is not None:
+                for i, s in enumerate(sys_cathode.species):
+                    if s.formula in moles_cathode or float(n_cathode[i]) > 1e-9:
+                        moles_cathode[s.formula] = max(0.0, float(n_cathode[i]))
+
+            total_electrons += max_electrons_per_step
+
+            # Мембранный транспорт
+            conc_an_m3 = {f: (m / vol_anode) * 1000 for f, m in moles_anode.items() if m > 1e-9}
+            conc_cat_m3 = {f: (m / vol_cathode) * 1000 for f, m in moles_cathode.items() if m > 1e-9}
+
+            charges_dict = {}
+            for f in set(conc_an_m3.keys()) | set(conc_cat_m3.keys()):
+                try:
+                    comp = parse_formula(f)
+                    charges_dict[f] = comp.charge
+                except Exception:
+                    charges_dict[f] = 0
+
+            delta_phi = -U - U
+
+            new_conc_an_m3, new_conc_cat_m3, ion_transfers = update_chambers(
+                conc_an_m3, conc_cat_m3, charges_dict, delta_phi, T, membrane, current_dt,
+                vol_anode * 1e-3, vol_cathode * 1e-3
             )
-            
-            # Разность потенциалов (анод - катод)
-            delta_phi = -U - U  # анод при -U, катод при +U
-            
-            # Обновляем концентрации
-            new_anode_conc, new_cathode_conc, ion_transfers = update_chambers(
-                anode_conc, cathode_conc, charges, delta_phi, T, membrane, duration_s,
-                volume_anode, volume_cathode
-            )
-            
-            # Пересчитываем моли
-            for i, s in enumerate(sys_anode.species):
-                if s.formula in new_anode_conc:
-                    n_anode[i] = new_anode_conc[s.formula] * volume_anode / 1000
-            
-            for i, s in enumerate(sys_cathode.species):
-                if s.formula in new_cathode_conc:
-                    n_cathode[i] = new_cathode_conc[s.formula] * volume_cathode / 1000
-            
-            # Добавляем информацию о переносе ионов
-            if ion_transfers:
-                warnings.append(
-                    f"Мембранный транспорт: перенесено ионов: " +
-                    ", ".join(f"{ion}: {n:.4g} моль" for ion, n in ion_transfers.items() if abs(n) > 1e-6)
-                )
 
-        def summarize(n_arr, sys_obj, ok):
-            if not ok or n_arr is None:
-                return {"converged": False, "species": []}
+            for f in list(moles_anode.keys()):
+                moles_anode[f] = max(0.0, new_conc_an_m3.get(f, 0.0) * vol_anode / 1000)
+            for f in list(moles_cathode.keys()):
+                moles_cathode[f] = max(0.0, new_conc_cat_m3.get(f, 0.0) * vol_cathode / 1000)
+
+            # Адаптивный шаг
+            if step > 1 and len(history) >= 2:
+                prev = history[-2]
+                curr = history[-1]
+                delta_an = sum(abs(curr["anode_moles"].get(f, 0) - prev["anode_moles"].get(f, 0))
+                            for f in set(list(curr["anode_moles"].keys()) + list(prev["anode_moles"].keys())))
+                delta_cat = sum(abs(curr["cathode_moles"].get(f, 0) - prev["cathode_moles"].get(f, 0))
+                                for f in set(list(curr["cathode_moles"].keys()) + list(prev["cathode_moles"].keys())))
+                total_moles = sum(moles_anode.values()) + sum(moles_cathode.values())
+                if total_moles > 1e-9:
+                    rel_change = (delta_an + delta_cat) / total_moles
+                    if rel_change < 1e-3:
+                        dt_adaptive = min(dt_adaptive * 1.5, duration_s / 10.0)
+                    elif rel_change > 0.01:
+                        dt_adaptive = max(dt_adaptive * 0.7, 1.0)
+
+            step += 1
+            if step % history_stride == 0 or t + current_dt >= duration_s:
+                history.append({
+                    "t_s": round(t + current_dt, 1),
+                    "I_A": round(I, 4),
+                    "anode_dominant": (last_dominant_an["ox"] + "->" + last_dominant_an["red"])
+                                    if last_dominant_an else "none",
+                    "cathode_dominant": (last_dominant_cat["ox"] + "->" + last_dominant_cat["red"])
+                                        if last_dominant_cat else "none",
+                    "anode_moles": {f: round(m, 6) for f, m in moles_anode.items() if m > 1e-6},
+                    "cathode_moles": {f: round(m, 6) for f, m in moles_cathode.items() if m > 1e-6},
+                    "transferred_ions": {f: round(n, 6) for f, n in ion_transfers.items() if abs(n) > 1e-6}
+                })
+
+            t += current_dt
+
+        def summarize(moles_dict):
             out = []
-            for i, s in enumerate(sys_obj.species):
-                if n_arr[i] > 1e-4:
+            for f, m in moles_dict.items():
+                if m > 1e-6:
+                    try:
+                        comp = parse_formula(f)
+                        mm = comp.molar_mass()
+                    except Exception:
+                        mm = 0.0
+                    sp_db = self.db.find_formula(f)
+                    phase = sp_db[0].phase if sp_db else "aq"
                     out.append({
-                        "formula": s.formula,
-                        "phase": s.phase,
-                        "moles": float(n_arr[i]),
+                        "formula": f,
+                        "phase": phase,
+                        "moles": float(m),
+                        "mass_g": float(m * mm)
                     })
             out.sort(key=lambda x: -x["moles"])
             return {"converged": True, "species": out}
 
         return {
-            "status": "ok" if (ok_anode and ok_cathode) else "error",
-            "mode": "cell",
+            "status": "ok",
+            "mode": "cell_dynamic",
             "cell_result": {
-                "anode": summarize(n_anode, sys_anode, ok_anode),
-                "cathode": summarize(n_cathode, sys_cathode, ok_cathode),
+                "anode": summarize(moles_anode),
+                "cathode": summarize(moles_cathode),
+            },
+            "dynamics": {
+                "total_duration_s": duration_s,
+                "total_electrons_mol": round(total_electrons, 4),
+                "time_steps": len(history),
+                "profile": history
             },
             "warnings": warnings,
         }
